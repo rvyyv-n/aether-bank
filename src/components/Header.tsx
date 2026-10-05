@@ -190,7 +190,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Export JSON */}
         <button
-          className="icon-button cursor-pointer"
+          className="icon-button cursor-pointer hide-phone"
           onClick={onExportJson}
           aria-label="Export vault JSON"
           title="Export vault JSON"
@@ -200,7 +200,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Reset Data */}
         <button
-          className="icon-button cursor-pointer"
+          className="icon-button cursor-pointer hide-phone"
           onClick={onResetData}
           aria-label="Reset default vault data"
           title="Reset default vault data"
@@ -211,10 +211,10 @@ export const Header: React.FC<HeaderProps> = ({
         {/* New Project CTA */}
         <button
           onClick={onOpenNewModal}
-          className="btn-accent cursor-pointer ml-1"
+          className="btn-accent cursor-pointer ml-1 max-md:h-9 max-md:w-9 max-md:justify-center max-md:!p-0"
         >
           <Plus className="h-3.5 w-3.5" />
-          <span>New Idea</span>
+          <span className="max-md:hidden">New Idea</span>
         </button>
 
         {/* Mobile Filter Toggle */}

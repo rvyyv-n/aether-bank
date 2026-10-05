@@ -7,6 +7,7 @@ import { KanbanBoard } from './components/KanbanBoard';
 import { TableView } from './components/TableView';
 import { RoadmapView } from './components/RoadmapView';
 import { AnalyticsView } from './components/AnalyticsView';
+import { MobileNav } from './components/MobileNav';
 import { UsageView } from './components/UsageView';
 import { ProjectDrawer } from './components/ProjectDrawer';
 import { NewProjectModal } from './components/NewProjectModal';
@@ -324,8 +325,12 @@ export function App() {
           isOpenMobile={isMobileSidebarOpen}
           onCloseMobile={() => setIsMobileSidebarOpen(false)}
           onResetFilters={handleResetFilters}
+          onExportJson={handleExportJson}
+          onResetData={handleResetData}
         />
       </div>
+
+      <MobileNav activeSection={activeSection} setActiveSection={setActiveSection} />
 
       {/* Slide-over Project Drawer */}
       <ProjectDrawer

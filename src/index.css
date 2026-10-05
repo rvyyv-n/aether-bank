@@ -460,25 +460,116 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   background: var(--fg-3);
 }
 
-/* Responsive adjustments */
-@media (max-width: 900px) {
-  .app-header {
-    padding: 0 16px;
-    gap: 16px;
+
+/* Phone layout */
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .app {
+    grid-template-rows: auto minmax(0, 1fr);
   }
-  .section-tabs {
-    padding-right: 12px;
-    gap: 10px;
+  .app-header {
+    height: auto;
+    flex-wrap: wrap;
+    gap: 0 8px;
+    padding: 0 14px;
+    padding-top: env(safe-area-inset-top);
+  }
+  .brand {
+    order: 1;
+    height: 48px;
+  }
+  .header-actions {
+    order: 2;
+    gap: 6px;
+    height: 48px;
+  }
+  .icon-button {
+    width: 40px;
+    height: 40px;
+  }
+  .section-tabs,
+  .hide-phone {
+    display: none !important;
+  }
+  .view-tabs {
+    order: 3;
+    flex-basis: 100%;
+    height: 40px;
+    margin: 0 -14px;
+    padding: 0 14px;
+    border-top: 1px solid var(--line);
+    gap: 18px;
+  }
+  .body-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .main-content {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+    -webkit-overflow-scrolling: touch;
   }
   .sidebar {
     display: none;
     position: fixed;
     inset: 0;
-    z-index: 50;
+    z-index: 60;
     width: 100%;
-    padding: 20px 16px;
+    border-left: 0;
+    padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
   }
   .sidebar.open {
     display: flex;
+  }
+  .filter-pill {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .project-row {
+    min-height: 40px;
+  }
+  .mobile-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: var(--bg);
+    border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .mobile-nav button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 56px;
+    font-size: 10.5px;
+    color: var(--fg-3);
+  }
+  .mobile-nav button.active {
+    color: var(--fg);
+  }
+  .mobile-nav button.active svg {
+    color: var(--accent);
+  }
+  /* 16px inputs stop iOS Safari zooming on focus */
+  input,
+  select,
+  textarea,
+  .search input {
+    font-size: 16px !important;
+  }
+  .kanban-scroll {
+    scrollbar-width: none;
+    scroll-padding-left: 16px;
+  }
+  .kanban-scroll::-webkit-scrollbar {
+    display: none;
   }
 }

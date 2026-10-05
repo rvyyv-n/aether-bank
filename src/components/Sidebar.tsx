@@ -19,6 +19,8 @@ interface SidebarProps {
   isOpenMobile: boolean;
   onCloseMobile: () => void;
   onResetFilters: () => void;
+  onExportJson: () => void;
+  onResetData: () => void;
 }
 
 const STATUSES: { id: ProjectStatus; label: string; color: string }[] = [
@@ -49,6 +51,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpenMobile,
   onCloseMobile,
   onResetFilters,
+  onExportJson,
+  onResetData,
 }) => {
   const categories = Array.from(new Set(projects.map((p) => p.category)));
   const hasActiveFilters =
@@ -280,6 +284,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
             );
           })}
         </div>
+      </div>
+
+      {/* Data actions (phones only; on larger screens they live in the header) */}
+      <div className="md:hidden flex gap-2 pt-2 border-t border-[var(--line)]">
+        <button
+          onClick={onExportJson}
+          className="flex-1 py-2.5 rounded-md border border-[var(--line)] text-xs text-[var(--fg-2)] text-center"
+        >
+          Export JSON
+        </button>
+        <button
+          onClick={onResetData}
+          className="flex-1 py-2.5 rounded-md border border-[var(--line)] text-xs text-[var(--fg-2)] text-center"
+        >
+          Reset data
+        </button>
       </div>
     </aside>
   );

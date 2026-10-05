@@ -97,14 +97,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5 w-full">
+    <div className="kanban-scroll flex md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5 md:w-full overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none -mx-4 px-4 md:mx-0 md:px-0 pb-2">
       {COLUMNS.map((col) => {
         const columnProjects = projects.filter((p) => p.status === col.id);
 
         return (
           <div
             key={col.id}
-            className="flex flex-col rounded-lg bg-[var(--surface)] border border-[var(--line)] p-3 min-h-[600px]"
+            className={`flex flex-col rounded-lg bg-[var(--surface)] border border-[var(--line)] p-3 ${columnProjects.length === 0 ? 'max-md:hidden' : ''} min-h-[60dvh] md:min-h-[600px] w-[84%] shrink-0 snap-center md:w-auto md:shrink`}
           >
             {/* Column header */}
             <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[var(--line)]">

@@ -88,7 +88,58 @@ export const TableView: React.FC<TableViewProps> = ({
   };
 
   return (
-    <div className="w-full overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--surface)]">
+    <>
+    <div className="md:hidden space-y-2.5">
+      {projects.length === 0 && (
+        <div className="py-12 text-center text-xs text-[var(--fg-3)] font-mono">
+          No projects matching active filters.
+        </div>
+      )}
+      {projects.map((project) => {
+        const completed = project.milestones.filter((m) => m.completed).length;
+        const total = project.milestones.length;
+        const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+        return (
+          <div
+            key={project.id}
+            onClick={() => onSelectProject(project)}
+            className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-3.5 active:bg-[var(--hover)]"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-medium text-sm text-[var(--fg)] truncate">{project.title}</span>
+              {getPriorityBadge(project.priority)}
+            </div>
+            <div className="text-xs text-[var(--fg-2)] mt-1 line-clamp-2">{project.subtitle}</div>
+            <div className="flex items-center gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
+              <span
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ backgroundColor: getStatusColor(project.status) }}
+              />
+              <select
+                value={project.status}
+                onChange={(e) => onUpdateStatus(project.id, e.target.value as ProjectStatus)}
+                className="bg-[var(--bg)] border border-[var(--line)] rounded px-2 py-1.5 text-xs text-[var(--fg)] focus:outline-none focus:border-[var(--accent)]"
+              >
+                <option value="backlog">Backlog</option>
+                <option value="planned">Planned</option>
+                <option value="spike">Exploring</option>
+                <option value="in_progress">In Progress</option>
+                <option value="polishing">Polishing</option>
+                <option value="shipped">Shipped</option>
+              </select>
+              <span className="ml-auto text-[11px] font-mono text-[var(--fg-3)]">{completed}/{total} &middot; {pct}%</span>
+            </div>
+            <div className="slop-progress-track mt-2">
+              <div
+                className="slop-progress-fill"
+                style={{ width: `${pct}%`, backgroundColor: pct === 100 ? '#a855f7' : 'var(--accent)' }}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+    <div className="hidden md:block w-full overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--surface)]">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
@@ -254,5 +305,6 @@ export const TableView: React.FC<TableViewProps> = ({
         </table>
       </div>
     </div>
+    </>
   );
 };

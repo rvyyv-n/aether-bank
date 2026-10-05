@@ -44,7 +44,7 @@ const PHASES = [
 
 export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProject }) => {
   return (
-    <div className="space-y-4 max-w-7xl mx-auto p-4 sm:p-6">
+    <div className="space-y-4 max-w-7xl mx-auto sm:p-6">
       {/* Top Banner */}
       <div className="slop-card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>

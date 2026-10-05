@@ -56,7 +56,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6">
       {/* Metric Cards (Slopalytics minimalist cards) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="slop-card p-4">
@@ -110,7 +110,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
       </div>
 
       {/* Main Chart Section */}
-      <div className="slop-card p-6">
+      <div className="slop-card p-4 sm:p-6">
         {/* Chart Header & View Switcher */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-[var(--line)] gap-3">
           <div>
