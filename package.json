@@ -7,9 +7,13 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "serve": "node server.cjs",
+    "host": "npm run build && node scripts/host.cjs start",
+    "host:stop": "node scripts/host.cjs stop",
+    "host:status": "node scripts/host.cjs status",
     "lint": "oxlint",
     "preview": "vite preview",
     "check": "npm run lint && npm run build",
+    "test:e2e": "npm run build && node scripts/e2e.cjs",
     "capture": "node capture.cjs"
   },
   "dependencies": {

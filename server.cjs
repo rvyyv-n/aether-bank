@@ -4,7 +4,7 @@ const path = require('path');
 
 const { collect } = require('./scripts/usage-collector.cjs');
 
-const PORT = 3333;
+const PORT = Number(process.env.PORT) || 3333;
 
 // Live token usage from local harness logs, cached briefly so refreshes stay cheap.
 let usageCache = null;

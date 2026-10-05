@@ -239,14 +239,21 @@ npm run dev
 
 Open the address Vite prints (default `http://localhost:3333`).
 
-| Command            | What it does                                                 |
-| ------------------ | ------------------------------------------------------------ |
-| `npm run dev`      | Start the Vite dev server with hot module reloading          |
-| `npm run build`    | Typecheck and build the production bundle to `dist/`         |
-| `npm run check`    | Lint, typecheck and build (what CI runs)                     |
-| `npm run preview`  | Preview the production build locally with Vite               |
-| `npm run serve`    | Serve `dist/` and live usage on port 3333, reachable on your LAN |
-| `node capture.cjs` | Retake high-resolution screenshots via headless Chrome       |
+| Command               | What it does                                                 |
+| --------------------- | ------------------------------------------------------------ |
+| `npm run dev`         | Start the Vite dev server with hot module reloading          |
+| `npm run build`       | Typecheck and build the production bundle to `dist/`         |
+| `npm run check`       | Lint, typecheck and build (what CI runs)                     |
+| `npm run test:e2e`    | Build, start the server on a free port, check every section on desktop and phone in headless Chrome, then stop |
+| `npm run preview`     | Preview the production build locally with Vite               |
+| `npm run serve`       | Serve `dist/` and live usage on port 3333, reachable on your LAN |
+| `npm run host`        | Build and run the same server in the background; prints local and LAN URLs and returns |
+| `npm run host:stop`   | Stop the background server (`host:status` shows if it's up) |
+| `node capture.cjs`    | Retake high-resolution screenshots via headless Chrome       |
+
+`host` and `test:e2e` take a `PORT` environment variable (`host` defaults
+to 3333). The background server logs to `banker-host-<port>.log` in the
+system temp folder.
 
 ### Keyboard shortcuts
 
