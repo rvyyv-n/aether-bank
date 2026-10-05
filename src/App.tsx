@@ -8,9 +8,20 @@ import { RoadmapView } from './components/RoadmapView';
 import { ProjectDrawer } from './components/ProjectDrawer';
 import { NewProjectModal } from './components/NewProjectModal';
 
-const STORAGE_KEY = 'aether_project_bank_v1';
+const STORAGE_KEY = 'banker_vault_v1';
+const THEME_KEY = 'banker_theme_v1';
 
 export function App() {
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    try {
+      const stored = localStorage.getItem(THEME_KEY);
+      if (stored === 'light' || stored === 'dark') return stored;
+    } catch (e) {
+      console.error(e);
+    }
+    return 'dark'; // OLED dark default
+  });
+
   const [projects, setProjects] = useState<ProjectIdea[]>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -29,7 +40,21 @@ export function App() {
   const [selectedProject, setSelectedProject] = useState<ProjectIdea | null>(null);
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
 
-  // Sync to localStorage
+  // Sync theme class to document
+  useEffect(() => {
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [theme]);
+
+  // Sync projects to localStorage
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
@@ -41,7 +66,6 @@ export function App() {
   // Global hotkeys
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if active in input/textarea
       const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
       if (tag === 'input' || tag === 'textarea' || tag === 'select') {
         if (e.key === 'Escape') {
@@ -60,6 +84,9 @@ export function App() {
       } else if (e.key === 'n' || e.key === 'N') {
         e.preventDefault();
         setIsNewModalOpen(true);
+      } else if (e.key === 't' || e.key === 'T') {
+        e.preventDefault();
+        setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
       } else if (e.key === '1') {
         setViewMode('board');
       } else if (e.key === '2') {
@@ -123,7 +150,7 @@ export function App() {
   };
 
   const handleResetData = () => {
-    if (confirm('Reset idea bank back to default initial context? Any custom edits will be reverted.')) {
+    if (confirm('Reset idea bank back to default initial context?')) {
       setProjects(INITIAL_PROJECTS);
       localStorage.removeItem(STORAGE_KEY);
     }
@@ -133,22 +160,15 @@ export function App() {
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(projects, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `aether-project-bank-${new Date().toISOString().slice(0, 10)}.json`);
+    downloadAnchor.setAttribute('download', `banker-vault-${new Date().toISOString().slice(0, 10)}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
   };
 
   return (
-    <div className="min-h-screen bg-[#090a0f] text-slate-100 flex flex-col relative selection:bg-cyan-500/30 selection:text-cyan-200">
-      {/* Background ambient lighting */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-[300px] left-1/4 w-[700px] h-[500px] bg-gradient-to-br from-indigo-900/25 to-cyan-900/10 rounded-full blur-[140px]" />
-        <div className="absolute top-[40%] -right-[200px] w-[600px] h-[600px] bg-gradient-to-tl from-purple-900/20 to-transparent rounded-full blur-[150px]" />
-        <div className="absolute inset-0 grain-overlay opacity-30" />
-      </div>
-
-      {/* Main Header */}
+    <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] flex flex-col">
+      {/* Header */}
       <Header
         projects={projects}
         viewMode={viewMode}
@@ -157,13 +177,15 @@ export function App() {
         setSearchQuery={setSearchQuery}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
+        theme={theme}
+        setTheme={setTheme}
         onOpenNewModal={() => setIsNewModalOpen(true)}
         onResetData={handleResetData}
         onExportJson={handleExportJson}
       />
 
       {/* Main View Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 z-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
         {viewMode === 'board' && (
           <KanbanBoard
             projects={filteredProjects}
@@ -188,18 +210,18 @@ export function App() {
         )}
       </main>
 
-      {/* Footer Hotkeys Bar */}
-      <footer className="w-full border-t border-white/[0.06] bg-zinc-950/80 py-2.5 px-4 text-center z-10">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between text-[11px] text-zinc-500 font-mono gap-2">
-          <div className="flex items-center gap-3">
+      {/* Minimal Footer */}
+      <footer className="w-full border-t border-[var(--border-main)] bg-[var(--bg-surface)] py-2 px-4 text-center">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between text-[11px] text-[var(--text-secondary)] font-mono gap-2">
+          <div className="flex items-center gap-2">
             <span>Shortcuts:</span>
-            <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">N</kbd> New Idea</span>
-            <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">/</kbd> Search</span>
-            <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">1</kbd><kbd className="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 ml-1">2</kbd><kbd className="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 ml-1">3</kbd> Switch Views</span>
-            <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">ESC</kbd> Close</span>
+            <span><kbd className="px-1 py-0.5 rounded bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-primary)]">N</kbd> New</span>
+            <span><kbd className="px-1 py-0.5 rounded bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-primary)]">T</kbd> Theme</span>
+            <span><kbd className="px-1 py-0.5 rounded bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-primary)]">/</kbd> Search</span>
+            <span><kbd className="px-1 py-0.5 rounded bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-primary)]">1</kbd><kbd className="px-1 py-0.5 rounded bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-primary)] ml-0.5">2</kbd><kbd className="px-1 py-0.5 rounded bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-primary)] ml-0.5">3</kbd> Views</span>
           </div>
           <div>
-            <span>Local CRM Host: http://localhost:3333 · Storage: Persistent</span>
+            <span>Banker · Local & Offline Capable</span>
           </div>
         </div>
       </footer>

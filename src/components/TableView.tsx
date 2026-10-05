@@ -7,8 +7,6 @@ import type {
 import { 
   ChevronRight, 
   FolderGit2, 
-  Flame, 
-  AlertTriangle,
   ExternalLink
 } from 'lucide-react';
 
@@ -27,69 +25,69 @@ export const TableView: React.FC<TableViewProps> = ({
     switch (priority) {
       case 'P0':
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-1 w-fit">
-            <Flame className="h-3 w-3" /> P0 Urgent
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+            P0
           </span>
         );
       case 'P1':
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center gap-1 w-fit">
-            <AlertTriangle className="h-3 w-3" /> P1 High
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+            P1
           </span>
         );
       case 'P2':
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30 w-fit">
-            P2 Medium
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium text-[var(--text-secondary)] border border-[var(--border-main)]">
+            P2
           </span>
         );
       case 'P3':
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-400 border border-zinc-700 w-fit">
-            P3 Low
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium text-[var(--text-muted)] border border-[var(--border-main)]">
+            P3
           </span>
         );
     }
   };
 
-  const getStatusColor = (status: ProjectStatus) => {
+  const getStatusBadge = (status: ProjectStatus) => {
     switch (status) {
       case 'in_progress':
-        return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
+        return 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
       case 'spike':
-        return 'text-amber-400 bg-amber-500/10 border-amber-500/30';
+        return 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20';
       case 'planned':
-        return 'text-blue-400 bg-blue-500/10 border-blue-500/30';
+        return 'text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-500/20';
       case 'polishing':
-        return 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30';
+        return 'text-sky-600 dark:text-sky-400 bg-sky-500/10 border-sky-500/20';
       case 'shipped':
-        return 'text-purple-400 bg-purple-500/10 border-purple-500/30';
+        return 'text-purple-600 dark:text-purple-400 bg-purple-500/10 border-purple-500/20';
       default:
-        return 'text-zinc-400 bg-zinc-800 border-zinc-700';
+        return 'text-[var(--text-secondary)] bg-[var(--bg-page)] border-[var(--border-main)]';
     }
   };
 
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-white/[0.08] bg-zinc-950/60 shadow-xl">
+    <div className="w-full overflow-hidden rounded-xl border border-[var(--border-main)] bg-[var(--bg-surface)]">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="border-b border-white/[0.08] bg-zinc-900/60 text-zinc-400 font-mono uppercase tracking-wider text-[11px]">
-              <th className="py-3 px-4">Priority</th>
-              <th className="py-3 px-4">Project</th>
-              <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4">Category</th>
-              <th className="py-3 px-4">Tech Stack</th>
-              <th className="py-3 px-4">Milestones</th>
-              <th className="py-3 px-4">Location / Upstream</th>
-              <th className="py-3 px-4 text-right">Details</th>
+            <tr className="border-b border-[var(--border-main)] bg-[var(--bg-page)] text-[var(--text-secondary)] font-mono uppercase tracking-wider text-[11px]">
+              <th className="py-2.5 px-4 font-medium">Priority</th>
+              <th className="py-2.5 px-4 font-medium">Project</th>
+              <th className="py-2.5 px-4 font-medium">Status</th>
+              <th className="py-2.5 px-4 font-medium">Category</th>
+              <th className="py-2.5 px-4 font-medium">Tech Stack</th>
+              <th className="py-2.5 px-4 font-medium">Tasks</th>
+              <th className="py-2.5 px-4 font-medium">Location</th>
+              <th className="py-2.5 px-4 text-right font-medium"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/[0.04]">
+          <tbody className="divide-y divide-[var(--border-main)]">
             {projects.length === 0 ? (
               <tr>
-                <td colSpan={8} className="py-12 text-center text-zinc-500 italic">
-                  No projects match your filter query.
+                <td colSpan={8} className="py-10 text-center text-[var(--text-muted)] italic">
+                  No projects match your filter.
                 </td>
               </tr>
             ) : (
@@ -102,37 +100,37 @@ export const TableView: React.FC<TableViewProps> = ({
                   <tr
                     key={project.id}
                     onClick={() => onSelectProject(project)}
-                    className="hover:bg-white/[0.03] transition-colors cursor-pointer group"
+                    className="hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer group"
                   >
                     {/* Priority */}
-                    <td className="py-3.5 px-4 whitespace-nowrap">
+                    <td className="py-3 px-4 whitespace-nowrap">
                       {getPriorityBadge(project.priority)}
                     </td>
 
                     {/* Title & subtitle */}
-                    <td className="py-3.5 px-4">
+                    <td className="py-3 px-4">
                       <div className="flex flex-col">
-                        <span className="font-semibold text-white group-hover:text-cyan-400 transition-colors text-sm">
+                        <span className="font-semibold text-[var(--text-primary)] group-hover:underline text-xs">
                           {project.title}
                         </span>
-                        <span className="text-zinc-400 text-xs line-clamp-1 max-w-sm mt-0.5">
+                        <span className="text-[var(--text-secondary)] text-[11px] line-clamp-1 max-w-sm mt-0.5">
                           {project.subtitle}
                         </span>
                       </div>
                     </td>
 
-                    {/* Status Dropdown */}
-                    <td className="py-3.5 px-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                    {/* Status Select */}
+                    <td className="py-3 px-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                       <select
                         value={project.status}
                         onChange={(e) => onUpdateStatus(project.id, e.target.value as ProjectStatus)}
-                        className={`text-xs font-medium py-1 px-2.5 rounded-md border focus:outline-none focus:ring-1 focus:ring-cyan-500/50 cursor-pointer ${getStatusColor(
+                        className={`text-[11px] font-mono py-0.5 px-2 rounded border focus:outline-none cursor-pointer bg-[var(--bg-surface)] ${getStatusBadge(
                           project.status
                         )}`}
                       >
                         <option value="backlog">Backlog</option>
                         <option value="planned">Planned</option>
-                        <option value="spike">Spike / R&D</option>
+                        <option value="spike">Spike</option>
                         <option value="in_progress">In Progress</option>
                         <option value="polishing">Polishing</option>
                         <option value="shipped">Shipped</option>
@@ -140,19 +138,19 @@ export const TableView: React.FC<TableViewProps> = ({
                     </td>
 
                     {/* Category */}
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <span className="text-zinc-300 font-mono text-[11px] bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      <span className="text-[var(--text-secondary)] font-mono text-[10px] bg-[var(--bg-page)] px-2 py-0.5 rounded border border-[var(--border-main)]">
                         {project.category}
                       </span>
                     </td>
 
                     {/* Tech stack */}
-                    <td className="py-3.5 px-4">
+                    <td className="py-3 px-4">
                       <div className="flex flex-wrap gap-1 max-w-xs">
                         {project.techStack.map((tech) => (
                           <span
                             key={tech}
-                            className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-900 text-zinc-300 border border-zinc-800/80"
+                            className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-[var(--bg-page)] text-[var(--text-secondary)] border border-[var(--border-main)]"
                           >
                             {tech}
                           </span>
@@ -161,26 +159,26 @@ export const TableView: React.FC<TableViewProps> = ({
                     </td>
 
                     {/* Progress */}
-                    <td className="py-3.5 px-4 whitespace-nowrap min-w-[130px]">
+                    <td className="py-3 px-4 whitespace-nowrap min-w-[120px]">
                       <div className="flex items-center gap-2">
-                        <div className="w-16 bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                        <div className="w-14 bg-[var(--bg-page)] h-1 rounded-full overflow-hidden border border-[var(--border-main)]">
                           <div
-                            className="h-full bg-cyan-500 rounded-full"
+                            className="h-full bg-[var(--text-primary)] rounded-full"
                             style={{ width: `${progressPct}%` }}
                           />
                         </div>
-                        <span className="font-mono text-[11px] text-zinc-400">
+                        <span className="font-mono text-[10px] text-[var(--text-secondary)]">
                           {completedMilestones}/{totalMilestones}
                         </span>
                       </div>
                     </td>
 
                     {/* Location / Repo */}
-                    <td className="py-3.5 px-4 whitespace-nowrap">
+                    <td className="py-3 px-4 whitespace-nowrap">
                       {project.path ? (
-                        <div className="flex items-center gap-1.5 font-mono text-cyan-400/90 text-xs">
-                          <FolderGit2 className="h-3.5 w-3.5 text-cyan-400" />
-                          <span className="truncate max-w-[140px]" title={project.path}>{project.path.split('\\').pop()}</span>
+                        <div className="flex items-center gap-1.5 font-mono text-[var(--text-secondary)] text-[11px]">
+                          <FolderGit2 className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate max-w-[130px]" title={project.path}>{project.path.split('\\').pop()}</span>
                         </div>
                       ) : project.upstreamRefs && project.upstreamRefs.length > 0 ? (
                         <a
@@ -188,23 +186,23 @@ export const TableView: React.FC<TableViewProps> = ({
                           target="_blank"
                           rel="noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1 text-zinc-400 hover:text-white transition"
+                          className="flex items-center gap-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
                         >
                           <ExternalLink className="h-3 w-3" />
-                          <span className="truncate max-w-[120px]">{project.upstreamRefs[0].name}</span>
+                          <span className="truncate max-w-[110px]">{project.upstreamRefs[0].name}</span>
                         </a>
                       ) : (
-                        <span className="text-zinc-600 italic">Unassigned</span>
+                        <span className="text-[var(--text-muted)] italic font-mono text-[11px]">—</span>
                       )}
                     </td>
 
-                    {/* Action */}
-                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                    {/* Arrow */}
+                    <td className="py-3 px-4 text-right whitespace-nowrap">
                       <button
                         onClick={() => onSelectProject(project)}
-                        className="p-1 rounded hover:bg-zinc-800 text-zinc-400 group-hover:text-cyan-400 transition"
+                        className="p-1 rounded text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition"
                       >
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="h-3.5 w-3.5" />
                       </button>
                     </td>
                   </tr>

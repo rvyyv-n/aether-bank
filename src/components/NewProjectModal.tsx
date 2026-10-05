@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { ProjectIdea, ProjectStatus, PriorityLevel } from '../types';
-import { X, Plus, Sparkles } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
+import { BankerLogo } from './BankerLogo';
 
 interface NewProjectModalProps {
   isOpen: boolean;
@@ -17,7 +18,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
 
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
-  const [category, setCategory] = useState('Utility');
+  const [category, setCategory] = useState('System');
   const [status, setStatus] = useState<ProjectStatus>('backlog');
   const [priority, setPriority] = useState<PriorityLevel>('P2');
   const [techStackInput, setTechStackInput] = useState('');
@@ -47,13 +48,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
     const newProject: ProjectIdea = {
       id,
       title: title.trim(),
-      subtitle: subtitle.trim() || 'Custom Idea',
+      subtitle: subtitle.trim() || 'Custom Project Idea',
       category: category.trim() || 'General',
       status,
       priority,
-      techStack: techStack.length > 0 ? techStack : ['Rust', 'Tauri'],
-      description: description.trim() || 'Newly logged project idea.',
-      milestones: milestones.length > 0 ? milestones : [{ id: 'm1', text: 'Initial scoping and technical spec', completed: false }],
+      techStack: techStack.length > 0 ? techStack : ['Rust', 'Tauri v2'],
+      description: description.trim() || 'Logged project concept.',
+      milestones: milestones.length > 0 ? milestones : [{ id: 'm1', text: 'Initial technical specification', completed: false }],
       path: path.trim() || undefined,
       updatedAt: new Date().toISOString(),
     };
@@ -63,70 +64,72 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div 
-        className="w-full max-w-lg bg-[#0d0f18] border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-6 py-4 border-b border-white/[0.08] flex items-center justify-between bg-zinc-950/60">
+        <div className="px-5 py-3.5 border-b border-[var(--border-main)] flex items-center justify-between bg-[var(--bg-page)]">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-cyan-400" />
-            <h3 className="text-sm font-semibold text-white m-0">Add New Idea / Project</h3>
+            <div className="h-6 w-6 rounded bg-[var(--text-primary)] text-[var(--bg-surface)] flex items-center justify-center">
+              <BankerLogo size={14} />
+            </div>
+            <h3 className="text-xs font-semibold text-[var(--text-primary)] m-0">New Project / Idea</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition"
+            className="p-1 rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
+        <form onSubmit={handleSubmit} className="p-5 space-y-3.5 text-xs">
           <div>
-            <label className="block text-zinc-400 font-mono text-[11px] uppercase mb-1">Project Title *</label>
+            <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Title *</label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Zen Quick Launcher"
-              className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-cyan-500/70"
+              className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
             />
           </div>
 
           <div>
-            <label className="block text-zinc-400 font-mono text-[11px] uppercase mb-1">Subtitle / Elevator Pitch</label>
+            <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Subtitle</label>
             <input
               type="text"
               value={subtitle}
               onChange={(e) => setSubtitle(e.target.value)}
-              placeholder="e.g. Raycast-style keyboard runner in Rust"
-              className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-cyan-500/70"
+              placeholder="e.g. Minimal keyboard runner in Rust"
+              className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-2.5">
             <div>
-              <label className="block text-zinc-400 font-mono text-[11px] uppercase mb-1">Category</label>
+              <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Category</label>
               <input
                 type="text"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                placeholder="e.g. System, Hardware"
-                className="w-full bg-zinc-950 border border-white/10 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-cyan-500/70"
+                placeholder="System"
+                className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-2 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
               />
             </div>
 
             <div>
-              <label className="block text-zinc-400 font-mono text-[11px] uppercase mb-1">Status</label>
+              <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Status</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as ProjectStatus)}
-                className="w-full bg-zinc-950 border border-white/10 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-cyan-500/70"
+                className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-2 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
               >
                 <option value="backlog">Backlog</option>
                 <option value="planned">Planned</option>
-                <option value="spike">Spike / R&D</option>
+                <option value="spike">Spike</option>
                 <option value="in_progress">In Progress</option>
                 <option value="polishing">Polishing</option>
                 <option value="shipped">Shipped</option>
@@ -134,78 +137,78 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-zinc-400 font-mono text-[11px] uppercase mb-1">Priority</label>
+              <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Priority</label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as PriorityLevel)}
-                className="w-full bg-zinc-950 border border-white/10 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-cyan-500/70"
+                className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-2 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
               >
-                <option value="P0">P0 (Urgent)</option>
-                <option value="P1">P1 (High)</option>
-                <option value="P2">P2 (Medium)</option>
-                <option value="P3">P3 (Low)</option>
+                <option value="P0">P0</option>
+                <option value="P1">P1</option>
+                <option value="P2">P2</option>
+                <option value="P3">P3</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label className="block text-zinc-400 font-mono text-[11px] uppercase mb-1">Tech Stack (comma separated)</label>
+            <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Tech Stack (comma separated)</label>
             <input
               type="text"
               value={techStackInput}
               onChange={(e) => setTechStackInput(e.target.value)}
-              placeholder="e.g. Rust, Tauri v2, SQLite, Tailwind"
-              className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-cyan-500/70"
+              placeholder="Rust, Tauri v2, Tailwind"
+              className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
             />
           </div>
 
           <div>
-            <label className="block text-zinc-400 font-mono text-[11px] uppercase mb-1">Description / Goals</label>
+            <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Description</label>
             <textarea
-              rows={3}
+              rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Core philosophy, architecture thoughts, key dependencies..."
-              className="w-full bg-zinc-950 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-cyan-500/70"
+              placeholder="What does it do? Key technical decisions..."
+              className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg p-2.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
             />
           </div>
 
           <div>
-            <label className="block text-zinc-400 font-mono text-[11px] uppercase mb-1">Milestones (1 per line)</label>
+            <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Milestones (1 per line)</label>
             <textarea
-              rows={3}
+              rows={2}
               value={milestonesInput}
               onChange={(e) => setMilestonesInput(e.target.value)}
-              placeholder="Initial spike prototype&#10;Wire up core Rust bindings&#10;Design Mica UI shell"
-              className="w-full bg-zinc-950 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-cyan-500/70 font-mono"
+              placeholder="Scaffold repository&#10;Implement core logic"
+              className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg p-2.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)] font-mono text-[11px]"
             />
           </div>
 
           <div>
-            <label className="block text-zinc-400 font-mono text-[11px] uppercase mb-1">Workspace Path (Optional)</label>
+            <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Path (Optional)</label>
             <input
               type="text"
               value={path}
               onChange={(e) => setPath(e.target.value)}
-              placeholder="e.g. D:\Code\Repos\zen-launcher"
-              className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-cyan-500/70 font-mono"
+              placeholder="D:\Code\Repos\zen-launcher"
+              className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-2.5 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)] font-mono"
             />
           </div>
 
-          <div className="pt-3 border-t border-white/[0.08] flex items-center justify-end gap-2">
+          <div className="pt-2 border-t border-[var(--border-main)] flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 transition"
+              className="px-3 py-1.5 rounded-lg border border-[var(--border-main)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black font-semibold transition flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg bg-[var(--text-primary)] text-[var(--bg-surface)] font-medium hover:opacity-90 transition flex items-center gap-1.5"
             >
-              <Plus className="h-4 w-4" />
-              <span>Add to Project Bank</span>
+              <Plus className="h-3.5 w-3.5" />
+              <span>Create</span>
             </button>
           </div>
         </form>

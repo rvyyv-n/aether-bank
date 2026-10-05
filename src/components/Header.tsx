@@ -7,10 +7,12 @@ import {
   Compass, 
   RotateCcw, 
   Download, 
-  Sparkles,
+  Sun,
+  Moon,
   Layers
 } from 'lucide-react';
 import type { ProjectIdea, ProjectStatus } from '../types';
+import { BankerLogo } from './BankerLogo';
 
 interface HeaderProps {
   projects: ProjectIdea[];
@@ -20,6 +22,8 @@ interface HeaderProps {
   setSearchQuery: (query: string) => void;
   selectedCategory: string;
   setSelectedCategory: (cat: string) => void;
+  theme: 'dark' | 'light';
+  setTheme: (theme: 'dark' | 'light') => void;
   onOpenNewModal: () => void;
   onResetData: () => void;
   onExportJson: () => void;
@@ -33,6 +37,8 @@ export const Header: React.FC<HeaderProps> = ({
   setSearchQuery,
   selectedCategory,
   setSelectedCategory,
+  theme,
+  setTheme,
   onOpenNewModal,
   onResetData,
   onExportJson,
@@ -43,107 +49,116 @@ export const Header: React.FC<HeaderProps> = ({
     projects.filter(p => p.status === status).length;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-white/[0.08] mica-surface">
-      {/* Top row */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+    <header className="sticky top-0 z-40 w-full border-b border-[var(--border-main)] bg-[var(--bg-surface)] backdrop-blur-md">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        {/* Top bar */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           {/* Logo & title */}
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-500 p-[1px] shadow-lg shadow-indigo-500/20">
-              <div className="h-full w-full bg-[#0d0f17] rounded-[11px] flex items-center justify-center">
-                <Sparkles className="h-4 w-4 text-cyan-400" />
-              </div>
+            <div className="h-8 w-8 rounded-lg bg-[var(--text-primary)] text-[var(--bg-surface)] flex items-center justify-center flex-shrink-0 transition-transform hover:scale-105">
+              <BankerLogo size={18} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-semibold tracking-tight text-white m-0">Aether Bank</h1>
-                <span className="px-2 py-0.5 text-[11px] font-medium tracking-wide uppercase bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded-full">
-                  v1.0 · T3 CRM
+                <h1 className="text-base font-semibold tracking-tight text-[var(--text-primary)] m-0">Banker</h1>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--border-subtle)] text-[var(--text-secondary)] border border-[var(--border-main)]">
+                  v1.2
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 m-0">Autonomous Project & Idea Bank · Fluent / Mica Ecosystem</p>
+              <p className="text-xs text-[var(--text-secondary)] m-0">Project & Idea Vault</p>
             </div>
           </div>
 
-          {/* Quick Metrics */}
-          <div className="flex items-center gap-2 text-xs overflow-x-auto pb-1 md:pb-0">
-            <div className="px-2.5 py-1 rounded-md bg-zinc-900/80 border border-zinc-800 text-zinc-300 flex items-center gap-1.5 whitespace-nowrap">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="font-semibold text-white">{countByStatus('in_progress')}</span> In Progress
+          {/* Quick Metrics (Clean dots, no rainbow glow) */}
+          <div className="flex items-center gap-1.5 text-xs overflow-x-auto pb-1 md:pb-0">
+            <div className="px-2.5 py-1 rounded-md bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-secondary)] flex items-center gap-2 whitespace-nowrap">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+              <span className="font-medium text-[var(--text-primary)]">{countByStatus('in_progress')}</span> In Progress
             </div>
-            <div className="px-2.5 py-1 rounded-md bg-zinc-900/80 border border-zinc-800 text-zinc-300 flex items-center gap-1.5 whitespace-nowrap">
-              <span className="h-2 w-2 rounded-full bg-amber-400"></span>
-              <span className="font-semibold text-white">{countByStatus('spike')}</span> R&D / Spike
+            <div className="px-2.5 py-1 rounded-md bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-secondary)] flex items-center gap-2 whitespace-nowrap">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+              <span className="font-medium text-[var(--text-primary)]">{countByStatus('spike')}</span> Spike
             </div>
-            <div className="px-2.5 py-1 rounded-md bg-zinc-900/80 border border-zinc-800 text-zinc-300 flex items-center gap-1.5 whitespace-nowrap">
-              <span className="h-2 w-2 rounded-full bg-blue-400"></span>
-              <span className="font-semibold text-white">{countByStatus('planned')}</span> Planned
+            <div className="px-2.5 py-1 rounded-md bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-secondary)] flex items-center gap-2 whitespace-nowrap">
+              <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+              <span className="font-medium text-[var(--text-primary)]">{countByStatus('planned')}</span> Planned
             </div>
-            <div className="px-2.5 py-1 rounded-md bg-zinc-900/80 border border-zinc-800 text-zinc-300 flex items-center gap-1.5 whitespace-nowrap">
-              <span className="h-2 w-2 rounded-full bg-zinc-500"></span>
-              <span className="font-semibold text-white">{countByStatus('backlog')}</span> Backlog
+            <div className="px-2.5 py-1 rounded-md bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-secondary)] flex items-center gap-2 whitespace-nowrap">
+              <span className="h-1.5 w-1.5 rounded-full bg-zinc-400"></span>
+              <span className="font-medium text-[var(--text-primary)]">{countByStatus('backlog')}</span> Backlog
             </div>
           </div>
 
           {/* Action buttons */}
           <div className="flex items-center gap-2">
+            {/* Dark / Light Toggle */}
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to OLED Dark'}
+              className="p-1.5 rounded-lg border border-[var(--border-main)] bg-[var(--bg-page)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-primary)] transition"
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+
             <button
               onClick={onExportJson}
               title="Export as JSON"
-              className="px-2.5 py-1.5 rounded-lg bg-zinc-900/80 hover:bg-zinc-800 border border-white/10 text-zinc-300 hover:text-white text-xs font-medium transition flex items-center gap-1.5"
+              className="px-2.5 py-1.5 rounded-lg border border-[var(--border-main)] bg-[var(--bg-page)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-primary)] text-xs font-medium transition flex items-center gap-1.5"
             >
-              <Download className="h-3.5 w-3.5" />
+              <Download className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
               <span className="hidden sm:inline">Export</span>
             </button>
+
             <button
               onClick={onResetData}
-              title="Reset to default context"
-              className="p-1.5 rounded-lg bg-zinc-900/80 hover:bg-zinc-800 border border-white/10 text-zinc-400 hover:text-zinc-200 transition"
+              title="Reset default ideas"
+              className="p-1.5 rounded-lg border border-[var(--border-main)] bg-[var(--bg-page)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
             >
               <RotateCcw className="h-3.5 w-3.5" />
             </button>
+
             <button
               onClick={onOpenNewModal}
-              className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-medium transition shadow-md shadow-cyan-500/20 flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg bg-[var(--text-primary)] text-[var(--bg-surface)] hover:opacity-90 text-xs font-medium transition flex items-center gap-1.5 shadow-sm"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span>New Idea / Project</span>
+              <span>New Idea</span>
             </button>
           </div>
         </div>
 
-        {/* Bottom controls row */}
-        <div className="mt-3 pt-3 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Controls row */}
+        <div className="mt-3 pt-2.5 border-t border-[var(--border-main)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           {/* View Mode Toggle */}
-          <div className="flex items-center bg-zinc-950/80 p-0.5 rounded-lg border border-white/10 w-fit">
+          <div className="flex items-center bg-[var(--bg-page)] p-0.5 rounded-lg border border-[var(--border-main)] w-fit">
             <button
               onClick={() => setViewMode('board')}
               className={`px-3 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition ${
                 viewMode === 'board'
-                  ? 'bg-zinc-800 text-white shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <LayoutGrid className="h-3.5 w-3.5" />
-              <span>Kanban Board</span>
+              <span>Board</span>
             </button>
             <button
               onClick={() => setViewMode('table')}
               className={`px-3 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition ${
                 viewMode === 'table'
-                  ? 'bg-zinc-800 text-white shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <Table2 className="h-3.5 w-3.5" />
-              <span>CRM Table</span>
+              <span>Table</span>
             </button>
             <button
               onClick={() => setViewMode('roadmap')}
               className={`px-3 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition ${
                 viewMode === 'roadmap'
-                  ? 'bg-zinc-800 text-white shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <Compass className="h-3.5 w-3.5" />
@@ -153,23 +168,23 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Search & Category Filter */}
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="relative flex-1 sm:w-64">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
+            <div className="relative flex-1 sm:w-60">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)]" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search ideas, tech, status... (/)"
-                className="w-full bg-zinc-950/70 border border-white/10 rounded-lg pl-8 pr-3 py-1 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/40 transition"
+                placeholder="Filter ideas... (/)"
+                className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg pl-8 pr-3 py-1 text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--text-primary)] transition"
               />
             </div>
 
             <div className="flex items-center gap-1">
-              <Layers className="h-3.5 w-3.5 text-zinc-500" />
+              <Layers className="h-3.5 w-3.5 text-[var(--text-muted)]" />
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="bg-zinc-950/70 border border-white/10 rounded-lg px-2 py-1 text-xs text-zinc-300 focus:outline-none focus:border-cyan-500/60"
+                className="bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-2 py-1 text-xs text-[var(--text-secondary)] focus:outline-none focus:border-[var(--text-primary)]"
               >
                 <option value="all">All Categories</option>
                 {categories.map((c) => (
