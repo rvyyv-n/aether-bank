@@ -2,177 +2,177 @@ import type { ProjectIdea } from '../types';
 
 export const INITIAL_PROJECTS: ProjectIdea[] = [
   {
-    id: 'aether',
-    title: 'Aether',
-    subtitle: 'Minimal, Reversible Windows 11 Debloater & Optimizer',
-    category: 'System Utility',
+    id: 'hyperlight',
+    title: 'Hyperlight',
+    subtitle: 'Minimal System Optimizer & Shell',
+    category: 'System',
     status: 'in_progress',
     priority: 'P0',
-    techStack: ['Rust', 'Tauri v2', 'WebView2', 'Windows DWM', 'Win32 API'],
-    description: 'High-performance, beautifully styled Windows debloating tool with native Mica blur, zero PowerShell dependencies, declarative reversible tweaks, and an Advanced mode.',
-    problemStatement: 'Existing debloaters (Winutil, Win11Debloat) are heavy, script-laden, fragile, and often leave behind un-trackable changes without clear rollbacks or safety diffs.',
-    architectureNotes: 'Rust core handles direct registry, service, Appx package, and scheduled task manipulation. Dry-run mode tests against mocked registry states to prevent unintended system modifications. Tauri v2 shell provides a native Windows 11 Mica backdrop.',
-    path: 'D:\\Code\\Repos\\aether',
-    threadId: 'mcp:1f049654-d9d9-4a57-a44b-68b22e9ca5a9:fork',
+    techStack: ['Rust', 'Tauri v2', 'Win32 API', 'Mica DWM'],
+    description: 'Lightweight desktop utility with native window blur, declarative reversible configuration, and a modular dry-run execution engine.',
+    problemStatement: 'Existing system utilities are often heavy, script-laden, and make irreversible changes without structured safety diffs.',
+    architectureNotes: 'Direct API interaction without shell spawning. Dry-run mode evaluates changes in memory before execution. Custom translucent surface styling.',
+    path: 'repos/hyperlight',
     license: 'MIT',
     milestones: [
-      { id: 'm1', text: 'Initialize repository & register in T3 Code', completed: true },
-      { id: 'm2', text: 'Fork dedicated autonomous build thread in T3 Code', completed: true },
-      { id: 'm3', text: 'Establish declarative tweak schema (JSON/TOML with apply/undo steps)', completed: false },
-      { id: 'm4', text: 'Implement Rust dry-run engine and mocked registry layer', completed: false },
-      { id: 'm5', text: 'Scaffold Tauri v2 shell with Fluent Mica backdrop & film grain', completed: false },
-      { id: 'm6', text: 'Curate 15-25 safe v1 tweaks across Telemetry, Services, and Bloatware', completed: false },
-      { id: 'm7', text: 'Build interactive before/after diff viewer & system restore trigger', completed: false },
-      { id: 'm8', text: 'Build Advanced Section: custom TOML tweak loader & Group Policy editor', completed: false },
-      { id: 'm9', text: 'Windows Update drift detection and automatic re-audit', completed: false }
+      { id: 'm1', text: 'Initialize repository and architecture spec', completed: true },
+      { id: 'm2', text: 'Declarative configuration schema with rollback support', completed: true },
+      { id: 'm3', text: 'Implement dry-run verification engine', completed: true },
+      { id: 'm4', text: 'Native translucent shell with minimal chrome', completed: false },
+      { id: 'm5', text: 'Curate initial profile presets and safety boundaries', completed: false },
+      { id: 'm6', text: 'Interactive before/after diff inspector', completed: false }
     ],
     upstreamRefs: [
-      { name: 'Winutil by Chris Titus', url: 'https://github.com/ChrisTitusTech/winutil' },
-      { name: 'Win11Debloat', url: 'https://github.com/Raphire/Win11Debloat' },
-      { name: 'O&O ShutUp10++', url: 'https://www.oo-software.com/en/shutup10' },
-      { name: 'Sophia Script for Windows', url: 'https://github.com/farag2/Sophia-Script-for-Windows' }
+      { name: 'Tauri v2 Documentation', url: 'https://v2.tauri.app/' },
+      { name: 'Windows DWM Guidelines', url: 'https://learn.microsoft.com/en-us/windows/win32/dwm/' }
     ],
     commands: [
-      { label: 'Navigate to Repo', cmd: 'cd D:\\Code\\Repos\\aether' },
-      { label: 'Check Git Status', cmd: 'git -C "D:\\Code\\Repos\\aether" status' },
-      { label: 'Run Tauri Dev', cmd: 'cargo tauri dev' }
+      { label: 'Check status', cmd: 'git status -s' },
+      { label: 'Run dev', cmd: 'cargo tauri dev' },
+      { label: 'Run tests', cmd: 'cargo test' }
     ],
-    notes: 'Currently undergoing initial planning & autonomous build preparation in T3 Code forked thread. Ensure safe dry-run mocking is enforced before executing live registry tweaks.',
-    updatedAt: '2026-10-05T09:40:00Z'
+    notes: 'Prioritize reversible operations and clean error boundaries before expanding the preset catalog.',
+    updatedAt: '2026-10-05T10:00:00Z'
   },
   {
-    id: 'peripheral-tool',
-    title: 'OpenMouse Companion',
-    subtitle: 'Native Windows Peripheral & Mouse Configurator',
-    category: 'Hardware & Input',
+    id: 'kite',
+    title: 'Kite',
+    subtitle: 'Low-Latency Peripheral Companion',
+    category: 'Hardware',
     status: 'planned',
     priority: 'P1',
-    techStack: ['Tauri v2', 'WebHID', 'TypeScript', 'Rust hidapi', 'Lucide'],
-    description: 'Minimalist desktop utility replacing bloated manufacturer suites (Logitech G Hub, Razer Synapse) with a sleek Fluent/Mica card carousel and zero background bloat.',
-    problemStatement: 'Proprietary mouse drivers consume hundreds of megabytes of RAM, inject background telemetry services, and offer clunky, slow UIs.',
-    architectureNotes: 'Runs purely in user space over WebHID API or Rust `hidapi`. Eliminates kernel-level drivers to prevent anti-cheat triggers and driver signing hassles. Employs Logitech HID++ 2.0 protocol for onboard memory profiles, DPI, and battery queries.',
-    license: 'AGPL-3.0 (derived from OpenMouse protocol base)',
+    techStack: ['WebHID', 'TypeScript', 'Rust', 'Tailwind'],
+    description: 'Hardware configuration companion replacing vendor bloatware with a clean card interface and user-space communication.',
+    problemStatement: 'Proprietary peripheral software consumes hundreds of megabytes of background memory and installs unwanted background services.',
+    architectureNotes: 'Communicates entirely through standard user-space USB/Bluetooth HID protocols without kernel drivers or anti-cheat conflicts.',
+    path: 'repos/kite',
+    license: 'MIT',
     milestones: [
-      { id: 'p1', text: 'Verify WebHID API availability and permissions inside Tauri v2 WebView2', completed: false },
-      { id: 'p2', text: 'Extract and modularize OpenMouse TypeScript protocol and device registry', completed: false },
-      { id: 'p3', text: 'Implement Logitech Lightspeed receiver & mouse telemetry (DPI, polling, battery)', completed: false },
-      { id: 'p4', text: 'Build OpenMouse-inspired horizontal carousel UI with card-peeking', completed: false },
-      { id: 'p5', text: 'Integrate Wooting Analog SDK for keyboard configuration', completed: false }
+      { id: 'p1', text: 'Verify WebHID API availability in native shell', completed: false },
+      { id: 'p2', text: 'Extract and modularize protocol definitions', completed: false },
+      { id: 'p3', text: 'DPI, polling rate, and battery telemetry support', completed: false },
+      { id: 'p4', text: 'Card carousel interface with active device focus', completed: false }
     ],
     upstreamRefs: [
-      { name: 'OpenMouse GitHub Repo', url: 'https://github.com/OpenMouse-Project/openmouse' },
-      { name: 'Solaar (Logitech HID++ reference)', url: 'https://github.com/pwr-Solaar/Solaar' },
-      { name: 'libratbag', url: 'https://github.com/libratbag/libratbag' },
-      { name: 'Wooting Analog SDK', url: 'https://github.com/WootingKb/wooting-analog-sdk' }
+      { name: 'W3C WebHID API', url: 'https://wicg.github.io/webhid/' },
+      { name: 'libratbag Reference', url: 'https://github.com/libratbag/libratbag' }
     ],
     commands: [
-      { label: 'Inspect OpenMouse Repo', cmd: 'git clone https://github.com/OpenMouse-Project/openmouse.git' }
+      { label: 'Run dev', cmd: 'npm run dev' }
     ],
-    notes: 'UI follows OpenMouse announcement mockup: dark translucent card carousel, prominent product render, green status dot, VID:PID capability tags, and film grain scrim.',
-    updatedAt: '2026-10-04T20:26:00Z'
+    notes: 'Focus on clean device disconnect/reconnect handling and persistent device profiles.',
+    updatedAt: '2026-10-04T20:00:00Z'
   },
   {
-    id: 'minimal-browser',
-    title: 'Aether Browser',
-    subtitle: 'Pure Performance, Zero-Bloat Windows 11 Web Browser',
-    category: 'Web Browser',
+    id: 'prism',
+    title: 'Prism',
+    subtitle: 'Minimal Multi-Engine Web Browser',
+    category: 'Browser',
     status: 'spike',
     priority: 'P2',
-    techStack: ['Tauri v2', 'wry / WebView2', 'adblock-rust', 'CEF (Evaluated)'],
-    description: 'Ultra-fast, minimalist web browser with Zen Browser ergonomics (vertical tabs, workspaces, glance previews) backed by native Windows 11 Mica aesthetics and built-in adblocking.',
-    problemStatement: 'Mainstream browsers are bloated with AI sidebars, shopping integrations, and tracking telemetry. Building Chromium from source costs 100GB+ and hours per build, making solo maintenance prohibitive.',
-    architectureNotes: 'Recommended architecture: Tauri v2 shell orchestrating multiple WebView2 instances (one per tab or workspace), or prebuilt CEF binaries. Custom request interception integrates Brave\'s `adblock-rust` for sub-millisecond network filtering. Per-workspace isolated user-data folders give container tabs for $0 compute cost.',
-    license: 'GPL-3.0 or MIT',
+    techStack: ['wry', 'WebView2', 'adblock-rust', 'CEF'],
+    description: 'Ultra-fast web browser focusing on vertical tab ergonomics, container workspaces, and built-in network filtering.',
+    problemStatement: 'Modern browsers have become heavy application platforms loaded with unwanted features, sidebars, and telemetry.',
+    architectureNotes: 'Lightweight shell orchestrating isolated webview contexts. Native network interception powered by compiled adblock rules.',
+    path: 'repos/prism',
+    license: 'MIT',
     milestones: [
-      { id: 'b1', text: 'Weekend spike: Multi-webview window prototype using Tauri v2 & wry', completed: false },
-      { id: 'b2', text: 'Implement Zen-style collapsible sidebar with vertical tabs and glance preview', completed: false },
-      { id: 'b3', text: 'Embed Brave adblock-rust engine in Rust core for native request interception', completed: false },
-      { id: 'b4', text: 'Wire isolated user data directories per workspace (cookie/session containers)', completed: false },
-      { id: 'b5', text: 'Test Widevine DRM & video codec support against streaming services', completed: false }
+      { id: 'b1', text: 'Multi-webview window spike using wry', completed: false },
+      { id: 'b2', text: 'Vertical tabs and collapsible navigation rail', completed: false },
+      { id: 'b3', text: 'Request filter integration with adblock rules', completed: false },
+      { id: 'b4', text: 'Isolated container sessions per workspace', completed: false }
     ],
     upstreamRefs: [
-      { name: 'Zen Browser', url: 'https://zen-browser.app/' },
-      { name: 'Limni Browser (Tauri v2 multi-tab)', url: 'https://gitverse.ru/FerrisMind/Limni' },
-      { name: 'Brave adblock-rust', url: 'https://github.com/brave/adblock-rust' },
-      { name: 'wry Window Rendering Engine', url: 'https://github.com/tauri-apps/wry' }
+      { name: 'wry Window Rendering Engine', url: 'https://github.com/tauri-apps/wry' },
+      { name: 'Brave adblock-rust', url: 'https://github.com/brave/adblock-rust' }
     ],
     commands: [
-      { label: 'Check wry repository', cmd: 'git clone https://github.com/tauri-apps/wry.git' }
+      { label: 'Run spike', cmd: 'cargo run' }
     ],
-    notes: 'Prioritize Option 1 (Tauri + WebView2) for $0 maintenance overhead. Keep Zen rebase as fallback if deep extension APIs are required.',
-    updatedAt: '2026-10-04T20:37:00Z'
+    notes: 'Evaluate webview resource footprint when multiple tab processes are open simultaneously.',
+    updatedAt: '2026-10-04T18:00:00Z'
   },
   {
-    id: 'fluent-ui-kit',
-    title: 'Fluent & Mica Shared UI Kit',
-    subtitle: 'Design System & Component Library for Windows Native Web Apps',
-    category: 'Design System',
+    id: 'vesper',
+    title: 'Vesper UI',
+    subtitle: 'Design System & Component Primitives',
+    category: 'Design',
     status: 'in_progress',
     priority: 'P1',
-    techStack: ['CSS Variables', 'Tailwind CSS', 'Mica / Acrylic DWM', 'Segoe UI Variable'],
-    description: 'Shared design tokens, custom window chrome, dark translucent card primitives, and film-grain overlays powering all suite applications.',
-    problemStatement: 'Building multiple desktop apps without a cohesive design language leads to styling divergence, duplicate CSS, and inconsistent window borders.',
-    architectureNotes: 'Leverages DWM system backdrop types (Mica / Acrylic) through Tauri window vibrancy. Surfaces use 16px corner radii with 1px low-contrast borders (rgba(255,255,255,0.08)) and subtle film grain overlay.',
+    techStack: ['Tailwind v4', 'CSS Tokens', 'Lucide', 'TypeScript'],
+    description: 'Shared design tokens, custom window chrome, dark translucent card primitives, and OLED styling across applications.',
+    problemStatement: 'Building separate tools without a shared design foundation leads to visual inconsistency and duplicated UI code.',
+    architectureNotes: 'Custom CSS variables for OLED dark and clean light modes with tight spatial rhythm and restrained typography.',
+    path: 'repos/vesper',
     license: 'MIT',
     milestones: [
-      { id: 'u1', text: 'Define color palette, typography (Segoe UI Variable), and elevation tokens', completed: true },
-      { id: 'u2', text: 'Implement Mica / Acrylic backdrop blur and film grain noise overlay', completed: true },
-      { id: 'u3', text: 'Build custom window titlebar with version pill and draggable regions', completed: false },
-      { id: 'u4', text: 'Package components into shared `ui/fluent` monorepo module', completed: false }
+      { id: 'u1', text: 'Define color palette, typography, and spacing tokens', completed: true },
+      { id: 'u2', text: 'OLED dark and crisp light mode variables', completed: true },
+      { id: 'u3', text: 'Custom window frame and header navigation components', completed: true },
+      { id: 'u4', text: 'Package into reusable internal library', completed: false }
     ],
     upstreamRefs: [
-      { name: 'Microsoft Fluent 2 Design System', url: 'https://fluent2.microsoft.design/' },
-      { name: 'OpenMouse UI Reference', url: 'https://x.com/openmouseapp/status/2106791463380005158' }
+      { name: 'Radix UI Primitives', url: 'https://www.radix-ui.com/' }
     ],
-    notes: 'Ensures that Aether, OpenMouse Companion, and Aether Browser look like a native first-party Windows 11 overhaul suite.',
-    updatedAt: '2026-10-04T20:19:00Z'
+    commands: [
+      { label: 'Build tokens', cmd: 'npm run build' }
+    ],
+    notes: 'Keep component APIs minimal with zero unnecessary props or runtime styling overhead.',
+    updatedAt: '2026-10-04T16:00:00Z'
   },
   {
-    id: 'showcase-website',
-    title: 'Aether Suite Showcase Website',
-    subtitle: 'Central Hub & Distribution Landing Page',
-    category: 'Web / Marketing',
+    id: 'relay',
+    title: 'Relay Hub',
+    subtitle: 'Static Distribution & Documentation',
+    category: 'Web',
     status: 'backlog',
     priority: 'P3',
-    techStack: ['Astro', 'Tailwind CSS', 'GitHub Pages / Cloudflare Pages'],
-    description: 'Minimalist, fast landing page displaying app features, screenshots, documentation, and live download links dynamically fetched from GitHub Releases.',
-    problemStatement: 'Open-source tools need a credible, cohesive web presence to build user trust without incurring hosting expenses.',
-    architectureNotes: 'Zero-cost static generation deployed on GitHub Pages or Cloudflare Pages (`pages.dev`). Uses GitHub REST API to display real-time version tags and asset download counts.',
+    techStack: ['Astro', 'TypeScript', 'GitHub Pages'],
+    description: 'Fast, clean landing page showcasing project downloads, documentation, and live release assets.',
+    problemStatement: 'Open-source projects require clear documentation and direct download entry points without complex hosting infrastructure.',
+    architectureNotes: 'Static site generation with zero runtime JavaScript required for reading. Direct download links resolved via GitHub API.',
+    path: 'repos/relay',
     license: 'MIT',
     milestones: [
-      { id: 's1', text: 'Design hero section with Mica card mockups and app interactive preview', completed: false },
-      { id: 's2', text: 'Create individual product detail pages for Debloater, Mouse Tool, and Browser', completed: false },
-      { id: 's3', text: 'Integrate GitHub Releases API for 1-click installer download buttons', completed: false },
-      { id: 's4', text: 'Deploy to Cloudflare Pages / GitHub Pages on custom domain', completed: false }
+      { id: 's1', text: 'Hero layout and interactive product cards', completed: false },
+      { id: 's2', text: 'Individual documentation and feature pages', completed: false },
+      { id: 's3', text: 'Automated release download button integration', completed: false }
     ],
     upstreamRefs: [
       { name: 'Astro Web Framework', url: 'https://astro.build/' }
     ],
-    notes: 'Keep design consistent with the desktop app: dark theme, subtle wallpaper glow, grain, and high typography polish.',
-    updatedAt: '2026-10-04T20:32:00Z'
+    commands: [
+      { label: 'Run dev', cmd: 'npm run dev' }
+    ],
+    notes: 'Ensure instant page loads and zero external font or script dependencies.',
+    updatedAt: '2026-10-04T14:00:00Z'
   },
   {
-    id: 'zero-dollar-pipeline',
-    title: 'Zero-Dollar CI/CD & Signing Pipeline',
-    subtitle: 'Automated Multi-Arch Builds, Signing, and Winget Distribution',
-    category: 'DevOps & Tooling',
+    id: 'orbit',
+    title: 'Orbit CI',
+    subtitle: 'Automated Multi-Arch Build Pipeline',
+    category: 'DevOps',
     status: 'planned',
     priority: 'P2',
-    techStack: ['GitHub Actions', 'SignPath Foundation', 'winget', 'PowerShell'],
-    description: 'End-to-end automated pipeline building release installers, signing binaries for free to bypass SmartScreen warnings, and publishing to the Windows Package Manager.',
-    problemStatement: 'Commercial code signing certificates cost hundreds of dollars per year. Unsigned Windows apps trigger severe SmartScreen warnings that scare users away.',
-    architectureNotes: 'Utilizes SignPath Foundation for free HSM-backed code signing certificates for qualifying open-source repositories. GitHub Actions handles release artifacts and publishes to winget-pkgs.',
+    techStack: ['GitHub Actions', 'SignPath', 'winget'],
+    description: 'Automated workflow producing multi-architecture binaries, open-source code signing, and package manager releases.',
+    problemStatement: 'Manual releases are error-prone and unsigned binaries trigger security warnings that degrade user trust.',
+    architectureNotes: 'GitHub Actions matrix build paired with automated manifest updates for package managers.',
+    path: 'repos/orbit',
     license: 'MIT',
     milestones: [
-      { id: 'd1', text: 'Configure GitHub Actions matrix build for Tauri v2 Windows x64 and ARM64', completed: false },
-      { id: 'd2', text: 'Submit SignPath Foundation open-source code signing application', completed: false },
-      { id: 'd3', text: 'Automate winget manifest generation and PR submission on release tags', completed: false }
+      { id: 'd1', text: 'Configure matrix build for x64 and ARM64 artifacts', completed: false },
+      { id: 'd2', text: 'Integrate open-source code signing step', completed: false },
+      { id: 'd3', text: 'Automated package manager manifest publication', completed: false }
     ],
     upstreamRefs: [
       { name: 'SignPath Foundation', url: 'https://signpath.org/' },
-      { name: 'Winget Releaser Action', url: 'https://github.com/vedantmgoyal2009/winget-releaser' }
+      { name: 'Windows Package Manager', url: 'https://github.com/microsoft/winget-pkgs' }
     ],
-    notes: 'SignPath eliminates the biggest financial barrier in native Windows development.',
-    updatedAt: '2026-10-04T20:37:00Z'
+    commands: [
+      { label: 'Check workflows', cmd: 'gh workflow list' }
+    ],
+    notes: 'Focus on reproducible builds and verifiable release checksums.',
+    updatedAt: '2026-10-04T12:00:00Z'
   }
 ];

@@ -11,34 +11,34 @@ const PHASES = [
   {
     phase: 'Phase 1 · Core',
     target: 'Sprint 1',
-    title: 'Aether Debloater & Shell',
+    title: 'System Shell & Primitives',
     icon: Zap,
-    projectIds: ['aether', 'fluent-ui-kit'],
-    description: 'Autonomous build of Aether core in Rust with mocked dry-run safety, Tauri v2 Mica translucent window shell, and reversible tweaks.'
+    projectIds: ['hyperlight', 'vesper'],
+    description: 'Native window shell with direct API interaction, declarative rollback engine, and core design tokens.'
   },
   {
     phase: 'Phase 2 · Input',
     target: 'Sprint 2',
-    title: 'Peripheral Configurator',
+    title: 'Peripheral Companion',
     icon: Cpu,
-    projectIds: ['peripheral-tool'],
-    description: 'Hardware configuration tool without kernel drivers. Adopts OpenMouse WebHID / HID++ 2.0 protocol layer for Logitech and Wooting peripherals.'
+    projectIds: ['kite'],
+    description: 'User-space hardware configuration over standard WebHID protocols without kernel drivers.'
   },
   {
     phase: 'Phase 3 · Web',
     target: 'Sprint 3',
-    title: 'Minimal Browser & Site',
+    title: 'Browser & Static Hub',
     icon: Globe,
-    projectIds: ['minimal-browser', 'showcase-website'],
-    description: 'Weekend spike of multi-webview shell in Tauri v2 + Brave adblock-rust. Companion Astro landing page showcasing the suite with live GitHub releases.'
+    projectIds: ['prism', 'relay'],
+    description: 'Lightweight webview container architecture with compiled adblock filtering and zero-runtime distribution.'
   },
   {
     phase: 'Phase 4 · Release',
     target: 'Production',
-    title: 'Zero-Dollar CI/CD & Signing',
+    title: 'Automation & Signing',
     icon: Shield,
-    projectIds: ['zero-dollar-pipeline'],
-    description: 'SignPath Foundation free open-source code signing to eliminate SmartScreen warnings, multi-architecture GitHub Actions, and winget publishing.'
+    projectIds: ['orbit'],
+    description: 'Matrix build workflows, open-source code signing to bypass security warnings, and package manager manifests.'
   }
 ];
 
@@ -48,10 +48,10 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProj
       <div className="p-3.5 rounded-xl border border-[var(--border-main)] bg-[var(--bg-surface)] flex items-center justify-between">
         <div>
           <h2 className="text-sm font-semibold text-[var(--text-primary)] m-0">Ecosystem Roadmap</h2>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5 m-0">Execution sequence across the open-source Windows suite.</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5 m-0">Sequential execution across the open-source toolchain.</p>
         </div>
         <div className="text-xs font-mono text-[var(--text-secondary)] bg-[var(--bg-page)] px-2.5 py-1 rounded border border-[var(--border-main)]">
-          Target: $0.00 Infra Cost
+          Zero-Cost Infrastructure
         </div>
       </div>
 

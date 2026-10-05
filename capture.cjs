@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const URL = 'https://rvyyv-n.github.io/aether-bank/';
+const URL = 'file:///' + path.join(__dirname, 'dist', 'index.html').replace(/\\/g, '/');
 const OUT_DIR = path.join(__dirname, 'screenshots');
 const ARTIFACT_DIR = 'C:\\Users\\rayyan\\.gemini\\antigravity-acp\\brain\\9e5afd4d-5d36-4b2d-8455-c190b3f6c150';
 
@@ -25,17 +25,22 @@ async function capture() {
     await page.goto(URL, { waitUntil: 'load' });
     await new Promise(r => setTimeout(r, 800));
 
-    // 1. OLED Dark Board
+    // Clear any previous storage in test browser to ensure fresh clean projects show
+    await page.evaluate(() => localStorage.clear());
+    await page.reload({ waitUntil: 'load' });
+    await new Promise(r => setTimeout(r, 800));
+
+    // 1. OLED Dark Board (with Hyperlight, Kite, Prism, Vesper, Relay, Orbit)
     const boardPath = path.join(OUT_DIR, 'banker-oled-dark.png');
     const boardArtifact = path.join(ARTIFACT_DIR, 'banker-oled-dark.png');
     await page.screenshot({ path: boardPath });
     fs.copyFileSync(boardPath, boardArtifact);
     console.log('Captured banker-oled-dark.png');
 
-    // 2. Open Aether Drawer in OLED Dark
-    const aetherCard = await page.$('.oled-card');
-    if (aetherCard) {
-      await aetherCard.click();
+    // 2. Open Hyperlight Drawer in OLED Dark
+    const card = await page.$('.oled-card');
+    if (card) {
+      await card.click();
       await new Promise(r => setTimeout(r, 500));
       const drawerPath = path.join(OUT_DIR, 'banker-drawer.png');
       const drawerArtifact = path.join(ARTIFACT_DIR, 'banker-drawer.png');

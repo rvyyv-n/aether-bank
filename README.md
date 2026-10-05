@@ -3,7 +3,7 @@
 Banker is a local-first project and idea vault for tracking tools, technical
 specifications, and roadmap milestones.
 
-**[Open the app](https://rvyyv-n.github.io/aether-bank/)**. There is nothing to
+**[Open the app](https://rvyyv-n.github.io/banker/)**. There is nothing to
 sign up for, no analytics, and your data never leaves your device.
 
 <p align="center">
@@ -14,6 +14,7 @@ sign up for, no analytics, and your data never leaves your device.
 
 - [What it does](#what-it-does)
 - [Views](#views)
+- [Running locally with your own projects](#running-locally-with-your-own-projects)
 - [Privacy and storage](#privacy-and-storage)
 - [How it's built](#how-its-built)
 - [Development](#development)
@@ -57,7 +58,7 @@ interactive milestone checklists, linked workspaces, terminal commands, and an
 editable scratchpad.
 
 <p align="center">
-  <img src="screenshots/banker-drawer.png" alt="Banker project detail drawer showing Aether debloater specifications" width="620" />
+  <img src="screenshots/banker-drawer.png" alt="Banker project detail drawer showing technical specifications" width="620" />
 </p>
 
 ### Table
@@ -89,6 +90,28 @@ sprints while maintaining a strict zero-dollar ($0) infrastructure footprint.
   <img src="screenshots/banker-mobile.png" alt="Banker mobile view on a phone" width="280" />
 </p>
 
+## Running locally with your own projects
+
+To run Banker on your local machine and point it to your repositories:
+
+1. **Clone and install**:
+   ```sh
+   git clone https://github.com/rvyyv-n/banker.git
+   cd banker
+   npm install
+   ```
+
+2. **Start the local server**:
+   ```sh
+   npm run dev
+   ```
+   Open `http://localhost:3333/`.
+
+3. **Managing your projects**:
+   - **Through the UI**: Use the `+` button (or press <kbd>N</kbd>) to add your own local projects with their directory paths and dev commands.
+   - **Pre-seeding via code**: Edit `src/data/initialData.ts` to define your own default catalog of repositories and initial milestones.
+   - **Backups & Sync**: Use **Export** in the header to save a `banker-vault.json` snapshot of your project state anytime.
+
 ## Privacy and storage
 
 Banker is strictly local-first. Your ideas, notes, status changes, and
@@ -109,7 +132,7 @@ src/
   types.ts                typed project schema, status enums, and milestones
   index.css               OLED dark and clean light CSS custom properties
   data/
-    initialData.ts        initial project catalog (Aether, OpenMouse, Browser)
+    initialData.ts        initial project catalog and milestone seeds
   components/
     Header.tsx            search bar, status counters, theme toggle, and actions
     BankerLogo.tsx        minimal geometric vault vector mark
