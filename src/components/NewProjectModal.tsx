@@ -98,7 +98,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Subtitle</label>
+            <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Subtitle</label>
             <input
               type="text"
               value={subtitle}
@@ -110,7 +110,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
 
           <div className="grid grid-cols-3 gap-2.5">
             <div>
-              <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Category</label>
+              <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Category</label>
               <input
                 type="text"
                 value={category}
@@ -121,7 +121,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Status</label>
+              <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Status</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as ProjectStatus)}
@@ -137,7 +137,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Priority</label>
+              <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Priority</label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as PriorityLevel)}
@@ -152,7 +152,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Tech Stack (comma separated)</label>
+            <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Tech Stack (comma separated)</label>
             <input
               type="text"
               value={techStackInput}
@@ -163,7 +163,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Description</label>
+            <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Description</label>
             <textarea
               rows={2}
               value={description}
@@ -174,7 +174,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Milestones (1 per line)</label>
+            <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Milestones (1 per line)</label>
             <textarea
               rows={2}
               value={milestonesInput}
@@ -185,7 +185,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Path (Optional)</label>
+            <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Path (Optional)</label>
             <input
               type="text"
               value={path}

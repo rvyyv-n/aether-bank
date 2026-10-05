@@ -27,11 +27,25 @@
     --code-bg: #121215;
   }
 
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-size: 100%;
+  }
+
+  /* 110% base scale on desktop screens for razor-sharp, comfortable readability */
+  @media (min-width: 768px) {
+    html {
+      font-size: 110%;
+    }
+  }
+
   body {
     background-color: var(--bg-page);
     color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Roboto, sans-serif;
-    letter-spacing: -0.01em;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    letter-spacing: normal;
     overflow-x: hidden;
     transition: background-color 0.15s ease, color 0.15s ease;
   }
@@ -39,8 +53,8 @@
 
 /* Custom minimal scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -61,7 +75,7 @@
 .oled-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-main);
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 .oled-card:hover {
