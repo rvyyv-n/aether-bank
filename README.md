@@ -1,14 +1,22 @@
+<div align="center">
+
+<a href="https://rvyyv-n.github.io/banker/">
+  <img src="icon.svg" alt="Banker icon" width="96" height="96" />
+</a>
+
 # Banker
 
-Banker is a local-first project and idea vault for tracking tools, technical
-specifications, and roadmap milestones.
+**Minimal project and idea vault.**
 
-**[Open the app](https://rvyyv-n.github.io/banker/)**. There is nothing to
-sign up for, no analytics, and your data never leaves your device.
+A local-first developer workbench for tracking software tools, technical specifications, and roadmap milestones.
 
-<p align="center">
-  <img src="screenshots/banker-oled-dark.png" alt="Banker in OLED Dark mode showing the six-stage Kanban board" width="700" />
-</p>
+[**Open the app**](https://rvyyv-n.github.io/banker/) • [GitHub](https://github.com/rvyyv-n/banker) • [License: MIT](LICENSE)
+
+</div>
+
+<a href="https://rvyyv-n.github.io/banker/">
+  <img src="screenshots/banker-oled-dark.png" alt="Banker Kanban Board in OLED Dark mode" width="100%" />
+</a>
 
 ## Contents
 
@@ -44,12 +52,23 @@ polishing, and release.
 
 ### Board
 
-The default high-level view. Six stages organize your active backlog and
-running work with task completion meters, tech stack tags, and priority badges.
+The default high-level view. Six stages organize active work across a fluid
+full-width grid with task completion meters, tech stack tags, next milestone
+previews, dev command shortcuts, and priority badges.
 
-<p align="center">
-  <img src="screenshots/banker-oled-dark.png" alt="Banker Kanban board" width="620" />
-</p>
+<a href="https://rvyyv-n.github.io/banker/">
+  <img src="screenshots/banker-oled-dark.png" alt="Banker Kanban board" width="100%" />
+</a>
+
+### Table
+
+A dense, high-efficiency developer data grid designed for quick audits. Scan
+repositories, inspect active milestones, copy terminal commands and folder paths
+in one click, and update project stages inline.
+
+<a href="https://rvyyv-n.github.io/banker/">
+  <img src="screenshots/banker-table.png" alt="Banker Table view" width="100%" />
+</a>
 
 ### Project drawer
 
@@ -57,38 +76,26 @@ Clicking any card opens a slide-over panel with the full technical specification
 interactive milestone checklists, linked workspaces, terminal commands, and an
 editable scratchpad.
 
-<p align="center">
-  <img src="screenshots/banker-drawer.png" alt="Banker project detail drawer showing technical specifications" width="620" />
-</p>
+<a href="https://rvyyv-n.github.io/banker/">
+  <img src="screenshots/banker-drawer.png" alt="Banker project detail drawer" width="100%" />
+</a>
 
-### Table
+### Light mode
 
-A compact CRM data grid designed for quick audits. Filter by category, scan
-repositories, and update project stages directly from inline dropdowns.
+Crisp, paper-like neutral styling with stark typography. Press <kbd>T</kbd>
+anywhere or tap the sun/moon icon to switch between OLED Dark and Light mode.
 
-<p align="center">
-  <img src="screenshots/banker-table.png" alt="Banker CRM table view in light mode" width="620" />
-</p>
+<a href="https://rvyyv-n.github.io/banker/">
+  <img src="screenshots/banker-light-mode.png" alt="Banker in crisp light mode" width="100%" />
+</a>
 
-### Roadmap
+### Mobile
 
-A four-phase chronological delivery plan mapping projects to execution
-sprints while maintaining a strict zero-dollar ($0) infrastructure footprint.
+Responsive mobile layout built for quick capture and status audits on the go.
 
-<p align="center">
-  <img src="screenshots/banker-light-mode.png" alt="Banker in crisp light mode" width="620" />
-</p>
-
-### OLED Dark & Light
-
-- **OLED Dark.** Pure pitch black (`#000000`) with subtle wireframe borders,
-  built for high-contrast mobile reading and OLED displays.
-- **Light mode.** Crisp, paper-like neutral styling with stark typography.
-- Press <kbd>T</kbd> anywhere or tap the sun/moon icon to switch.
-
-<p align="center">
-  <img src="screenshots/banker-mobile.png" alt="Banker mobile view on a phone" width="280" />
-</p>
+<a href="https://rvyyv-n.github.io/banker/">
+  <img src="screenshots/banker-mobile.png" alt="Banker mobile layout" width="100%" />
+</a>
 
 ## Running locally with your own projects
 
@@ -127,21 +134,23 @@ custom projects stay entirely in your browser's local storage.
 Built with React 19, TypeScript, and Vite with Tailwind CSS v4.
 
 ```
+icon.svg                  clean vector mark for repository and documentation
+icon.png                  512x512 high-resolution app icon
 src/
   App.tsx                 app shell, theme provider, and view orchestrator
   types.ts                typed project schema, status enums, and milestones
-  index.css               OLED dark and clean light CSS custom properties
+  index.css               pure OLED dark (#000000) and paper light CSS tokens
   data/
     initialData.ts        initial project catalog and milestone seeds
   components/
-    Header.tsx            search bar, status counters, theme toggle, and actions
+    Header.tsx            search bar, status filters, priority filter, and actions
     BankerLogo.tsx        minimal geometric vault vector mark
-    KanbanBoard.tsx       six-column stage board with fast transitions
-    TableView.tsx         high-density CRM data grid with inline status selection
+    KanbanBoard.tsx       six-column stage board with dev shortcuts & milestones
+    TableView.tsx         high-density CRM data grid with 1-click command & path copy
     RoadmapView.tsx       four-phase execution timeline
     ProjectDrawer.tsx     slide-over drawer with checklists and scratchpad
     NewProjectModal.tsx   fast idea capture modal
-screenshots/              retina screenshots of views and mobile layout
+screenshots/              retina edge-to-edge screenshots of views and mobile layout
 capture.cjs               automated headless Chrome screenshot capture script
 server.cjs                lightweight standalone local static HTTP server
 ```
