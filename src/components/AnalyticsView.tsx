@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import type { ProjectIdea, ProjectStatus, PriorityLevel } from '../types';
-import { 
-  TrendingUp 
-} from 'lucide-react';
+import type { ProjectIdea, PriorityLevel } from '../types';
+import { TrendingUp } from 'lucide-react';
+import { StatusDot, ProgressBar } from './ui';
+import { STATUS_ORDER, STATUS_META, DONE_COLOR } from '../data/status';
 
 interface AnalyticsViewProps {
   projects: ProjectIdea[];
@@ -37,23 +37,6 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
   });
   const sortedTech = Object.entries(techMap).sort((a, b) => b[1] - a[1]);
 
-  const getStatusColor = (status: ProjectStatus) => {
-    switch (status) {
-      case 'in_progress':
-        return '#10b981';
-      case 'spike':
-        return '#f59e0b';
-      case 'planned':
-        return '#3b82f6';
-      case 'polishing':
-        return '#0ea5e9';
-      case 'shipped':
-        return '#a855f7';
-      case 'backlog':
-      default:
-        return '#71717a';
-    }
-  };
 
   return (
     <div className="sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6">
@@ -88,7 +71,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
           <div className="text-[11px] font-mono text-[var(--fg-3)] uppercase tracking-wider">
             Shipped Products
           </div>
-          <div className="text-2xl font-semibold mt-1 tracking-tight text-purple-400">
+          <div className="text-2xl font-semibold mt-1 tracking-tight" style={{ color: DONE_COLOR }}>
             {shippedCount}
           </div>
           <div className="text-xs text-[var(--fg-2)] mt-1">
@@ -186,10 +169,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
                   >
                     <div className="min-w-[200px] flex-1">
                       <div className="flex items-center gap-2">
-                        <span
-                          className="w-2 h-2 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: getStatusColor(proj.status) }}
-                        />
+                        <StatusDot status={proj.status} />
                         <span className="font-medium text-xs text-[var(--fg)]">
                           {proj.title}
                         </span>
@@ -206,15 +186,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
                     </div>
 
                     <div className="w-full sm:w-64 flex items-center gap-3">
-                      <div className="flex-1 slop-progress-track h-2">
-                        <div
-                          className="slop-progress-fill"
-                          style={{
-                            width: `${pct}%`,
-                            backgroundColor: pct === 100 ? '#a855f7' : 'var(--accent)',
-                          }}
-                        />
-                      </div>
+                      <ProgressBar pct={pct} className="flex-1  h-2" />
                       <div className="w-16 text-right font-mono text-xs text-[var(--fg)] font-medium">
                         {pct}%
                       </div>
@@ -237,7 +209,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
                 LIFECYCLE PIPELINE BREAKDOWN
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
-                {(['backlog', 'planned', 'spike', 'in_progress', 'polishing', 'shipped'] as ProjectStatus[]).map(
+                {STATUS_ORDER.map(
                   (st) => {
                     const matched = projects.filter((p) => p.status === st);
                     return (
@@ -246,12 +218,9 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
                         className="p-3 rounded-lg border border-[var(--line)] bg-[var(--surface)] flex flex-col justify-between min-h-[90px]"
                       >
                         <div className="flex items-center gap-1.5">
-                          <span
-                            className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: getStatusColor(st) }}
-                          />
-                          <span className="text-xs font-medium text-[var(--fg)] capitalize">
-                            {st.replace('_', ' ')}
+                          <StatusDot status={st} />
+                          <span className="text-xs font-medium text-[var(--fg)]">
+                            {STATUS_META[st].label}
                           </span>
                         </div>
                         <div className="mt-2 text-xl font-bold font-mono text-[var(--fg)]">
@@ -327,12 +296,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
                   <div className="w-40 font-mono text-xs font-medium text-[var(--fg)] truncate">
                     {tech}
                   </div>
-                  <div className="flex-1 slop-progress-track">
-                    <div
-                      className="slop-progress-fill"
-                      style={{ width: `${pct}%`, backgroundColor: 'var(--accent)' }}
-                    />
-                  </div>
+                  <ProgressBar pct={pct} className="flex-1" />
                   <div className="w-20 text-right font-mono text-xs text-[var(--fg-2)]">
                     {count} {count === 1 ? 'project' : 'projects'} ({pct}%)
                   </div>

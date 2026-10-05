@@ -1,5 +1,7 @@
 import React from 'react';
 import type { ProjectIdea, ProjectStatus, PriorityLevel } from '../types';
+import { StatusDot } from './ui';
+import { STATUS_META, progressOf } from '../data/status';
 import { Search, X, RotateCcw } from 'lucide-react';
 
 interface SidebarProps {
@@ -23,16 +25,10 @@ interface SidebarProps {
   onResetData: () => void;
 }
 
-const STATUSES: { id: ProjectStatus; label: string; color: string }[] = [
-  { id: 'in_progress', label: 'In Progress', color: '#10b981' },
-  { id: 'spike', label: 'Exploring', color: '#f59e0b' },
-  { id: 'planned', label: 'Planned', color: '#3b82f6' },
-  { id: 'polishing', label: 'Polishing', color: '#0ea5e9' },
-  { id: 'shipped', label: 'Shipped', color: '#a855f7' },
-  { id: 'backlog', label: 'Backlog', color: '#71717a' },
-];
-
 const PRIORITIES: PriorityLevel[] = ['P0', 'P1', 'P2', 'P3'];
+
+// Active work first in the filter list
+const STATUS_FILTER_ORDER: ProjectStatus[] = ['in_progress', 'spike', 'planned', 'polishing', 'shipped', 'backlog'];
 
 export const Sidebar: React.FC<SidebarProps> = ({
   projects,
@@ -61,23 +57,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     selectedPriority !== 'all' ||
     selectedCategory !== 'all';
 
-  const getStatusColor = (status: ProjectStatus) => {
-    switch (status) {
-      case 'in_progress':
-        return '#10b981';
-      case 'spike':
-        return '#f59e0b';
-      case 'planned':
-        return '#3b82f6';
-      case 'polishing':
-        return '#0ea5e9';
-      case 'shipped':
-        return '#a855f7';
-      case 'backlog':
-      default:
-        return '#71717a';
-    }
-  };
 
   return (
     <aside className={`sidebar ${isOpenMobile ? 'open' : ''}`}>
@@ -144,7 +123,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
         </div>
         <div className="flex flex-col gap-1">
-          {STATUSES.map((st) => {
+          {STATUS_FILTER_ORDER.map((id) => {
+            const st = { id, ...STATUS_META[id] };
             const isSelected = selectedStatus === st.id;
             const count = projects.filter((p) => p.status === st.id).length;
             return (
@@ -160,10 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }`}
               >
                 <span className="flex items-center gap-2">
-                  <span
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ backgroundColor: st.color }}
-                  />
+                  <StatusDot status={st.id} className="w-1.5 h-1.5" />
                   <span>{st.label}</span>
                 </span>
                 <span className="font-mono text-[11px] text-[var(--fg-3)]">
@@ -259,8 +236,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
         <div className="flex flex-col gap-0.5 overflow-y-auto pr-1">
           {projects.map((proj) => {
-            const completed = proj.milestones.filter((m) => m.completed).length;
-            const total = proj.milestones.length;
+            const { done: completed, total } = progressOf(proj);
             const isSelected = selectedProjectId === proj.id;
 
             return (
@@ -272,10 +248,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }`}
                 title={`${proj.title}: ${proj.subtitle}`}
               >
-                <span
-                  className="project-dot"
-                  style={{ backgroundColor: getStatusColor(proj.status) }}
-                />
+                <StatusDot status={proj.status} className="project-dot" />
                 <span className="truncate flex-1 font-medium">{proj.title}</span>
                 <span className="font-mono text-[10px] text-[var(--fg-3)]">
                   {completed}/{total}

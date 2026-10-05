@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import type { 
-  ProjectIdea, 
-  ProjectStatus, 
-  PriorityLevel 
-} from '../types';
+import type { ProjectIdea, ProjectStatus } from '../types';
 import { 
   Terminal,
   Copy,
   Check,
   ChevronRight
 } from 'lucide-react';
+import { StatusDot, StatusOptions, PriorityBadge, ProgressBar } from './ui';
+import { progressOf } from '../data/status';
 
 interface TableViewProps {
   projects: ProjectIdea[];
@@ -31,52 +29,7 @@ export const TableView: React.FC<TableViewProps> = ({
     setTimeout(() => setCopiedId(null), 1800);
   };
 
-  const getPriorityBadge = (priority: PriorityLevel) => {
-    switch (priority) {
-      case 'P0':
-        return (
-          <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/25">
-            P0
-          </span>
-        );
-      case 'P1':
-        return (
-          <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-medium bg-amber-500/10 text-amber-400 border border-amber-500/25">
-            P1
-          </span>
-        );
-      case 'P2':
-        return (
-          <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-medium text-[var(--fg-2)] border border-[var(--line)]">
-            P2
-          </span>
-        );
-      case 'P3':
-        return (
-          <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-medium text-[var(--fg-3)] border border-[var(--line)]">
-            P3
-          </span>
-        );
-    }
-  };
 
-  const getStatusColor = (status: ProjectStatus) => {
-    switch (status) {
-      case 'in_progress':
-        return '#10b981';
-      case 'spike':
-        return '#f59e0b';
-      case 'planned':
-        return '#3b82f6';
-      case 'polishing':
-        return '#0ea5e9';
-      case 'shipped':
-        return '#a855f7';
-      case 'backlog':
-      default:
-        return '#71717a';
-    }
-  };
 
   const formatShortDate = (isoStr: string) => {
     try {
@@ -96,9 +49,7 @@ export const TableView: React.FC<TableViewProps> = ({
         </div>
       )}
       {projects.map((project) => {
-        const completed = project.milestones.filter((m) => m.completed).length;
-        const total = project.milestones.length;
-        const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+        const { done: completed, total, pct } = progressOf(project);
         return (
           <div
             key={project.id}
@@ -107,34 +58,21 @@ export const TableView: React.FC<TableViewProps> = ({
           >
             <div className="flex items-center justify-between gap-2">
               <span className="font-medium text-sm text-[var(--fg)] truncate">{project.title}</span>
-              {getPriorityBadge(project.priority)}
+              <PriorityBadge priority={project.priority} />
             </div>
             <div className="text-xs text-[var(--fg-2)] mt-1 line-clamp-2">{project.subtitle}</div>
             <div className="flex items-center gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
-              <span
-                className="w-2 h-2 rounded-full flex-shrink-0"
-                style={{ backgroundColor: getStatusColor(project.status) }}
-              />
+              <StatusDot status={project.status} />
               <select
                 value={project.status}
                 onChange={(e) => onUpdateStatus(project.id, e.target.value as ProjectStatus)}
                 className="bg-[var(--bg)] border border-[var(--line)] rounded px-2 py-1.5 text-xs text-[var(--fg)] focus:outline-none focus:border-[var(--accent)]"
               >
-                <option value="backlog">Backlog</option>
-                <option value="planned">Planned</option>
-                <option value="spike">Exploring</option>
-                <option value="in_progress">In Progress</option>
-                <option value="polishing">Polishing</option>
-                <option value="shipped">Shipped</option>
+                <StatusOptions />
               </select>
               <span className="ml-auto text-[11px] font-mono text-[var(--fg-3)]">{completed}/{total} &middot; {pct}%</span>
             </div>
-            <div className="slop-progress-track mt-2">
-              <div
-                className="slop-progress-fill"
-                style={{ width: `${pct}%`, backgroundColor: pct === 100 ? '#a855f7' : 'var(--accent)' }}
-              />
-            </div>
+            <ProgressBar pct={pct} className="mt-2" />
           </div>
         );
       })}
@@ -163,13 +101,8 @@ export const TableView: React.FC<TableViewProps> = ({
               </tr>
             ) : (
               projects.map((project) => {
-                const completed = project.milestones.filter((m) => m.completed).length;
-                const total = project.milestones.length;
-                const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
-                const primaryCommand =
-                  project.commands && project.commands.length > 0
-                    ? project.commands[0]
-                    : null;
+                const { done: completed, total, pct } = progressOf(project);
+                const primaryCommand = project.commands?.[0] ?? null;
 
                 return (
                   <tr
@@ -179,7 +112,7 @@ export const TableView: React.FC<TableViewProps> = ({
                   >
                     {/* Priority */}
                     <td className="py-3 px-3.5 whitespace-nowrap align-middle">
-                      {getPriorityBadge(project.priority)}
+                      <PriorityBadge priority={project.priority} />
                     </td>
 
                     {/* Title & Category */}
@@ -200,10 +133,7 @@ export const TableView: React.FC<TableViewProps> = ({
                     {/* Status with dot */}
                     <td className="py-3 px-3.5 whitespace-nowrap align-middle" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2">
-                        <span
-                          className="w-2 h-2 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: getStatusColor(project.status) }}
-                        />
+                        <StatusDot status={project.status} />
                         <select
                           value={project.status}
                           onChange={(e) =>
@@ -211,12 +141,7 @@ export const TableView: React.FC<TableViewProps> = ({
                           }
                           className="bg-[var(--bg)] border border-[var(--line)] rounded px-2 py-1 text-xs text-[var(--fg)] cursor-pointer focus:outline-none focus:border-[var(--accent)]"
                         >
-                          <option value="backlog">Backlog</option>
-                          <option value="planned">Planned</option>
-                          <option value="spike">Exploring</option>
-                          <option value="in_progress">In Progress</option>
-                          <option value="polishing">Polishing</option>
-                          <option value="shipped">Shipped</option>
+                          <StatusOptions />
                         </select>
                       </div>
                     </td>
@@ -227,15 +152,7 @@ export const TableView: React.FC<TableViewProps> = ({
                         <span>{completed}/{total}</span>
                         <span>{pct}%</span>
                       </div>
-                      <div className="slop-progress-track">
-                        <div
-                          className="slop-progress-fill"
-                          style={{
-                            width: `${pct}%`,
-                            backgroundColor: pct === 100 ? '#a855f7' : 'var(--accent)',
-                          }}
-                        />
-                      </div>
+                      <ProgressBar pct={pct} />
                     </td>
 
                     {/* Tech Stack */}
@@ -274,7 +191,7 @@ export const TableView: React.FC<TableViewProps> = ({
                           <Terminal className="h-3 w-3 opacity-60" />
                           <span className="truncate max-w-[120px]">{primaryCommand.cmd}</span>
                           {copiedId === `tbl-cmd-${project.id}` ? (
-                            <Check className="h-3 w-3 text-emerald-400" />
+                            <Check className="h-3 w-3 text-emerald-500" />
                           ) : (
                             <Copy className="h-3 w-3 opacity-40" />
                           )}

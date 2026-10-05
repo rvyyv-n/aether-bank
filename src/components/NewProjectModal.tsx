@@ -2,21 +2,30 @@ import React, { useState } from 'react';
 import type { ProjectIdea, ProjectStatus, PriorityLevel } from '../types';
 import { X, Plus } from 'lucide-react';
 import { BankerLogo } from './BankerLogo';
+import { StatusOptions } from './ui';
+import { PRIORITY_META } from '../data/status';
 
 interface NewProjectModalProps {
   isOpen: boolean;
+  existingIds: string[];
+  categories: string[];
   onClose: () => void;
   onAddProject: (project: ProjectIdea) => void;
 }
 
+const slugify = (s: string) =>
+  s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'project';
+
 export const NewProjectModal: React.FC<NewProjectModalProps> = ({
   isOpen,
+  existingIds,
+  categories,
   onClose,
   onAddProject,
 }) => {
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
-  const [category, setCategory] = useState('System');
+  const [category, setCategory] = useState('Tools');
   const [status, setStatus] = useState<ProjectStatus>('backlog');
   const [priority, setPriority] = useState<PriorityLevel>('P2');
   const [techStackInput, setTechStackInput] = useState('');
@@ -28,7 +37,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
     e.preventDefault();
     if (!title.trim()) return;
 
-    const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    // Keep ids unique so a second "Todo app" doesn't overwrite the first
+    const base = slugify(title);
+    let id = base;
+    for (let n = 2; existingIds.includes(id); n++) id = `${base}-${n}`;
+
     const techStack = techStackInput
       .split(',')
       .map((s) => s.trim())
@@ -46,13 +59,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
     const newProject: ProjectIdea = {
       id,
       title: title.trim(),
-      subtitle: subtitle.trim() || 'Custom Project Concept',
-      category: category.trim() || 'Tooling',
+      subtitle: subtitle.trim() || 'New idea',
+      category: category.trim() || 'Tools',
       status,
       priority,
-      techStack: techStack.length > 0 ? techStack : ['TypeScript', 'React'],
-      description: description.trim() || 'Logged project concept.',
-      milestones: milestones.length > 0 ? milestones : [{ id: 'm1', text: 'Initial technical specification', completed: false }],
+      techStack,
+      description: description.trim(),
+      milestones: milestones.length > 0 ? milestones : [{ id: `m_${Date.now()}_0`, text: 'Write a first spec', completed: false }],
       path: path.trim() || undefined,
       updatedAt: new Date().toISOString(),
     };
@@ -70,134 +83,147 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div 
-        className="w-full max-w-md bg-[var(--surface)] border border-[var(--line)] rounded-lg shadow-2xl overflow-hidden"
+    <div
+      className="fixed inset-0 z-50 overflow-y-auto backdrop flex items-start sm:items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="new-idea-title"
+        className="modal-panel w-full max-w-lg bg-[var(--surface)] border border-[var(--line)] rounded-xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-5 py-3.5 border-b border-[var(--line)] flex items-center justify-between bg-[var(--surface)]">
+        <div className="px-5 py-3.5 border-b border-[var(--line)] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BankerLogo size={16} className="text-[var(--accent)]" />
-            <h3 className="text-xs font-semibold text-[var(--fg)] m-0">Log New Project Idea</h3>
+            <h3 id="new-idea-title" className="text-[13px] font-semibold text-[var(--fg)] m-0">New idea</h3>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded text-[var(--fg-3)] hover:text-[var(--fg)] transition cursor-pointer"
-          >
+          <button onClick={onClose} className="icon-button" aria-label="Close" title="Close (Esc)">
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-3.5 text-xs">
-          <div>
-            <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Title *</label>
+        <form onSubmit={handleSubmit} className="p-5 space-y-4 text-xs">
+          <label className="block">
+            <span className="field-label">Title</span>
             <input
               type="text"
               required
+              autoFocus
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Zen Quick Launcher"
-              className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-3 py-1.5 text-[var(--fg)] placeholder-[var(--fg-3)] focus:outline-none focus:border-[var(--accent)]"
+              className="field !text-sm !py-2"
             />
-          </div>
+          </label>
 
-          <div>
-            <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">One-line Subtitle</label>
+          <label className="block">
+            <span className="field-label">One-liner</span>
             <input
               type="text"
               value={subtitle}
               onChange={(e) => setSubtitle(e.target.value)}
               placeholder="e.g. Keyboard-driven fuzzy file and command palette"
-              className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-3 py-1.5 text-[var(--fg)] placeholder-[var(--fg-3)] focus:outline-none focus:border-[var(--accent)]"
+              className="field"
             />
-          </div>
+          </label>
 
-          <div className="grid grid-cols-3 gap-2">
-            <div>
-              <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Category</label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <label className="block">
+              <span className="field-label">Category</span>
               <input
                 type="text"
+                list="category-options"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 placeholder="CLI / App"
-                className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-2.5 py-1.5 text-[var(--fg)] placeholder-[var(--fg-3)] focus:outline-none focus:border-[var(--accent)]"
+                className="field"
               />
-            </div>
-            <div>
-              <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Initial Status</label>
+              <datalist id="category-options">
+                {categories.map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
+            </label>
+            <label className="block">
+              <span className="field-label">Status</span>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as ProjectStatus)}
-                className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-2 py-1.5 text-[var(--fg)] focus:outline-none focus:border-[var(--accent)]"
+                className="field"
               >
-                <option value="backlog">Backlog</option>
-                <option value="planned">Planned</option>
-                <option value="spike">Exploring</option>
-                <option value="in_progress">In Progress</option>
+                <StatusOptions only={['backlog', 'planned', 'spike', 'in_progress']} />
               </select>
-            </div>
-            <div>
-              <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Priority</label>
+            </label>
+            <label className="block">
+              <span className="field-label">Priority</span>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as PriorityLevel)}
-                className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-2 py-1.5 text-[var(--fg)] focus:outline-none focus:border-[var(--accent)]"
+                className="field"
               >
-                <option value="P0">P0 (Critical)</option>
-                <option value="P1">P1 (High)</option>
-                <option value="P2">P2 (Standard)</option>
-                <option value="P3">P3 (Backburner)</option>
+                {(Object.keys(PRIORITY_META) as PriorityLevel[]).map((p) => (
+                  <option key={p} value={p}>
+                    {p} · {PRIORITY_META[p]}
+                  </option>
+                ))}
               </select>
-            </div>
+            </label>
           </div>
 
-          <div>
-            <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Tech Stack (comma separated)</label>
-            <input
-              type="text"
-              value={techStackInput}
-              onChange={(e) => setTechStackInput(e.target.value)}
-              placeholder="e.g. Rust, Tokio, Ratatui, SQLite"
-              className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-3 py-1.5 text-[var(--fg)] placeholder-[var(--fg-3)] focus:outline-none focus:border-[var(--accent)]"
+          <label className="block">
+            <span className="field-label">Description</span>
+            <textarea
+              rows={2}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="What is it and why does it matter?"
+              className="field leading-relaxed"
             />
+          </label>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label className="block">
+              <span className="field-label">Tech stack</span>
+              <input
+                type="text"
+                value={techStackInput}
+                onChange={(e) => setTechStackInput(e.target.value)}
+                placeholder="Rust, Tokio, SQLite"
+                className="field"
+              />
+            </label>
+            <label className="block">
+              <span className="field-label">Repo path</span>
+              <input
+                type="text"
+                value={path}
+                onChange={(e) => setPath(e.target.value)}
+                placeholder="projects/zen-launcher"
+                className="field font-mono"
+              />
+            </label>
           </div>
 
-          <div>
-            <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Local Repo Path (optional)</label>
-            <input
-              type="text"
-              value={path}
-              onChange={(e) => setPath(e.target.value)}
-              placeholder="e.g. projects/zen-launcher"
-              className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-3 py-1.5 text-[var(--fg)] placeholder-[var(--fg-3)] font-mono focus:outline-none focus:border-[var(--accent)]"
-            />
-          </div>
-
-          <div>
-            <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Milestones (one per line)</label>
+          <label className="block">
+            <span className="field-label">Milestones <span className="normal-case font-normal tracking-normal">· one per line</span></span>
             <textarea
               rows={3}
               value={milestonesInput}
               onChange={(e) => setMilestonesInput(e.target.value)}
               placeholder={"Project scaffold & CLI args\nFuzzy matching index\nRelease v0.1.0"}
-              className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-3 py-1.5 text-[var(--fg)] placeholder-[var(--fg-3)] focus:outline-none focus:border-[var(--accent)] font-mono"
+              className="field font-mono leading-relaxed"
             />
-          </div>
+          </label>
 
-          <div className="pt-2 flex items-center justify-end gap-2 border-t border-[var(--line)]">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-3 py-1.5 rounded-md border border-[var(--line)] hover:border-[var(--line-2)] text-[var(--fg-2)] hover:text-[var(--fg)] transition cursor-pointer"
-            >
+          <div className="pt-3 flex items-center justify-end gap-2 border-t border-[var(--line)]">
+            <button type="button" onClick={onClose} className="btn-ghost">
               Cancel
             </button>
-            <button
-              type="submit"
-              className="btn-accent cursor-pointer"
-            >
+            <button type="submit" className="btn-accent" disabled={!title.trim()}>
               <Plus className="h-3.5 w-3.5" />
-              <span>Create Project</span>
+              <span>Add idea</span>
             </button>
           </div>
         </form>

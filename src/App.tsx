@@ -63,6 +63,9 @@ export function App() {
         document.documentElement.classList.remove('light');
         document.documentElement.classList.add('dark');
       }
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute('content', theme === 'light' ? '#ffffff' : '#000000');
     } catch (e) {
       console.error(e);
     }
@@ -273,7 +276,7 @@ export function App() {
 
       {/* Main Body Layout: Fluid Content + Slopalytics Right Sidebar */}
       <div className="body-layout">
-        <main className="main-content p-4 sm:p-6">
+        <main key={activeSection + viewMode} className="main-content view-enter p-4 sm:p-6">
           {activeSection === 'vault' && viewMode === 'board' && (
             <KanbanBoard
               projects={filteredProjects}
@@ -343,6 +346,8 @@ export function App() {
       {/* New Project Idea Modal */}
       <NewProjectModal
         isOpen={isNewModalOpen}
+        existingIds={projects.map((p) => p.id)}
+        categories={Array.from(new Set(projects.map((p) => p.category)))}
         onClose={() => setIsNewModalOpen(false)}
         onAddProject={handleAddProject}
       />

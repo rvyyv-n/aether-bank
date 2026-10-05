@@ -1,6 +1,8 @@
 import React from 'react';
 import type { ProjectIdea } from '../types';
 import { ArrowRight, Zap, Shield, Cpu, Globe } from 'lucide-react';
+import { StatusDot, PriorityBadge, ProgressBar } from './ui';
+import { STATUS_META } from '../data/status';
 
 interface RoadmapViewProps {
   projects: ProjectIdea[];
@@ -97,15 +99,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProj
                     <span>Progress</span>
                     <span>{pct}% ({completedMilestones}/{totalMilestones})</span>
                   </div>
-                  <div className="slop-progress-track">
-                    <div
-                      className="slop-progress-fill"
-                      style={{
-                        width: `${pct}%`,
-                        backgroundColor: pct === 100 ? '#a855f7' : 'var(--accent)',
-                      }}
-                    />
-                  </div>
+                  <ProgressBar pct={pct} />
                 </div>
 
                 {/* Linked Projects */}
@@ -123,8 +117,10 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProj
                         <span className="text-xs font-medium text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors">
                           {proj.title}
                         </span>
-                        <span className="text-[10px] text-[var(--fg-3)] font-mono mt-0.5">
-                          {proj.status.toUpperCase()} &middot; {proj.priority}
+                        <span className="flex items-center gap-1.5 text-[10.5px] text-[var(--fg-3)] mt-1">
+                          <StatusDot status={proj.status} className="w-1.5 h-1.5" />
+                          {STATUS_META[proj.status].label}
+                          <PriorityBadge priority={proj.priority} />
                         </span>
                       </div>
                       <ArrowRight className="h-3 w-3 text-[var(--fg-3)] group-hover:text-[var(--fg)] transition" />

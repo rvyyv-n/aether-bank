@@ -71,9 +71,15 @@ button, input, textarea, select {
   }
 }
 
-button:focus-visible, input:focus-visible, textarea:focus-visible {
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible,
+a:focus-visible, [tabindex="0"]:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+::selection {
+  background: var(--accent-muted);
+  color: var(--fg);
 }
 
 /* App grid layout matching Slopalytics */
@@ -206,6 +212,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   right: 0;
 }
 
+.view-tabs > span,
+.view-tabs > div {
+  align-self: center;
+}
+
 .tab-divider {
   width: 1px;
   height: 16px;
@@ -255,6 +266,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 
 .btn-accent:hover {
   opacity: 0.9;
+}
+
+.btn-accent:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* Sidebar matching Slopalytics */
@@ -430,6 +446,124 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 .slop-card:hover {
   border-color: var(--line-2);
   background: var(--hover);
+}
+
+/* Cards lift slightly on hover so the hovered one reads as clickable */
+.card-lift {
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.45);
+}
+
+/* Small mono chip for tech tags, licences and similar metadata */
+.tag {
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  line-height: 18px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--fg-2);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+/* Section label used in the drawer and forms */
+.field-label {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  margin-bottom: 6px;
+}
+
+.field {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  color: var(--fg);
+  transition: border-color 0.15s;
+}
+
+.field::placeholder {
+  color: var(--fg-3);
+}
+
+.field:hover {
+  border-color: var(--line-2);
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.btn-ghost {
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  color: var(--fg-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.btn-ghost:hover {
+  color: var(--fg);
+  border-color: var(--line-2);
+}
+
+/* Overlay motion */
+.backdrop {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  animation: fade-in 0.15s ease-out;
+}
+
+.drawer-panel {
+  animation: slide-in 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.modal-panel {
+  animation: pop-in 0.16s ease-out;
+}
+
+.view-enter {
+  animation: fade-up 0.18s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes slide-in {
+  from { transform: translateX(24px); opacity: 0; }
+}
+
+@keyframes pop-in {
+  from { transform: translateY(6px) scale(0.98); opacity: 0; }
+}
+
+@keyframes fade-up {
+  from { transform: translateY(4px); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Slopalytics Progress Bar */
