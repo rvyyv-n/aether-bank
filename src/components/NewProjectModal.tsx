@@ -14,8 +14,6 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
   onClose,
   onAddProject,
 }) => {
-  if (!isOpen) return null;
-
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [category, setCategory] = useState('System');
@@ -62,6 +60,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
     onAddProject(newProject);
     onClose();
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">

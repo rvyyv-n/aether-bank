@@ -1,14 +1,16 @@
 {
-  "name": "project-bank",
+  "name": "banker",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "serve": "node server.cjs",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check": "npm run lint && npm run build",
+    "capture": "node capture.cjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -28,5 +30,12 @@
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "vite": "^8.3.0"
-  }
+  },
+  "description": "Minimal local-first developer project and idea vault.",
+  "homepage": "https://rvyyv-n.github.io/banker/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rvyyv-n/banker.git"
+  },
+  "license": "MIT"
 }

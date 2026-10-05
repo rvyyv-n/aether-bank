@@ -26,13 +26,17 @@ interface ProjectDrawerProps {
   onDeleteProject: (projectId: string) => void;
 }
 
-export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
+const DrawerContent: React.FC<{
+  project: ProjectIdea;
+  onClose: () => void;
+  onUpdateProject: (updated: ProjectIdea) => void;
+  onDeleteProject: (projectId: string) => void;
+}> = ({
   project,
   onClose,
   onUpdateProject,
   onDeleteProject,
 }) => {
-  if (!project) return null;
 
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
   const [isEditingNotes, setIsEditingNotes] = useState(false);
@@ -404,4 +408,10 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       </div>
     </div>
   );
+};
+
+
+export const ProjectDrawer: React.FC<ProjectDrawerProps> = (props) => {
+  if (!props.project) return null;
+  return <DrawerContent key={props.project.id} {...props} project={props.project} />;
 };

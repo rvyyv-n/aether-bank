@@ -258,7 +258,7 @@ export const TableView: React.FC<TableViewProps> = ({
                             className="flex items-center gap-1 px-2 py-1 rounded bg-[var(--bg-surface)] border border-[var(--border-main)] hover:border-[var(--text-muted)] font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
                           >
                             <FolderGit2 className="h-3.5 w-3.5 flex-shrink-0" />
-                            <span className="truncate max-w-[120px]">{project.path.split(/[\/\\]/).pop()}</span>
+                            <span className="truncate max-w-[120px]">{project.path.split(/[/\\]/).pop()}</span>
                             {copiedId === `path-${project.id}` ? (
                               <Check className="h-3 w-3 text-emerald-400 flex-shrink-0" />
                             ) : (

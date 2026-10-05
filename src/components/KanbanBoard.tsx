@@ -226,7 +226,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                                 className="flex items-center gap-1 font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] truncate max-w-[110px]"
                               >
                                 <FolderGit2 className="h-3.5 w-3.5 flex-shrink-0" />
-                                <span className="truncate text-[11px]">{project.path.split(/[\/\\]/).pop()}</span>
+                                <span className="truncate text-[11px]">{project.path.split(/[/\\]/).pop()}</span>
                                 {copiedId === `k-path-${project.id}` && (
                                   <Check className="h-3 w-3 text-emerald-400 flex-shrink-0" />
                                 )}
