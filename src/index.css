@@ -8,23 +8,26 @@
     --bg-subtle: #f1f1f3;
     --border-main: #e4e4e7;
     --border-subtle: #f4f4f5;
+    --border-focus: #71717a;
     --text-primary: #09090b;
     --text-secondary: #71717a;
     --text-muted: #a1a1aa;
     --code-bg: #f4f4f5;
   }
 
+  /* Full OLED Dark Mode without grays - pure #000000 with crisp hairline wireframes */
   .dark {
     --bg-page: #000000;
-    --bg-surface: #09090b;
-    --bg-surface-hover: #121215;
-    --bg-subtle: #18181b;
-    --border-main: #27272a;
-    --border-subtle: #18181b;
-    --text-primary: #fafafa;
-    --text-secondary: #a1a1aa;
+    --bg-surface: #000000;
+    --bg-surface-hover: #080808;
+    --bg-subtle: #000000;
+    --border-main: #1f1f23;
+    --border-subtle: #141416;
+    --border-focus: #3f3f46;
+    --text-primary: #ffffff;
+    --text-secondary: #99999f;
     --text-muted: #52525b;
-    --code-bg: #121215;
+    --code-bg: #000000;
   }
 
   html {
@@ -32,6 +35,7 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     font-size: 100%;
+    background-color: var(--bg-page);
   }
 
   /* 110% base scale on desktop screens for razor-sharp, comfortable readability */
@@ -75,10 +79,10 @@
 .oled-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-main);
-  transition: background-color 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .oled-card:hover {
   background-color: var(--bg-surface-hover);
-  border-color: var(--text-muted);
+  border-color: var(--border-focus);
 }

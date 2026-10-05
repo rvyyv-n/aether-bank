@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { ProjectIdea, ProjectStatus } from './types';
+import type { ProjectIdea, ProjectStatus, PriorityLevel } from './types';
 import { INITIAL_PROJECTS } from './data/initialData';
 import { Header } from './components/Header';
 import { KanbanBoard } from './components/KanbanBoard';
@@ -37,6 +37,10 @@ export function App() {
   const [viewMode, setViewMode] = useState<'board' | 'table' | 'roadmap'>('board');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedPriority, setSelectedPriority] = useState('all');
+  const [sortBy, setSortBy] = useState<'priority' | 'status' | 'title' | 'progress' | 'updated'>('priority');
+
   const [selectedProject, setSelectedProject] = useState<ProjectIdea | null>(null);
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
 
@@ -100,24 +104,72 @@ export function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Filter projects
-  const filteredProjects = projects.filter((project) => {
-    const matchesCategory =
-      selectedCategory === 'all' || project.category === selectedCategory;
+  // Filter and sort projects
+  const filteredProjects = projects
+    .filter((project) => {
+      const matchesCategory =
+        selectedCategory === 'all' || project.category === selectedCategory;
 
-    const q = searchQuery.toLowerCase().trim();
-    if (!q) return matchesCategory;
+      const matchesStatus =
+        selectedStatus === 'all' || project.status === selectedStatus;
 
-    const matchesQuery =
-      project.title.toLowerCase().includes(q) ||
-      project.subtitle.toLowerCase().includes(q) ||
-      project.description.toLowerCase().includes(q) ||
-      project.techStack.some((t) => t.toLowerCase().includes(q)) ||
-      (project.notes && project.notes.toLowerCase().includes(q)) ||
-      project.status.toLowerCase().includes(q);
+      const matchesPriority =
+        selectedPriority === 'all' || project.priority === selectedPriority;
 
-    return matchesCategory && matchesQuery;
-  });
+      const q = searchQuery.toLowerCase().trim();
+      const matchesQuery =
+        !q ||
+        project.title.toLowerCase().includes(q) ||
+        project.subtitle.toLowerCase().includes(q) ||
+        project.description.toLowerCase().includes(q) ||
+        project.techStack.some((t) => t.toLowerCase().includes(q)) ||
+        (project.notes && project.notes.toLowerCase().includes(q)) ||
+        project.status.toLowerCase().includes(q) ||
+        (project.path && project.path.toLowerCase().includes(q)) ||
+        (project.commands &&
+          project.commands.some(
+            (c) =>
+              c.cmd.toLowerCase().includes(q) ||
+              c.label.toLowerCase().includes(q)
+          ));
+
+      return matchesCategory && matchesStatus && matchesPriority && matchesQuery;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'priority') {
+        const pOrder: Record<PriorityLevel, number> = { P0: 0, P1: 1, P2: 2, P3: 3 };
+        return pOrder[a.priority] - pOrder[b.priority];
+      }
+      if (sortBy === 'status') {
+        const sOrder: Record<ProjectStatus, number> = {
+          in_progress: 0,
+          spike: 1,
+          polishing: 2,
+          planned: 3,
+          backlog: 4,
+          shipped: 5,
+        };
+        return sOrder[a.status] - sOrder[b.status];
+      }
+      if (sortBy === 'title') {
+        return a.title.localeCompare(b.title);
+      }
+      if (sortBy === 'progress') {
+        const pA =
+          a.milestones.length > 0
+            ? a.milestones.filter((m) => m.completed).length / a.milestones.length
+            : 0;
+        const pB =
+          b.milestones.length > 0
+            ? b.milestones.filter((m) => m.completed).length / b.milestones.length
+            : 0;
+        return pB - pA;
+      }
+      if (sortBy === 'updated') {
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      }
+      return 0;
+    });
 
   const handleUpdateStatus = (projectId: string, newStatus: ProjectStatus) => {
     setProjects((prev) =>
@@ -153,14 +205,23 @@ export function App() {
     if (confirm('Reset idea bank back to default initial context?')) {
       setProjects(INITIAL_PROJECTS);
       localStorage.removeItem(STORAGE_KEY);
+      setSelectedCategory('all');
+      setSelectedStatus('all');
+      setSelectedPriority('all');
+      setSearchQuery('');
     }
   };
 
   const handleExportJson = () => {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(projects, null, 2));
+    const dataStr =
+      'data:text/json;charset=utf-8,' +
+      encodeURIComponent(JSON.stringify(projects, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `banker-vault-${new Date().toISOString().slice(0, 10)}.json`);
+    downloadAnchor.setAttribute(
+      'download',
+      `banker-vault-${new Date().toISOString().slice(0, 10)}.json`
+    );
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -171,12 +232,19 @@ export function App() {
       {/* Header */}
       <Header
         projects={projects}
+        filteredCount={filteredProjects.length}
         viewMode={viewMode}
         setViewMode={setViewMode}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
+        selectedStatus={selectedStatus}
+        setSelectedStatus={setSelectedStatus}
+        selectedPriority={selectedPriority}
+        setSelectedPriority={setSelectedPriority}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
         theme={theme}
         setTheme={setTheme}
         onOpenNewModal={() => setIsNewModalOpen(true)}
@@ -184,8 +252,8 @@ export function App() {
         onExportJson={handleExportJson}
       />
 
-      {/* Main View Area */}
-      <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      {/* Main View Area - Fluid full-width desktop layout without artificial narrow clamp */}
+      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 py-5">
         {viewMode === 'board' && (
           <KanbanBoard
             projects={filteredProjects}
@@ -204,29 +272,13 @@ export function App() {
 
         {viewMode === 'roadmap' && (
           <RoadmapView
-            projects={projects}
+            projects={filteredProjects}
             onSelectProject={setSelectedProject}
           />
         )}
       </main>
 
-      {/* Minimal Footer */}
-      <footer className="w-full border-t border-[var(--border-main)] bg-[var(--bg-surface)] py-2 px-4 text-center">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between text-[11px] text-[var(--text-secondary)] font-mono gap-2">
-          <div className="flex items-center gap-2">
-            <span>Shortcuts:</span>
-            <span><kbd className="px-1 py-0.5 rounded bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-primary)]">N</kbd> New</span>
-            <span><kbd className="px-1 py-0.5 rounded bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-primary)]">T</kbd> Theme</span>
-            <span><kbd className="px-1 py-0.5 rounded bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-primary)]">/</kbd> Search</span>
-            <span><kbd className="px-1 py-0.5 rounded bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-primary)]">1</kbd><kbd className="px-1 py-0.5 rounded bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-primary)] ml-0.5">2</kbd><kbd className="px-1 py-0.5 rounded bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-primary)] ml-0.5">3</kbd> Views</span>
-          </div>
-          <div>
-            <span>Banker · Local & Offline Capable</span>
-          </div>
-        </div>
-      </footer>
-
-      {/* Project Detail Drawer */}
+      {/* Slide-over Project Drawer */}
       <ProjectDrawer
         project={selectedProject}
         onClose={() => setSelectedProject(null)}
@@ -234,7 +286,7 @@ export function App() {
         onDeleteProject={handleDeleteProject}
       />
 
-      {/* New Project Modal */}
+      {/* New Project Idea Modal */}
       <NewProjectModal
         isOpen={isNewModalOpen}
         onClose={() => setIsNewModalOpen(false)}

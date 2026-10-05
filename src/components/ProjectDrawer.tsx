@@ -77,7 +77,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
         {/* Top bar */}
         <div className="sticky top-0 z-10 bg-[var(--bg-surface)] px-6 py-4 border-b border-[var(--border-main)] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] bg-[var(--bg-page)] px-2.5 py-0.5 rounded border border-[var(--border-main)]">
+            <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] bg-[var(--bg-surface)] px-2.5 py-0.5 rounded border border-[var(--border-main)]">
               {project.category}
             </span>
             <span className="text-xs font-mono text-[var(--text-muted)]">· {project.id}</span>
@@ -98,7 +98,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-page)] transition"
+              className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] transition"
             >
               <X className="h-4 w-4" />
             </button>
@@ -118,7 +118,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
           </div>
 
           {/* Quick Property Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-xl bg-[var(--bg-page)] border border-[var(--border-main)]">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-main)]">
             <div>
               <span className="text-xs font-mono uppercase text-[var(--text-muted)] block mb-1.5">Status</span>
               <select
@@ -182,7 +182,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] block">Links</span>
               <div className="space-y-2">
                 {project.path && (
-                  <div className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-page)] border border-[var(--border-main)] font-mono text-xs">
+                  <div className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-main)] font-mono text-xs">
                     <div className="flex items-center gap-2 text-[var(--text-primary)] truncate">
                       <FolderGit2 className="h-4 w-4 text-[var(--text-secondary)] flex-shrink-0" />
                       <span className="truncate text-xs">{project.path}</span>
@@ -198,7 +198,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 )}
 
                 {project.threadId && (
-                  <div className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-page)] border border-[var(--border-main)] font-mono text-xs">
+                  <div className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-main)] font-mono text-xs">
                     <div className="flex items-center gap-2 text-[var(--text-primary)] truncate">
                       <GitFork className="h-4 w-4 text-[var(--text-secondary)] flex-shrink-0" />
                       <span className="text-[var(--text-muted)] text-xs">T3:</span>
@@ -224,7 +224,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               {project.techStack.map((tech) => (
                 <span
                   key={tech}
-                  className="px-2.5 py-1 rounded text-xs font-mono bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-secondary)]"
+                  className="px-2.5 py-1 rounded text-xs font-mono bg-[var(--bg-surface)] border border-[var(--border-main)] text-[var(--text-secondary)]"
                 >
                   {tech}
                 </span>
@@ -236,7 +236,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
           <div className="space-y-3.5">
             <div>
               <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] block mb-1.5">Overview</span>
-              <p className="text-sm text-[var(--text-primary)] leading-relaxed bg-[var(--bg-page)] p-3.5 rounded-lg border border-[var(--border-main)]">
+              <p className="text-sm text-[var(--text-primary)] leading-relaxed bg-[var(--bg-surface)] p-3.5 rounded-lg border border-[var(--border-main)]">
                 {project.description}
               </p>
             </div>
@@ -244,7 +244,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
             {project.problemStatement && (
               <div>
                 <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] block mb-1.5">Problem & Rationale</span>
-                <p className="text-sm text-[var(--text-primary)] leading-relaxed bg-[var(--bg-page)] p-3.5 rounded-lg border border-[var(--border-main)]">
+                <p className="text-sm text-[var(--text-primary)] leading-relaxed bg-[var(--bg-surface)] p-3.5 rounded-lg border border-[var(--border-main)]">
                   {project.problemStatement}
                 </p>
               </div>
@@ -253,7 +253,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
             {project.architectureNotes && (
               <div>
                 <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] block mb-1.5">Architecture</span>
-                <p className="text-sm text-[var(--text-primary)] leading-relaxed bg-[var(--bg-page)] p-3.5 rounded-lg border border-[var(--border-main)]">
+                <p className="text-sm text-[var(--text-primary)] leading-relaxed bg-[var(--bg-surface)] p-3.5 rounded-lg border border-[var(--border-main)]">
                   {project.architectureNotes}
                 </p>
               </div>
@@ -271,7 +271,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               </span>
             </div>
 
-            <div className="w-full bg-[var(--bg-page)] h-1.5 rounded-full overflow-hidden mb-3 border border-[var(--border-main)]">
+            <div className="w-full bg-[var(--bg-surface)] h-1.5 rounded-full overflow-hidden mb-3 border border-[var(--border-main)]">
               <div
                 className="h-full bg-[var(--text-primary)] transition-all duration-300"
                 style={{ width: `${progressPct}%` }}
@@ -285,7 +285,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                   onClick={() => toggleMilestone(milestone.id)}
                   className={`flex items-start gap-2.5 p-2.5 rounded-lg cursor-pointer transition text-sm select-none ${
                     milestone.completed
-                      ? 'bg-[var(--bg-page)] text-[var(--text-muted)]'
+                      ? 'bg-[var(--bg-surface)] text-[var(--text-muted)]'
                       : 'bg-[var(--bg-surface)] text-[var(--text-primary)] border border-[var(--border-main)] hover:bg-[var(--bg-surface-hover)]'
                   }`}
                 >
@@ -314,7 +314,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 {project.commands.map((cmd) => (
                   <div
                     key={cmd.label}
-                    className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-page)] border border-[var(--border-main)] font-mono text-xs"
+                    className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-main)] font-mono text-xs"
                   >
                     <div className="flex items-center gap-2 text-[var(--text-primary)] truncate">
                       <Terminal className="h-3.5 w-3.5 text-[var(--text-secondary)] flex-shrink-0" />
@@ -351,7 +351,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     href={ref.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="p-2.5 rounded-lg bg-[var(--bg-page)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-main)] transition flex items-center justify-between text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] group"
+                    className="p-2.5 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-main)] transition flex items-center justify-between text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] group"
                   >
                     <span className="truncate text-xs font-mono">{ref.name}</span>
                     <ExternalLink className="h-3.5 w-3.5 text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition flex-shrink-0" />
@@ -391,11 +391,11 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 value={notesValue}
                 onChange={(e) => setNotesValue(e.target.value)}
                 rows={4}
-                className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg p-3 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+                className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg p-3 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
                 placeholder="Thoughts, notes, or ideas..."
               />
             ) : (
-              <div className="p-3 bg-[var(--bg-page)] rounded-lg border border-[var(--border-main)] text-sm text-[var(--text-secondary)] whitespace-pre-wrap min-h-[50px]">
+              <div className="p-3 bg-[var(--bg-surface)] rounded-lg border border-[var(--border-main)] text-sm text-[var(--text-secondary)] whitespace-pre-wrap min-h-[50px]">
                 {project.notes || 'No notes yet. Click edit to add.'}
               </div>
             )}

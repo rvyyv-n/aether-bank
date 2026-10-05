@@ -50,7 +50,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProj
           <h2 className="text-base font-semibold text-[var(--text-primary)] m-0">Ecosystem Roadmap</h2>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5 m-0">Sequential execution across the open-source toolchain.</p>
         </div>
-        <div className="text-xs font-mono text-[var(--text-secondary)] bg-[var(--bg-page)] px-3 py-1 rounded border border-[var(--border-main)]">
+        <div className="text-xs font-mono text-[var(--text-secondary)] bg-[var(--bg-surface)] px-3 py-1 rounded border border-[var(--border-main)]">
           Zero-Cost Infrastructure
         </div>
       </div>
@@ -71,11 +71,11 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProj
               <div>
                 <div className="flex items-center justify-between text-xs font-mono text-[var(--text-secondary)] mb-2.5">
                   <span className="font-semibold text-[var(--text-primary)]">{p.phase}</span>
-                  <span className="bg-[var(--bg-page)] px-2 py-0.5 rounded border border-[var(--border-main)]">{p.target}</span>
+                  <span className="bg-[var(--bg-surface)] px-2 py-0.5 rounded border border-[var(--border-main)]">{p.target}</span>
                 </div>
 
                 <div className="flex items-center gap-2.5 my-3">
-                  <div className="p-2 rounded-md bg-[var(--bg-page)] border border-[var(--border-main)] text-[var(--text-primary)]">
+                  <div className="p-2 rounded-md bg-[var(--bg-surface)] border border-[var(--border-main)] text-[var(--text-primary)]">
                     <Icon className="h-4 w-4" />
                   </div>
                   <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight m-0">
@@ -93,7 +93,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProj
                     <span>Progress</span>
                     <span>{pct}% ({completedMilestones}/{totalMilestones})</span>
                   </div>
-                  <div className="w-full bg-[var(--bg-page)] h-1.5 rounded-full overflow-hidden border border-[var(--border-main)]">
+                  <div className="w-full bg-[var(--bg-surface)] h-1.5 rounded-full overflow-hidden border border-[var(--border-main)]">
                     <div className="h-full bg-[var(--text-primary)]" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
@@ -105,7 +105,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProj
                     <div
                       key={proj.id}
                       onClick={() => onSelectProject(proj)}
-                      className="p-2.5 rounded-lg bg-[var(--bg-page)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-main)] cursor-pointer transition flex items-center justify-between group"
+                      className="p-2.5 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-main)] cursor-pointer transition flex items-center justify-between group"
                     >
                       <div className="flex flex-col">
                         <span className="text-xs font-medium text-[var(--text-primary)] group-hover:underline">

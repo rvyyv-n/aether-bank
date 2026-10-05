@@ -69,7 +69,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
         className="w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-5 py-3.5 border-b border-[var(--border-main)] flex items-center justify-between bg-[var(--bg-page)]">
+        <div className="px-5 py-3.5 border-b border-[var(--border-main)] flex items-center justify-between bg-[var(--bg-surface)]">
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 rounded bg-[var(--text-primary)] text-[var(--bg-surface)] flex items-center justify-center">
               <BankerLogo size={14} />
@@ -93,7 +93,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Zen Quick Launcher"
-              className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+              className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
             />
           </div>
 
@@ -104,7 +104,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               value={subtitle}
               onChange={(e) => setSubtitle(e.target.value)}
               placeholder="e.g. Minimal keyboard runner in Rust"
-              className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+              className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
             />
           </div>
 
@@ -116,7 +116,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 placeholder="System"
-                className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-2 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+                className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-2 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
               />
             </div>
 
@@ -125,7 +125,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as ProjectStatus)}
-                className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-2 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+                className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-2 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
               >
                 <option value="backlog">Backlog</option>
                 <option value="planned">Planned</option>
@@ -141,7 +141,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as PriorityLevel)}
-                className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-2 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+                className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-2 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
               >
                 <option value="P0">P0</option>
                 <option value="P1">P1</option>
@@ -158,7 +158,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               value={techStackInput}
               onChange={(e) => setTechStackInput(e.target.value)}
               placeholder="Rust, Tauri v2, Tailwind"
-              className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+              className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
             />
           </div>
 
@@ -169,7 +169,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What does it do? Key technical decisions..."
-              className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg p-2.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+              className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg p-2.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
             />
           </div>
 
@@ -180,7 +180,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               value={milestonesInput}
               onChange={(e) => setMilestonesInput(e.target.value)}
               placeholder="Scaffold repository&#10;Implement core logic"
-              className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg p-2.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)] font-mono text-[11px]"
+              className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg p-2.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)] font-mono text-[11px]"
             />
           </div>
 
@@ -191,7 +191,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               value={path}
               onChange={(e) => setPath(e.target.value)}
               placeholder="D:\Code\Repos\zen-launcher"
-              className="w-full bg-[var(--bg-page)] border border-[var(--border-main)] rounded-lg px-2.5 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)] font-mono"
+              className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-2.5 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)] font-mono"
             />
           </div>
 
