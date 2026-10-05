@@ -93,9 +93,15 @@ anywhere or tap the sun/moon icon to switch between OLED Dark and Light mode.
 
 Responsive mobile layout built for quick capture and status audits on the go.
 
-<a href="https://rvyyv-n.github.io/banker/">
-  <img src="screenshots/banker-mobile.png" alt="Banker mobile layout" width="100%" />
-</a>
+<p align="center">
+  <a href="https://rvyyv-n.github.io/banker/">
+    <img src="screenshots/banker-mobile-dark.png" alt="Banker mobile in OLED dark mode" width="48%" />
+  </a>
+  &nbsp;
+  <a href="https://rvyyv-n.github.io/banker/">
+    <img src="screenshots/banker-mobile-light.png" alt="Banker mobile in light mode" width="48%" />
+  </a>
+</p>
 
 ## Running locally with your own projects
 

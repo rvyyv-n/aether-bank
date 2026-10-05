@@ -87,12 +87,22 @@ async function capture() {
     // 5. Mobile View (iPhone 15 format, dark mode)
     await page.keyboard.press('t'); // back to dark
     await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
-    await new Promise(r => setTimeout(r, 500));
-    const mobilePath = path.join(OUT_DIR, 'banker-mobile.png');
-    const mobileArtifact = path.join(ARTIFACT_DIR, 'banker-mobile.png');
-    await page.screenshot({ path: mobilePath });
-    fs.copyFileSync(mobilePath, mobileArtifact);
-    console.log('Captured banker-mobile.png');
+    await new Promise(r => setTimeout(r, 600));
+    const mobileDarkPath = path.join(OUT_DIR, 'banker-mobile-dark.png');
+    const mobileDarkArtifact = path.join(ARTIFACT_DIR, 'banker-mobile-dark.png');
+    await page.screenshot({ path: mobileDarkPath });
+    fs.copyFileSync(mobileDarkPath, mobileDarkArtifact);
+    fs.copyFileSync(mobileDarkPath, path.join(OUT_DIR, 'banker-mobile.png'));
+    console.log('Captured banker-mobile-dark.png');
+
+    // 6. Mobile View (iPhone 15 format, light mode)
+    await page.keyboard.press('t'); // toggle to light
+    await new Promise(r => setTimeout(r, 600));
+    const mobileLightPath = path.join(OUT_DIR, 'banker-mobile-light.png');
+    const mobileLightArtifact = path.join(ARTIFACT_DIR, 'banker-mobile-light.png');
+    await page.screenshot({ path: mobileLightPath });
+    fs.copyFileSync(mobileLightPath, mobileLightArtifact);
+    console.log('Captured banker-mobile-light.png');
 
   } catch (err) {
     console.error('Error during capture:', err);
