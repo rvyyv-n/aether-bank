@@ -5,14 +5,10 @@ import type {
   PriorityLevel 
 } from '../types';
 import { 
-  ChevronRight, 
-  FolderGit2, 
-  ExternalLink,
   Terminal,
   Copy,
   Check,
-  CircleDot,
-  CheckCircle2
+  ChevronRight
 } from 'lucide-react';
 
 interface TableViewProps {
@@ -39,266 +35,216 @@ export const TableView: React.FC<TableViewProps> = ({
     switch (priority) {
       case 'P0':
         return (
-          <span className="px-2 py-0.5 rounded text-xs font-mono font-semibold bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/25">
+          <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/25">
             P0
           </span>
         );
       case 'P1':
         return (
-          <span className="px-2 py-0.5 rounded text-xs font-mono font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25">
+          <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-medium bg-amber-500/10 text-amber-400 border border-amber-500/25">
             P1
           </span>
         );
       case 'P2':
         return (
-          <span className="px-2 py-0.5 rounded text-xs font-mono font-medium text-[var(--text-secondary)] border border-[var(--border-main)]">
+          <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-medium text-[var(--fg-2)] border border-[var(--line)]">
             P2
           </span>
         );
       case 'P3':
         return (
-          <span className="px-2 py-0.5 rounded text-xs font-mono font-medium text-[var(--text-muted)] border border-[var(--border-main)]">
+          <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-medium text-[var(--fg-3)] border border-[var(--line)]">
             P3
           </span>
         );
     }
   };
 
-  const getStatusBadge = (status: ProjectStatus) => {
+  const getStatusColor = (status: ProjectStatus) => {
     switch (status) {
       case 'in_progress':
-        return 'text-emerald-500 dark:text-emerald-400 border-emerald-500/30';
+        return '#10b981';
       case 'spike':
-        return 'text-amber-500 dark:text-amber-400 border-amber-500/30';
+        return '#f59e0b';
       case 'planned':
-        return 'text-blue-500 dark:text-blue-400 border-blue-500/30';
+        return '#3b82f6';
       case 'polishing':
-        return 'text-sky-500 dark:text-sky-400 border-sky-500/30';
+        return '#0ea5e9';
       case 'shipped':
-        return 'text-purple-500 dark:text-purple-400 border-purple-500/30';
+        return '#a855f7';
+      case 'backlog':
       default:
-        return 'text-[var(--text-secondary)] border-[var(--border-main)]';
+        return '#71717a';
     }
   };
 
   const formatShortDate = (isoStr: string) => {
     try {
       const d = new Date(isoStr);
-      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     } catch {
       return isoStr;
     }
   };
 
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-[var(--border-main)] bg-[var(--bg-surface)]">
+    <div className="w-full overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--surface)]">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="border-b border-[var(--border-main)] bg-[var(--bg-surface)] text-[var(--text-secondary)] font-mono uppercase tracking-wider text-xs select-none">
-              <th className="py-3 px-3.5 font-medium whitespace-nowrap">Priority</th>
-              <th className="py-3 px-3.5 font-medium whitespace-nowrap">Project</th>
-              <th className="py-3 px-3.5 font-medium whitespace-nowrap">Status</th>
-              <th className="py-3 px-3.5 font-medium whitespace-nowrap">Category</th>
-              <th className="py-3 px-3.5 font-medium whitespace-nowrap">Next Milestone</th>
-              <th className="py-3 px-3.5 font-medium whitespace-nowrap">Progress</th>
-              <th className="py-3 px-3.5 font-medium whitespace-nowrap">Tech Stack</th>
-              <th className="py-3 px-3.5 font-medium whitespace-nowrap">Dev Command</th>
-              <th className="py-3 px-3.5 font-medium whitespace-nowrap">Repository</th>
-              <th className="py-3 px-3.5 font-medium whitespace-nowrap">Updated</th>
-              <th className="py-3 px-3.5 text-right font-medium"></th>
+            <tr className="border-b border-[var(--line)] bg-[var(--surface)] text-[var(--fg-3)] font-mono uppercase tracking-wider text-[11px] select-none">
+              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Priority</th>
+              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Project</th>
+              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Status</th>
+              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Milestones</th>
+              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Tech Stack</th>
+              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Dev Command</th>
+              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Updated</th>
+              <th className="py-2.5 px-2 text-right"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--border-subtle)]">
+          <tbody className="divide-y divide-[var(--line)] font-normal">
             {projects.length === 0 ? (
               <tr>
-                <td colSpan={11} className="py-16 text-center text-[var(--text-muted)] italic text-sm">
-                  No projects match your active search or filters.
+                <td colSpan={8} className="py-12 text-center text-xs text-[var(--fg-3)] font-mono">
+                  No projects matching active filters.
                 </td>
               </tr>
             ) : (
               projects.map((project) => {
-                const completedMilestones = project.milestones.filter(m => m.completed).length;
-                const totalMilestones = project.milestones.length;
-                const progressPct = totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0;
-                const nextMilestone = project.milestones.find(m => !m.completed);
-                const primaryCommand = project.commands && project.commands.length > 0 ? project.commands[0] : null;
+                const completed = project.milestones.filter((m) => m.completed).length;
+                const total = project.milestones.length;
+                const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+                const primaryCommand =
+                  project.commands && project.commands.length > 0
+                    ? project.commands[0]
+                    : null;
 
                 return (
                   <tr
                     key={project.id}
                     onClick={() => onSelectProject(project)}
-                    className="hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer group"
+                    className="hover:bg-[var(--hover)] transition-colors cursor-pointer group"
                   >
                     {/* Priority */}
-                    <td className="py-3.5 px-3.5 whitespace-nowrap">
+                    <td className="py-3 px-3.5 whitespace-nowrap align-middle">
                       {getPriorityBadge(project.priority)}
                     </td>
 
-                    {/* Title & subtitle */}
-                    <td className="py-3.5 px-3.5 min-w-[200px]">
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-[var(--text-primary)] group-hover:underline text-sm tracking-tight">
-                            {project.title}
-                          </span>
-                          {project.license && (
-                            <span className="text-[10px] font-mono text-[var(--text-muted)] border border-[var(--border-main)] px-1.5 py-0.2 rounded">
-                              {project.license}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[var(--text-secondary)] text-xs line-clamp-1 max-w-sm mt-0.5">
-                          {project.subtitle}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Status Select */}
-                    <td className="py-3.5 px-3.5 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                      <select
-                        value={project.status}
-                        onChange={(e) => onUpdateStatus(project.id, e.target.value as ProjectStatus)}
-                        className={`text-xs font-mono py-1 px-2.5 rounded border focus:outline-none cursor-pointer bg-[var(--bg-surface)] ${getStatusBadge(
-                          project.status
-                        )}`}
-                      >
-                        <option value="backlog">Backlog</option>
-                        <option value="planned">Planned</option>
-                        <option value="spike">Spike</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="polishing">Polishing</option>
-                        <option value="shipped">Shipped</option>
-                      </select>
-                    </td>
-
-                    {/* Category */}
-                    <td className="py-3.5 px-3.5 whitespace-nowrap">
-                      <span className="text-[var(--text-secondary)] font-mono text-xs bg-[var(--bg-surface)] px-2.5 py-0.5 rounded border border-[var(--border-main)]">
-                        {project.category}
-                      </span>
-                    </td>
-
-                    {/* Next Milestone */}
-                    <td className="py-3.5 px-3.5 min-w-[210px] max-w-xs">
-                      {nextMilestone ? (
-                        <div className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] font-mono truncate" title={nextMilestone.text}>
-                          <CircleDot className="h-3.5 w-3.5 text-amber-500/80 flex-shrink-0" />
-                          <span className="truncate">{nextMilestone.text}</span>
-                        </div>
-                      ) : totalMilestones > 0 ? (
-                        <div className="flex items-center gap-1.5 text-xs text-emerald-500 dark:text-emerald-400 font-mono">
-                          <CheckCircle2 className="h-3.5 w-3.5 flex-shrink-0" />
-                          <span>All {totalMilestones} done</span>
-                        </div>
-                      ) : (
-                        <span className="text-[var(--text-muted)] italic font-mono text-xs">—</span>
-                      )}
-                    </td>
-
-                    {/* Progress */}
-                    <td className="py-3.5 px-3.5 whitespace-nowrap min-w-[130px]">
+                    {/* Title & Category */}
+                    <td className="py-3 px-3.5 align-middle min-w-[220px]">
                       <div className="flex items-center gap-2">
-                        <div className="w-16 bg-[var(--border-subtle)] h-1.5 rounded-full overflow-hidden border border-[var(--border-main)]">
-                          <div
-                            className="h-full bg-[var(--text-primary)] rounded-full transition-all duration-300"
-                            style={{ width: `${progressPct}%` }}
-                          />
-                        </div>
-                        <span className="font-mono text-xs text-[var(--text-secondary)] whitespace-nowrap">
-                          {completedMilestones}/{totalMilestones} ({progressPct}%)
+                        <span className="font-medium text-xs text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors">
+                          {project.title}
                         </span>
+                        <span className="text-[10px] font-mono text-[var(--fg-3)] border border-[var(--line)] px-1 py-0.2 rounded">
+                          {project.category}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-[var(--fg-2)] truncate max-w-sm mt-0.5">
+                        {project.subtitle}
                       </div>
                     </td>
 
-                    {/* Tech stack */}
-                    <td className="py-3.5 px-3.5">
-                      <div className="flex flex-wrap gap-1 max-w-xs">
-                        {project.techStack.map((tech) => (
+                    {/* Status with dot */}
+                    <td className="py-3 px-3.5 whitespace-nowrap align-middle" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="w-2 h-2 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: getStatusColor(project.status) }}
+                        />
+                        <select
+                          value={project.status}
+                          onChange={(e) =>
+                            onUpdateStatus(project.id, e.target.value as ProjectStatus)
+                          }
+                          className="bg-[var(--bg)] border border-[var(--line)] rounded px-2 py-1 text-xs text-[var(--fg)] cursor-pointer focus:outline-none focus:border-[var(--accent)]"
+                        >
+                          <option value="backlog">Backlog</option>
+                          <option value="planned">Planned</option>
+                          <option value="spike">Spike & R&D</option>
+                          <option value="in_progress">In Progress</option>
+                          <option value="polishing">Polishing</option>
+                          <option value="shipped">Shipped</option>
+                        </select>
+                      </div>
+                    </td>
+
+                    {/* Milestones Progress */}
+                    <td className="py-3 px-3.5 align-middle min-w-[150px]">
+                      <div className="flex items-center justify-between text-[11px] font-mono text-[var(--fg-3)] mb-1">
+                        <span>{completed}/{total}</span>
+                        <span>{pct}%</span>
+                      </div>
+                      <div className="slop-progress-track">
+                        <div
+                          className="slop-progress-fill"
+                          style={{
+                            width: `${pct}%`,
+                            backgroundColor: pct === 100 ? '#a855f7' : 'var(--accent)',
+                          }}
+                        />
+                      </div>
+                    </td>
+
+                    {/* Tech Stack */}
+                    <td className="py-3 px-3.5 align-middle">
+                      <div className="flex flex-wrap gap-1 max-w-[200px]">
+                        {project.techStack.slice(0, 3).map((tech) => (
                           <span
                             key={tech}
-                            className="px-2 py-0.5 rounded text-xs font-mono bg-[var(--bg-surface)] text-[var(--text-secondary)] border border-[var(--border-main)] whitespace-nowrap"
+                            className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-[var(--bg)] text-[var(--fg-2)] border border-[var(--line)]"
                           >
                             {tech}
                           </span>
                         ))}
+                        {project.techStack.length > 3 && (
+                          <span className="px-1 py-0.2 rounded text-[10px] font-mono text-[var(--fg-3)] border border-[var(--line)]">
+                            +{project.techStack.length - 3}
+                          </span>
+                        )}
                       </div>
                     </td>
 
-                    {/* Dev Command with 1-click copy */}
-                    <td className="py-3.5 px-3.5 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                    {/* Dev Command */}
+                    <td className="py-3 px-3.5 whitespace-nowrap align-middle" onClick={(e) => e.stopPropagation()}>
                       {primaryCommand ? (
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            onClick={(e) => copyToClipboard(e, primaryCommand.cmd, `cmd-${project.id}`)}
-                            title={`Copy: ${primaryCommand.cmd}`}
-                            className="flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--bg-surface)] border border-[var(--border-main)] hover:border-[var(--text-muted)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-xs transition"
-                          >
-                            <Terminal className="h-3 w-3 flex-shrink-0" />
-                            <span className="truncate max-w-[120px]">{primaryCommand.cmd}</span>
-                            {copiedId === `cmd-${project.id}` ? (
-                              <Check className="h-3 w-3 text-emerald-400 flex-shrink-0" />
-                            ) : (
-                              <Copy className="h-3 w-3 opacity-60 flex-shrink-0" />
-                            )}
-                          </button>
-                        </div>
+                        <button
+                          onClick={(e) =>
+                            copyToClipboard(
+                              e,
+                              primaryCommand.cmd,
+                              `tbl-cmd-${project.id}`
+                            )
+                          }
+                          className="flex items-center gap-1.5 px-2 py-1 rounded border border-[var(--line)] hover:border-[var(--line-2)] font-mono text-[11px] text-[var(--fg-2)] hover:text-[var(--fg)] bg-[var(--bg)] transition cursor-pointer"
+                          title={`Copy: ${primaryCommand.cmd}`}
+                        >
+                          <Terminal className="h-3 w-3 opacity-60" />
+                          <span className="truncate max-w-[120px]">{primaryCommand.cmd}</span>
+                          {copiedId === `tbl-cmd-${project.id}` ? (
+                            <Check className="h-3 w-3 text-emerald-400" />
+                          ) : (
+                            <Copy className="h-3 w-3 opacity-40" />
+                          )}
+                        </button>
+                      ) : project.path ? (
+                        <span className="text-[11px] font-mono text-[var(--fg-3)] truncate max-w-[120px] block">
+                          {project.path.split(/[/\\\\]/).pop()}
+                        </span>
                       ) : (
-                        <span className="text-[var(--text-muted)] italic font-mono text-xs">—</span>
+                        <span className="text-[11px] font-mono text-[var(--fg-3)]">&mdash;</span>
                       )}
                     </td>
 
-                    {/* Location / Repo with 1-click copy & external link */}
-                    <td className="py-3.5 px-3.5 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-1.5">
-                        {project.path ? (
-                          <button
-                            onClick={(e) => copyToClipboard(e, project.path!, `path-${project.id}`)}
-                            title={`Copy path: ${project.path}`}
-                            className="flex items-center gap-1 px-2 py-1 rounded bg-[var(--bg-surface)] border border-[var(--border-main)] hover:border-[var(--text-muted)] font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
-                          >
-                            <FolderGit2 className="h-3.5 w-3.5 flex-shrink-0" />
-                            <span className="truncate max-w-[120px]">{project.path.split(/[/\\]/).pop()}</span>
-                            {copiedId === `path-${project.id}` ? (
-                              <Check className="h-3 w-3 text-emerald-400 flex-shrink-0" />
-                            ) : (
-                              <Copy className="h-3 w-3 opacity-60 flex-shrink-0" />
-                            )}
-                          </button>
-                        ) : null}
-
-                        {project.upstreamRefs && project.upstreamRefs.length > 0 && (
-                          <a
-                            href={project.upstreamRefs[0].url}
-                            target="_blank"
-                            rel="noreferrer"
-                            title={project.upstreamRefs[0].name}
-                            className="p-1 rounded border border-[var(--border-main)] bg-[var(--bg-surface)] hover:border-[var(--text-muted)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
-                          >
-                            <ExternalLink className="h-3.5 w-3.5" />
-                          </a>
-                        )}
-
-                        {!project.path && (!project.upstreamRefs || project.upstreamRefs.length === 0) && (
-                          <span className="text-[var(--text-muted)] italic font-mono text-xs">—</span>
-                        )}
-                      </div>
-                    </td>
-
                     {/* Updated */}
-                    <td className="py-3.5 px-3.5 whitespace-nowrap font-mono text-xs text-[var(--text-secondary)]">
+                    <td className="py-3 px-3.5 whitespace-nowrap font-mono text-[11px] text-[var(--fg-3)] align-middle">
                       {formatShortDate(project.updatedAt)}
                     </td>
 
-                    {/* Arrow */}
-                    <td className="py-3.5 px-3.5 text-right whitespace-nowrap">
-                      <button
-                        onClick={() => onSelectProject(project)}
-                        className="p-1 rounded text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition"
-                        title="Open details"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
+                    {/* Chevron */}
+                    <td className="py-3 px-2 text-right align-middle">
+                      <ChevronRight className="h-3.5 w-3.5 text-[var(--fg-3)] group-hover:text-[var(--fg)] group-hover:translate-x-0.5 transition-all inline-block" />
                     </td>
                   </tr>
                 );

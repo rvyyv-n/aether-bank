@@ -80,6 +80,15 @@ editable scratchpad.
   <img src="screenshots/banker-drawer.png" alt="Banker project detail drawer" width="100%" />
 </a>
 
+### Analytics
+
+Slopalytics-inspired performance and execution benchmarks. Track task completion velocity,
+lifecycle distribution matrices, priority weighting, and tech stack intelligence across your entire vault.
+
+<a href="https://rvyyv-n.github.io/banker/">
+  <img src="screenshots/banker-analytics.png" alt="Banker Analytics and Velocity view" width="100%" />
+</a>
+
 ### Light mode
 
 Crisp, paper-like neutral styling with stark typography. Press <kbd>T</kbd>
@@ -149,11 +158,13 @@ src/
   data/
     initialData.ts        initial project catalog and milestone seeds
   components/
-    Header.tsx            search bar, status filters, priority filter, and actions
+    Header.tsx            Slopalytics-style navigation header with section & view tabs
+    Sidebar.tsx           Slopalytics-style filter sidebar with status, priority, and quick directory
     BankerLogo.tsx        minimal geometric vault vector mark
     KanbanBoard.tsx       six-column stage board with dev shortcuts & milestones
-    TableView.tsx         high-density CRM data grid with 1-click command & path copy
-    RoadmapView.tsx       four-phase execution timeline
+    TableView.tsx         high-density developer data grid with 1-click command & path copy
+    RoadmapView.tsx       four-phase ecosystem execution timeline
+    AnalyticsView.tsx     Slopalytics-style velocity, distribution, and tech stack intelligence
     ProjectDrawer.tsx     slide-over drawer with checklists and scratchpad
     NewProjectModal.tsx   fast idea capture modal
 screenshots/              retina edge-to-edge screenshots of views and mobile layout

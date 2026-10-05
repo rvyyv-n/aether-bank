@@ -6,7 +6,13 @@ const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
 const URL = 'file:///' + path.join(__dirname, 'dist', 'index.html').replace(/\\/g, '/');
 const ICON_SVG_URL = 'file:///' + path.join(__dirname, 'icon.svg').replace(/\\/g, '/');
 const OUT_DIR = path.join(__dirname, 'screenshots');
-const ARTIFACT_DIR = 'C:\\Users\\rayyan\\.gemini\\antigravity-acp\\brain\\9e5afd4d-5d36-4b2d-8455-c190b3f6c150';
+const ARTIFACT_DIR = process.env.ARTIFACT_DIR;
+
+function copyToArtifact(srcPath, filename) {
+  if (ARTIFACT_DIR && fs.existsSync(ARTIFACT_DIR)) {
+    fs.copyFileSync(srcPath, path.join(ARTIFACT_DIR, filename));
+  }
+}
 
 if (!fs.existsSync(OUT_DIR)) {
   fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -36,79 +42,80 @@ async function capture() {
     await page.setViewport({ width: 1600, height: 940, deviceScaleFactor: 2 });
     console.log('Navigating to', URL);
     await page.goto(URL, { waitUntil: 'load' });
-    await new Promise(r => setTimeout(r, 800));
+    await new Promise(r => setTimeout(r, 1000));
 
     // Clear previous storage to ensure clean projects
     await page.evaluate(() => localStorage.clear());
     await page.reload({ waitUntil: 'load' });
-    await new Promise(r => setTimeout(r, 800));
+    await new Promise(r => setTimeout(r, 1000));
 
-    // 1. OLED Dark Board (edge to edge full width)
+    // 1. OLED Dark Board (edge to edge full width in Slopalytics aesthetic)
     const boardPath = path.join(OUT_DIR, 'banker-oled-dark.png');
-    const boardArtifact = path.join(ARTIFACT_DIR, 'banker-oled-dark.png');
     await page.screenshot({ path: boardPath });
-    fs.copyFileSync(boardPath, boardArtifact);
+    copyToArtifact(boardPath, 'banker-oled-dark.png');
     console.log('Captured banker-oled-dark.png');
 
     // 2. Open Project Drawer in OLED Dark
-    const card = await page.$('.oled-card');
+    const card = await page.$('.slop-card');
     if (card) {
       await card.click();
-      await new Promise(r => setTimeout(r, 500));
+      await new Promise(r => setTimeout(r, 600));
       const drawerPath = path.join(OUT_DIR, 'banker-drawer.png');
-      const drawerArtifact = path.join(ARTIFACT_DIR, 'banker-drawer.png');
       await page.screenshot({ path: drawerPath });
-      fs.copyFileSync(drawerPath, drawerArtifact);
+      copyToArtifact(drawerPath, 'banker-drawer.png');
       console.log('Captured banker-drawer.png');
 
       await page.keyboard.press('Escape');
-      await new Promise(r => setTimeout(r, 300));
+      await new Promise(r => setTimeout(r, 400));
     }
 
-    // 3. Switch to Table view in OLED Dark (hotkey '2')
+    // 3. Switch to Table view (hotkey '2')
     await page.keyboard.press('2');
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 600));
     const tablePath = path.join(OUT_DIR, 'banker-table.png');
-    const tableArtifact = path.join(ARTIFACT_DIR, 'banker-table.png');
     await page.screenshot({ path: tablePath });
-    fs.copyFileSync(tablePath, tableArtifact);
+    copyToArtifact(tablePath, 'banker-table.png');
     console.log('Captured banker-table.png');
 
-    // 4. Switch to Light Mode (hotkey 'T')
-    await page.keyboard.press('t');
+    // 4. Switch to Roadmap view (hotkey '3')
+    await page.keyboard.press('3');
+    await new Promise(r => setTimeout(r, 600));
+    const roadmapPath = path.join(OUT_DIR, 'banker-roadmap.png');
+    await page.screenshot({ path: roadmapPath });
+    copyToArtifact(roadmapPath, 'banker-roadmap.png');
+    console.log('Captured banker-roadmap.png');
+
+    // 5. Switch to Analytics view (hotkey '4')
+    await page.keyboard.press('4');
+    await new Promise(r => setTimeout(r, 600));
+    const analyticsPath = path.join(OUT_DIR, 'banker-analytics.png');
+    await page.screenshot({ path: analyticsPath });
+    copyToArtifact(analyticsPath, 'banker-analytics.png');
+    console.log('Captured banker-analytics.png');
+
+    // 6. Switch to Light Mode (hotkey 'T') on Board
     await page.keyboard.press('1'); // back to board
-    await new Promise(r => setTimeout(r, 500));
+    await page.keyboard.press('t'); // toggle theme
+    await new Promise(r => setTimeout(r, 600));
     const lightPath = path.join(OUT_DIR, 'banker-light-mode.png');
-    const lightArtifact = path.join(ARTIFACT_DIR, 'banker-light-mode.png');
     await page.screenshot({ path: lightPath });
-    fs.copyFileSync(lightPath, lightArtifact);
+    copyToArtifact(lightPath, 'banker-light-mode.png');
     console.log('Captured banker-light-mode.png');
 
-    // 5. Mobile View (iPhone 15 format, dark mode)
+    // 7. Mobile View (iPhone 15 format, dark mode)
     await page.keyboard.press('t'); // back to dark
     await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
     await new Promise(r => setTimeout(r, 600));
     const mobileDarkPath = path.join(OUT_DIR, 'banker-mobile-dark.png');
-    const mobileDarkArtifact = path.join(ARTIFACT_DIR, 'banker-mobile-dark.png');
     await page.screenshot({ path: mobileDarkPath });
-    fs.copyFileSync(mobileDarkPath, mobileDarkArtifact);
+    copyToArtifact(mobileDarkPath, 'banker-mobile-dark.png');
     fs.copyFileSync(mobileDarkPath, path.join(OUT_DIR, 'banker-mobile.png'));
     console.log('Captured banker-mobile-dark.png');
-
-    // 6. Mobile View (iPhone 15 format, light mode)
-    await page.keyboard.press('t'); // toggle to light
-    await new Promise(r => setTimeout(r, 600));
-    const mobileLightPath = path.join(OUT_DIR, 'banker-mobile-light.png');
-    const mobileLightArtifact = path.join(ARTIFACT_DIR, 'banker-mobile-light.png');
-    await page.screenshot({ path: mobileLightPath });
-    fs.copyFileSync(mobileLightPath, mobileLightArtifact);
-    console.log('Captured banker-mobile-light.png');
 
   } catch (err) {
     console.error('Error during capture:', err);
   } finally {
     await browser.close();
-    console.log('Capture complete!');
   }
 }
 

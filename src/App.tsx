@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import type { ProjectIdea, ProjectStatus, PriorityLevel } from './types';
 import { INITIAL_PROJECTS } from './data/initialData';
 import { Header } from './components/Header';
+import { Sidebar } from './components/Sidebar';
 import { KanbanBoard } from './components/KanbanBoard';
 import { TableView } from './components/TableView';
 import { RoadmapView } from './components/RoadmapView';
+import { AnalyticsView } from './components/AnalyticsView';
 import { ProjectDrawer } from './components/ProjectDrawer';
 import { NewProjectModal } from './components/NewProjectModal';
 
@@ -19,7 +21,7 @@ export function App() {
     } catch (e) {
       console.error(e);
     }
-    return 'dark'; // OLED dark default
+    return 'dark'; // Slopalytics dark default
   });
 
   const [projects, setProjects] = useState<ProjectIdea[]>(() => {
@@ -34,7 +36,8 @@ export function App() {
     return INITIAL_PROJECTS;
   });
 
-  const [viewMode, setViewMode] = useState<'board' | 'table' | 'roadmap'>('board');
+  const [activeSection, setActiveSection] = useState<'vault' | 'roadmap' | 'analytics'>('vault');
+  const [viewMode, setViewMode] = useState<'board' | 'table'>('board');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -43,15 +46,20 @@ export function App() {
 
   const [selectedProject, setSelectedProject] = useState<ProjectIdea | null>(null);
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  // Sync theme class to document
+  // Sync theme to document element
   useEffect(() => {
     try {
       localStorage.setItem(THEME_KEY, theme);
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
+      if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
         document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
       }
     } catch (e) {
       console.error(e);
@@ -81,9 +89,10 @@ export function App() {
       if (e.key === 'Escape') {
         setSelectedProject(null);
         setIsNewModalOpen(false);
+        setIsMobileSidebarOpen(false);
       } else if (e.key === '/' || (e.ctrlKey && e.key === 'k') || (e.metaKey && e.key === 'k')) {
         e.preventDefault();
-        const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
+        const searchInput = document.querySelector('.search input') as HTMLInputElement;
         searchInput?.focus();
       } else if (e.key === 'n' || e.key === 'N') {
         e.preventDefault();
@@ -92,11 +101,15 @@ export function App() {
         e.preventDefault();
         setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
       } else if (e.key === '1') {
+        setActiveSection('vault');
         setViewMode('board');
       } else if (e.key === '2') {
+        setActiveSection('vault');
         setViewMode('table');
       } else if (e.key === '3') {
-        setViewMode('roadmap');
+        setActiveSection('roadmap');
+      } else if (e.key === '4') {
+        setActiveSection('analytics');
       }
     };
 
@@ -212,6 +225,13 @@ export function App() {
     }
   };
 
+  const handleResetFilters = () => {
+    setSelectedCategory('all');
+    setSelectedStatus('all');
+    setSelectedPriority('all');
+    setSearchQuery('');
+  };
+
   const handleExportJson = () => {
     const dataStr =
       'data:text/json;charset=utf-8,' +
@@ -228,21 +248,15 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] flex flex-col">
-      {/* Header */}
+    <div className="app">
+      {/* Header matching Slopalytics structure */}
       <Header
         projects={projects}
         filteredCount={filteredProjects.length}
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
         viewMode={viewMode}
         setViewMode={setViewMode}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        selectedStatus={selectedStatus}
-        setSelectedStatus={setSelectedStatus}
-        selectedPriority={selectedPriority}
-        setSelectedPriority={setSelectedPriority}
         sortBy={sortBy}
         setSortBy={setSortBy}
         theme={theme}
@@ -250,33 +264,63 @@ export function App() {
         onOpenNewModal={() => setIsNewModalOpen(true)}
         onResetData={handleResetData}
         onExportJson={handleExportJson}
+        onToggleMobileSidebar={() => setIsMobileSidebarOpen((prev) => !prev)}
       />
 
-      {/* Main View Area - Fluid full-width desktop layout without artificial narrow clamp */}
-      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 py-5">
-        {viewMode === 'board' && (
-          <KanbanBoard
-            projects={filteredProjects}
-            onSelectProject={setSelectedProject}
-            onUpdateStatus={handleUpdateStatus}
-          />
-        )}
+      {/* Main Body Layout: Fluid Content + Slopalytics Right Sidebar */}
+      <div className="body-layout">
+        <main className="main-content p-4 sm:p-6">
+          {activeSection === 'vault' && viewMode === 'board' && (
+            <KanbanBoard
+              projects={filteredProjects}
+              onSelectProject={setSelectedProject}
+              onUpdateStatus={handleUpdateStatus}
+            />
+          )}
 
-        {viewMode === 'table' && (
-          <TableView
-            projects={filteredProjects}
-            onSelectProject={setSelectedProject}
-            onUpdateStatus={handleUpdateStatus}
-          />
-        )}
+          {activeSection === 'vault' && viewMode === 'table' && (
+            <TableView
+              projects={filteredProjects}
+              onSelectProject={setSelectedProject}
+              onUpdateStatus={handleUpdateStatus}
+            />
+          )}
 
-        {viewMode === 'roadmap' && (
-          <RoadmapView
-            projects={filteredProjects}
-            onSelectProject={setSelectedProject}
-          />
-        )}
-      </main>
+          {activeSection === 'roadmap' && (
+            <RoadmapView
+              projects={filteredProjects}
+              onSelectProject={setSelectedProject}
+            />
+          )}
+
+          {activeSection === 'analytics' && (
+            <AnalyticsView
+              projects={filteredProjects}
+              onSelectProject={setSelectedProject}
+            />
+          )}
+        </main>
+
+        {/* Slopalytics Right-Hand Sidebar */}
+        <Sidebar
+          projects={projects}
+          filteredCount={filteredProjects.length}
+          totalCount={projects.length}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedStatus={selectedStatus}
+          setSelectedStatus={setSelectedStatus}
+          selectedPriority={selectedPriority}
+          setSelectedPriority={setSelectedPriority}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          selectedProjectId={selectedProject?.id || null}
+          onSelectProject={setSelectedProject}
+          isOpenMobile={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
+          onResetFilters={handleResetFilters}
+        />
+      </div>
 
       {/* Slide-over Project Drawer */}
       <ProjectDrawer

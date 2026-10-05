@@ -46,11 +46,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
     const newProject: ProjectIdea = {
       id,
       title: title.trim(),
-      subtitle: subtitle.trim() || 'Custom Project Idea',
-      category: category.trim() || 'General',
+      subtitle: subtitle.trim() || 'Custom Project Concept',
+      category: category.trim() || 'Tooling',
       status,
       priority,
-      techStack: techStack.length > 0 ? techStack : ['Rust', 'Tauri v2'],
+      techStack: techStack.length > 0 ? techStack : ['TypeScript', 'React'],
       description: description.trim() || 'Logged project concept.',
       milestones: milestones.length > 0 ? milestones : [{ id: 'm1', text: 'Initial technical specification', completed: false }],
       path: path.trim() || undefined,
@@ -58,6 +58,12 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
     };
 
     onAddProject(newProject);
+    setTitle('');
+    setSubtitle('');
+    setDescription('');
+    setTechStackInput('');
+    setPath('');
+    setMilestonesInput('');
     onClose();
   };
 
@@ -66,19 +72,17 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div 
-        className="w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-xl shadow-2xl overflow-hidden"
+        className="w-full max-w-md bg-[var(--surface)] border border-[var(--line)] rounded-lg shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-5 py-3.5 border-b border-[var(--border-main)] flex items-center justify-between bg-[var(--bg-surface)]">
+        <div className="px-5 py-3.5 border-b border-[var(--line)] flex items-center justify-between bg-[var(--surface)]">
           <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded bg-[var(--text-primary)] text-[var(--bg-surface)] flex items-center justify-center">
-              <BankerLogo size={14} />
-            </div>
-            <h3 className="text-xs font-semibold text-[var(--text-primary)] m-0">New Project / Idea</h3>
+            <BankerLogo size={16} className="text-[var(--accent)]" />
+            <h3 className="text-xs font-semibold text-[var(--fg)] m-0">Log New Project Idea</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
+            className="p-1 rounded text-[var(--fg-3)] hover:text-[var(--fg)] transition cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
@@ -86,129 +90,114 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-5 space-y-3.5 text-xs">
           <div>
-            <label className="block text-[var(--text-secondary)] font-mono text-[10px] uppercase mb-1">Title *</label>
+            <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Title *</label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Zen Quick Launcher"
-              className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+              className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-3 py-1.5 text-[var(--fg)] placeholder-[var(--fg-3)] focus:outline-none focus:border-[var(--accent)]"
             />
           </div>
 
           <div>
-            <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Subtitle</label>
+            <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">One-line Subtitle</label>
             <input
               type="text"
               value={subtitle}
               onChange={(e) => setSubtitle(e.target.value)}
-              placeholder="e.g. Minimal keyboard runner in Rust"
-              className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+              placeholder="e.g. Keyboard-driven fuzzy file and command palette"
+              className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-3 py-1.5 text-[var(--fg)] placeholder-[var(--fg-3)] focus:outline-none focus:border-[var(--accent)]"
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-3 gap-2">
             <div>
-              <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Category</label>
+              <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Category</label>
               <input
                 type="text"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                placeholder="System"
-                className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-2 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+                placeholder="CLI / App"
+                className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-2.5 py-1.5 text-[var(--fg)] placeholder-[var(--fg-3)] focus:outline-none focus:border-[var(--accent)]"
               />
             </div>
-
             <div>
-              <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Status</label>
+              <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Initial Status</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as ProjectStatus)}
-                className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-2 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+                className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-2 py-1.5 text-[var(--fg)] focus:outline-none focus:border-[var(--accent)]"
               >
                 <option value="backlog">Backlog</option>
                 <option value="planned">Planned</option>
                 <option value="spike">Spike</option>
                 <option value="in_progress">In Progress</option>
-                <option value="polishing">Polishing</option>
-                <option value="shipped">Shipped</option>
               </select>
             </div>
-
             <div>
-              <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Priority</label>
+              <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Priority</label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as PriorityLevel)}
-                className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-2 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+                className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-2 py-1.5 text-[var(--fg)] focus:outline-none focus:border-[var(--accent)]"
               >
-                <option value="P0">P0</option>
-                <option value="P1">P1</option>
-                <option value="P2">P2</option>
-                <option value="P3">P3</option>
+                <option value="P0">P0 (Critical)</option>
+                <option value="P1">P1 (High)</option>
+                <option value="P2">P2 (Standard)</option>
+                <option value="P3">P3 (Backburner)</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Tech Stack (comma separated)</label>
+            <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Tech Stack (comma separated)</label>
             <input
               type="text"
               value={techStackInput}
               onChange={(e) => setTechStackInput(e.target.value)}
-              placeholder="Rust, Tauri v2, Tailwind"
-              className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
+              placeholder="e.g. Rust, Tokio, Ratatui, SQLite"
+              className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-3 py-1.5 text-[var(--fg)] placeholder-[var(--fg-3)] focus:outline-none focus:border-[var(--accent)]"
             />
           </div>
 
           <div>
-            <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Description</label>
-            <textarea
-              rows={2}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="What does it do? Key technical decisions..."
-              className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg p-2.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
-            />
-          </div>
-
-          <div>
-            <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Milestones (1 per line)</label>
-            <textarea
-              rows={2}
-              value={milestonesInput}
-              onChange={(e) => setMilestonesInput(e.target.value)}
-              placeholder="Scaffold repository&#10;Implement core logic"
-              className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg p-2.5 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)] font-mono text-[11px]"
-            />
-          </div>
-
-          <div>
-            <label className="block text-[var(--text-secondary)] font-mono text-xs uppercase mb-1.5">Path (Optional)</label>
+            <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Local Repo Path (optional)</label>
             <input
               type="text"
               value={path}
               onChange={(e) => setPath(e.target.value)}
-              placeholder="D:\Code\Repos\zen-launcher"
-              className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg px-2.5 py-1 text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)] font-mono"
+              placeholder="e.g. projects/zen-launcher"
+              className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-3 py-1.5 text-[var(--fg)] placeholder-[var(--fg-3)] font-mono focus:outline-none focus:border-[var(--accent)]"
             />
           </div>
 
-          <div className="pt-2 border-t border-[var(--border-main)] flex items-center justify-end gap-2">
+          <div>
+            <label className="block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1">Milestones (one per line)</label>
+            <textarea
+              rows={3}
+              value={milestonesInput}
+              onChange={(e) => setMilestonesInput(e.target.value)}
+              placeholder={"Project scaffold & CLI args\nFuzzy matching index\nRelease v0.1.0"}
+              className="w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-3 py-1.5 text-[var(--fg)] placeholder-[var(--fg-3)] focus:outline-none focus:border-[var(--accent)] font-mono"
+            />
+          </div>
+
+          <div className="pt-2 flex items-center justify-end gap-2 border-t border-[var(--line)]">
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-1.5 rounded-lg border border-[var(--border-main)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
+              className="px-3 py-1.5 rounded-md border border-[var(--line)] hover:border-[var(--line-2)] text-[var(--fg-2)] hover:text-[var(--fg)] transition cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-3 py-1.5 rounded-lg bg-[var(--text-primary)] text-[var(--bg-surface)] font-medium hover:opacity-90 transition flex items-center gap-1.5"
+              className="btn-accent cursor-pointer"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span>Create</span>
+              <span>Create Project</span>
             </button>
           </div>
         </form>

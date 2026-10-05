@@ -9,7 +9,6 @@ import {
   CheckSquare, 
   Square, 
   FolderGit2, 
-  GitFork, 
   ExternalLink, 
   Copy, 
   Check, 
@@ -26,6 +25,8 @@ interface ProjectDrawerProps {
   onDeleteProject: (projectId: string) => void;
 }
 
+const getNowIso = () => new Date().toISOString();
+
 const DrawerContent: React.FC<{
   project: ProjectIdea;
   onClose: () => void;
@@ -37,7 +38,6 @@ const DrawerContent: React.FC<{
   onUpdateProject,
   onDeleteProject,
 }) => {
-
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [notesValue, setNotesValue] = useState(project.notes || '');
@@ -55,7 +55,7 @@ const DrawerContent: React.FC<{
     onUpdateProject({
       ...project,
       milestones: updatedMilestones,
-      updatedAt: new Date().toISOString(),
+      updatedAt: getNowIso(),
     });
   };
 
@@ -63,28 +63,31 @@ const DrawerContent: React.FC<{
     onUpdateProject({
       ...project,
       notes: notesValue,
-      updatedAt: new Date().toISOString(),
+      updatedAt: getNowIso(),
     });
     setIsEditingNotes(false);
   };
 
   const completedMilestones = project.milestones.filter((m) => m.completed).length;
   const totalMilestones = project.milestones.length;
-  const progressPct = totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0;
+  const progressPct =
+    totalMilestones > 0
+      ? Math.round((completedMilestones / totalMilestones) * 100)
+      : 0;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/50 backdrop-blur-xs flex justify-end">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-xs flex justify-end">
       <div 
-        className="w-full max-w-xl bg-[var(--bg-surface)] border-l border-[var(--border-main)] h-full overflow-y-auto flex flex-col shadow-2xl relative"
+        className="w-full max-w-xl bg-[var(--surface)] border-l border-[var(--line)] h-full overflow-y-auto flex flex-col shadow-2xl relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top bar */}
-        <div className="sticky top-0 z-10 bg-[var(--bg-surface)] px-6 py-4 border-b border-[var(--border-main)] flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-[var(--surface)] px-6 py-4 border-b border-[var(--line)] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] bg-[var(--bg-surface)] px-2.5 py-0.5 rounded border border-[var(--border-main)]">
+            <span className="text-[10.5px] font-mono uppercase tracking-wider text-[var(--fg-3)] bg-[var(--bg)] px-2 py-0.5 rounded border border-[var(--line)]">
               {project.category}
             </span>
-            <span className="text-xs font-mono text-[var(--text-muted)]">· {project.id}</span>
+            <span className="text-[11px] font-mono text-[var(--fg-3)]">&middot; {project.id}</span>
           </div>
 
           <div className="flex items-center gap-1.5">
@@ -95,36 +98,47 @@ const DrawerContent: React.FC<{
                   onClose();
                 }
               }}
-              className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-500/10 transition"
+              className="p-1.5 rounded text-[var(--fg-3)] hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
               title="Delete project"
             >
               <Trash2 className="h-4 w-4" />
             </button>
+
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] transition"
+              className="p-1.5 rounded text-[var(--fg-3)] hover:text-[var(--fg)] hover:bg-[var(--hover)] transition cursor-pointer"
+              title="Close (Esc)"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        {/* Content body */}
-        <div className="p-6 space-y-6 flex-1">
+        {/* Drawer Body */}
+        <div className="p-6 space-y-6 flex-1 text-xs">
           {/* Header Title & Subtitle */}
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] m-0">
-              {project.title}
-            </h2>
-            <p className="text-sm text-[var(--text-secondary)] mt-1.5 leading-relaxed">
+            <div className="flex items-start justify-between gap-3">
+              <h2 className="text-xl font-semibold text-[var(--fg)] tracking-tight m-0">
+                {project.title}
+              </h2>
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <span className="text-xs font-mono font-medium px-2 py-0.5 rounded bg-[var(--bg)] text-[var(--fg-2)] border border-[var(--line)]">
+                  {project.priority}
+                </span>
+              </div>
+            </div>
+            <p className="text-xs text-[var(--fg-2)] mt-1.5 leading-relaxed m-0">
               {project.subtitle}
             </p>
           </div>
 
-          {/* Quick Property Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-main)]">
+          {/* Status & Path Controls */}
+          <div className="grid grid-cols-2 gap-3 p-3.5 rounded-lg border border-[var(--line)] bg-[var(--bg)]">
             <div>
-              <span className="text-xs font-mono uppercase text-[var(--text-muted)] block mb-1.5">Status</span>
+              <label className="text-[10px] font-mono text-[var(--fg-3)] uppercase block mb-1">
+                Lifecycle Stage
+              </label>
               <select
                 value={project.status}
                 onChange={(e) =>
@@ -134,11 +148,11 @@ const DrawerContent: React.FC<{
                     updatedAt: new Date().toISOString(),
                   })
                 }
-                className="text-xs font-mono py-1.5 px-2 rounded bg-[var(--bg-surface)] border border-[var(--border-main)] text-[var(--text-primary)] focus:outline-none w-full"
+                className="w-full bg-[var(--surface)] border border-[var(--line)] rounded px-2.5 py-1 text-xs text-[var(--fg)] focus:outline-none focus:border-[var(--accent)]"
               >
                 <option value="backlog">Backlog</option>
                 <option value="planned">Planned</option>
-                <option value="spike">Spike</option>
+                <option value="spike">Spike & R&D</option>
                 <option value="in_progress">In Progress</option>
                 <option value="polishing">Polishing</option>
                 <option value="shipped">Shipped</option>
@@ -146,7 +160,9 @@ const DrawerContent: React.FC<{
             </div>
 
             <div>
-              <span className="text-xs font-mono uppercase text-[var(--text-muted)] block mb-1.5">Priority</span>
+              <label className="text-[10px] font-mono text-[var(--fg-3)] uppercase block mb-1">
+                Priority Tier
+              </label>
               <select
                 value={project.priority}
                 onChange={(e) =>
@@ -156,79 +172,74 @@ const DrawerContent: React.FC<{
                     updatedAt: new Date().toISOString(),
                   })
                 }
-                className="text-xs font-mono py-1.5 px-2 rounded bg-[var(--bg-surface)] border border-[var(--border-main)] text-[var(--text-primary)] focus:outline-none w-full"
+                className="w-full bg-[var(--surface)] border border-[var(--line)] rounded px-2.5 py-1 text-xs text-[var(--fg)] focus:outline-none focus:border-[var(--accent)]"
               >
-                <option value="P0">P0 (Urgent)</option>
-                <option value="P1">P1 (High)</option>
-                <option value="P2">P2 (Medium)</option>
-                <option value="P3">P3 (Low)</option>
+                <option value="P0">P0 - Blocker / Core Path</option>
+                <option value="P1">P1 - High Priority</option>
+                <option value="P2">P2 - Standard Roadmap</option>
+                <option value="P3">P3 - Nice to have</option>
               </select>
-            </div>
-
-            <div>
-              <span className="text-xs font-mono uppercase text-[var(--text-muted)] block mb-1.5">License</span>
-              <span className="text-xs font-mono text-[var(--text-secondary)] block py-1.5">
-                {project.license || 'TBD'}
-              </span>
-            </div>
-
-            <div>
-              <span className="text-xs font-mono uppercase text-[var(--text-muted)] block mb-1.5">Updated</span>
-              <span className="text-xs font-mono text-[var(--text-secondary)] block py-1.5">
-                {new Date(project.updatedAt).toLocaleDateString()}
-              </span>
             </div>
           </div>
 
-          {/* Location & Thread ID */}
-          {(project.path || project.threadId) && (
+          {/* Repo Path & External Links */}
+          {(project.path || (project.upstreamRefs && project.upstreamRefs.length > 0)) && (
             <div className="space-y-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] block">Links</span>
-              <div className="space-y-2">
+              <label className="text-[10px] font-mono text-[var(--fg-3)] uppercase block">
+                Local Workspace & References
+              </label>
+              <div className="space-y-1.5">
                 {project.path && (
-                  <div className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-main)] font-mono text-xs">
-                    <div className="flex items-center gap-2 text-[var(--text-primary)] truncate">
-                      <FolderGit2 className="h-4 w-4 text-[var(--text-secondary)] flex-shrink-0" />
-                      <span className="truncate text-xs">{project.path}</span>
-                    </div>
+                  <div className="flex items-center justify-between p-2 rounded border border-[var(--line)] bg-[var(--bg)] font-mono text-xs">
+                    <span className="flex items-center gap-2 text-[var(--fg-2)] truncate">
+                      <FolderGit2 className="h-3.5 w-3.5 text-[var(--accent)] flex-shrink-0" />
+                      <span className="truncate">{project.path}</span>
+                    </span>
                     <button
                       onClick={() => copyToClipboard(project.path!, 'path')}
-                      className="p-1 rounded hover:bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
+                      className="p-1 rounded text-[var(--fg-3)] hover:text-[var(--fg)] transition ml-2 cursor-pointer"
                       title="Copy path"
                     >
-                      {copiedCmd === 'path' ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+                      {copiedCmd === 'path' ? (
+                        <Check className="h-3.5 w-3.5 text-emerald-400" />
+                      ) : (
+                        <Copy className="h-3.5 w-3.5" />
+                      )}
                     </button>
                   </div>
                 )}
 
-                {project.threadId && (
-                  <div className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-main)] font-mono text-xs">
-                    <div className="flex items-center gap-2 text-[var(--text-primary)] truncate">
-                      <GitFork className="h-4 w-4 text-[var(--text-secondary)] flex-shrink-0" />
-                      <span className="text-[var(--text-muted)] text-xs">T3:</span>
-                      <span className="truncate text-xs">{project.threadId}</span>
-                    </div>
-                    <button
-                      onClick={() => copyToClipboard(project.threadId!, 'thread')}
-                      className="p-1 rounded hover:bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
-                      title="Copy Thread ID"
-                    >
-                      {copiedCmd === 'thread' ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
-                    </button>
-                  </div>
-                )}
+                {project.upstreamRefs?.map((ref) => (
+                  <a
+                    key={ref.url}
+                    href={ref.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-between p-2 rounded border border-[var(--line)] bg-[var(--bg)] hover:border-[var(--line-2)] font-mono text-xs text-[var(--fg-2)] hover:text-[var(--fg)] transition group"
+                  >
+                    <span className="flex items-center gap-2">
+                      <ExternalLink className="h-3.5 w-3.5 text-[var(--fg-3)] group-hover:text-[var(--accent)] transition" />
+                      <span>{ref.name}</span>
+                    </span>
+                    <span className="text-[11px] text-[var(--fg-3)] truncate max-w-[200px]">
+                      {ref.url}
+                    </span>
+                  </a>
+                ))}
               </div>
             </div>
           )}
 
           {/* Tech Stack */}
           <div>
-            <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] block mb-2">Tech Stack</span>
+            <label className="text-[10px] font-mono text-[var(--fg-3)] uppercase block mb-2">
+              Tech Stack & Tooling
+            </label>
             <div className="flex flex-wrap gap-1.5">
               {project.techStack.map((tech) => (
                 <span
                   key={tech}
-                  className="px-2.5 py-1 rounded text-xs font-mono bg-[var(--bg-surface)] border border-[var(--border-main)] text-[var(--text-secondary)]"
+                  className="px-2 py-0.5 rounded text-[11px] font-mono bg-[var(--bg)] text-[var(--fg-2)] border border-[var(--line)]"
                 >
                   {tech}
                 </span>
@@ -236,102 +247,30 @@ const DrawerContent: React.FC<{
             </div>
           </div>
 
-          {/* Overview & Problem Statement */}
-          <div className="space-y-3.5">
-            <div>
-              <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] block mb-1.5">Overview</span>
-              <p className="text-sm text-[var(--text-primary)] leading-relaxed bg-[var(--bg-surface)] p-3.5 rounded-lg border border-[var(--border-main)]">
-                {project.description}
-              </p>
-            </div>
-
-            {project.problemStatement && (
-              <div>
-                <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] block mb-1.5">Problem & Rationale</span>
-                <p className="text-sm text-[var(--text-primary)] leading-relaxed bg-[var(--bg-surface)] p-3.5 rounded-lg border border-[var(--border-main)]">
-                  {project.problemStatement}
-                </p>
-              </div>
-            )}
-
-            {project.architectureNotes && (
-              <div>
-                <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] block mb-1.5">Architecture</span>
-                <p className="text-sm text-[var(--text-primary)] leading-relaxed bg-[var(--bg-surface)] p-3.5 rounded-lg border border-[var(--border-main)]">
-                  {project.architectureNotes}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Milestones Checklist */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)]">
-                Milestones & Checklist
-              </span>
-              <span className="text-xs font-mono text-[var(--text-secondary)]">
-                {completedMilestones}/{totalMilestones} ({progressPct}%)
-              </span>
-            </div>
-
-            <div className="w-full bg-[var(--bg-surface)] h-1.5 rounded-full overflow-hidden mb-3 border border-[var(--border-main)]">
-              <div
-                className="h-full bg-[var(--text-primary)] transition-all duration-300"
-                style={{ width: `${progressPct}%` }}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              {project.milestones.map((milestone) => (
-                <div
-                  key={milestone.id}
-                  onClick={() => toggleMilestone(milestone.id)}
-                  className={`flex items-start gap-2.5 p-2.5 rounded-lg cursor-pointer transition text-sm select-none ${
-                    milestone.completed
-                      ? 'bg-[var(--bg-surface)] text-[var(--text-muted)]'
-                      : 'bg-[var(--bg-surface)] text-[var(--text-primary)] border border-[var(--border-main)] hover:bg-[var(--bg-surface-hover)]'
-                  }`}
-                >
-                  <div className="mt-0.5 flex-shrink-0 text-[var(--text-primary)]">
-                    {milestone.completed ? (
-                      <CheckSquare className="h-4 w-4 text-emerald-500" />
-                    ) : (
-                      <Square className="h-4 w-4 text-[var(--text-muted)]" />
-                    )}
-                  </div>
-                  <span className={milestone.completed ? 'line-through text-[var(--text-muted)]' : ''}>
-                    {milestone.text}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Quick Commands */}
+          {/* Dev Commands */}
           {project.commands && project.commands.length > 0 && (
             <div>
-              <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] block mb-2">
-                Commands
-              </span>
-              <div className="space-y-2">
+              <label className="text-[10px] font-mono text-[var(--fg-3)] uppercase block mb-2">
+                Terminal Commands
+              </label>
+              <div className="space-y-1.5">
                 {project.commands.map((cmd) => (
                   <div
-                    key={cmd.label}
-                    className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-main)] font-mono text-xs"
+                    key={cmd.cmd}
+                    className="flex items-center justify-between p-2 rounded border border-[var(--line)] bg-[var(--bg)] font-mono text-xs"
                   >
-                    <div className="flex items-center gap-2 text-[var(--text-primary)] truncate">
-                      <Terminal className="h-3.5 w-3.5 text-[var(--text-secondary)] flex-shrink-0" />
-                      <span className="text-[var(--text-muted)] text-xs">{cmd.label}:</span>
-                      <span className="text-xs truncate">{cmd.cmd}</span>
+                    <div className="flex items-center gap-2 truncate">
+                      <Terminal className="h-3.5 w-3.5 text-[var(--fg-3)] flex-shrink-0" />
+                      <span className="text-[var(--fg-3)]">{cmd.label}:</span>
+                      <span className="text-[var(--fg)] truncate">{cmd.cmd}</span>
                     </div>
                     <button
-                      onClick={() => copyToClipboard(cmd.cmd, cmd.label)}
-                      className="p-1 rounded hover:bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
+                      onClick={() => copyToClipboard(cmd.cmd, cmd.cmd)}
+                      className="p-1 rounded text-[var(--fg-3)] hover:text-[var(--fg)] transition ml-2 cursor-pointer"
                       title="Copy command"
                     >
-                      {copiedCmd === cmd.label ? (
-                        <Check className="h-3.5 w-3.5 text-emerald-500" />
+                      {copiedCmd === cmd.cmd ? (
+                        <Check className="h-3.5 w-3.5 text-emerald-400" />
                       ) : (
                         <Copy className="h-3.5 w-3.5" />
                       )}
@@ -342,50 +281,76 @@ const DrawerContent: React.FC<{
             </div>
           )}
 
-          {/* Upstream References */}
-          {project.upstreamRefs && project.upstreamRefs.length > 0 && (
-            <div>
-              <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] block mb-2">
-                Upstream & References
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {project.upstreamRefs.map((ref) => (
-                  <a
-                    key={ref.name}
-                    href={ref.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="p-2.5 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-main)] transition flex items-center justify-between text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] group"
-                  >
-                    <span className="truncate text-xs font-mono">{ref.name}</span>
-                    <ExternalLink className="h-3.5 w-3.5 text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition flex-shrink-0" />
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Notes / Scratchpad */}
+          {/* Milestones Checklist */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)]">
-                Scratchpad
+              <label className="text-[10px] font-mono text-[var(--fg-3)] uppercase block">
+                Milestones & Deliverables ({completedMilestones}/{totalMilestones})
+              </label>
+              <span className="text-[11px] font-mono text-[var(--accent)] font-medium">
+                {progressPct}%
               </span>
-              {isEditingNotes ? (
-                <button
-                  onClick={handleSaveNotes}
-                  className="flex items-center gap-1 text-xs text-[var(--text-primary)] hover:underline font-medium"
+            </div>
+
+            <div className="slop-progress-track mb-3">
+              <div
+                className="slop-progress-fill"
+                style={{
+                  width: `${progressPct}%`,
+                  backgroundColor: progressPct === 100 ? '#a855f7' : 'var(--accent)',
+                }}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              {project.milestones.map((m) => (
+                <div
+                  key={m.id}
+                  onClick={() => toggleMilestone(m.id)}
+                  className={`flex items-start gap-2.5 p-2 rounded border transition cursor-pointer select-none ${
+                    m.completed
+                      ? 'border-[var(--line)] bg-[var(--bg)] opacity-60'
+                      : 'border-[var(--line)] bg-[var(--surface)] hover:border-[var(--line-2)] hover:bg-[var(--hover)]'
+                  }`}
                 >
-                  <Save className="h-3.5 w-3.5" />
-                  <span>Save</span>
+                  {m.completed ? (
+                    <CheckSquare className="h-4 w-4 text-[var(--accent)] flex-shrink-0 mt-0.5" />
+                  ) : (
+                    <Square className="h-4 w-4 text-[var(--fg-3)] flex-shrink-0 mt-0.5" />
+                  )}
+                  <span
+                    className={`text-xs leading-relaxed ${
+                      m.completed ? 'line-through text-[var(--fg-3)]' : 'text-[var(--fg)]'
+                    }`}
+                  >
+                    {m.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Architecture Notes & Scratchpad */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-[10px] font-mono text-[var(--fg-3)] uppercase block">
+                Notes & Architecture Decisions
+              </label>
+              {!isEditingNotes ? (
+                <button
+                  onClick={() => setIsEditingNotes(true)}
+                  className="flex items-center gap-1 text-[11px] text-[var(--accent)] hover:underline cursor-pointer"
+                >
+                  <Edit3 className="h-3 w-3" />
+                  <span>Edit</span>
                 </button>
               ) : (
                 <button
-                  onClick={() => setIsEditingNotes(true)}
-                  className="flex items-center gap-1 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium"
+                  onClick={handleSaveNotes}
+                  className="flex items-center gap-1 text-[11px] text-emerald-400 hover:underline cursor-pointer"
                 >
-                  <Edit3 className="h-3.5 w-3.5" />
-                  <span>Edit</span>
+                  <Save className="h-3 w-3" />
+                  <span>Save</span>
                 </button>
               )}
             </div>
@@ -394,13 +359,15 @@ const DrawerContent: React.FC<{
               <textarea
                 value={notesValue}
                 onChange={(e) => setNotesValue(e.target.value)}
-                rows={4}
-                className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-lg p-3 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)]"
-                placeholder="Thoughts, notes, or ideas..."
+                rows={5}
+                className="w-full bg-[var(--bg)] border border-[var(--line-2)] rounded-lg p-3 text-xs text-[var(--fg)] font-mono leading-relaxed focus:outline-none focus:border-[var(--accent)]"
+                placeholder="Log thoughts, architectural findings, or scratchpad notes..."
               />
             ) : (
-              <div className="p-3 bg-[var(--bg-surface)] rounded-lg border border-[var(--border-main)] text-sm text-[var(--text-secondary)] whitespace-pre-wrap min-h-[50px]">
-                {project.notes || 'No notes yet. Click edit to add.'}
+              <div className="p-3 rounded-lg border border-[var(--line)] bg-[var(--bg)] text-xs text-[var(--fg-2)] leading-relaxed whitespace-pre-wrap font-mono">
+                {project.notes || (
+                  <span className="text-[var(--fg-3)] italic">No notes logged yet.</span>
+                )}
               </div>
             )}
           </div>
@@ -410,8 +377,21 @@ const DrawerContent: React.FC<{
   );
 };
 
+export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
+  project,
+  onClose,
+  onUpdateProject,
+  onDeleteProject,
+}) => {
+  if (!project) return null;
 
-export const ProjectDrawer: React.FC<ProjectDrawerProps> = (props) => {
-  if (!props.project) return null;
-  return <DrawerContent key={props.project.id} {...props} project={props.project} />;
+  return (
+    <DrawerContent
+      key={project.id}
+      project={project}
+      onClose={onClose}
+      onUpdateProject={onUpdateProject}
+      onDeleteProject={onDeleteProject}
+    />
+  );
 };
