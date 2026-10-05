@@ -1,19 +1,30 @@
-# Aether Bank — Idea & Project Bank CRM
+# Banker
 
-A high-density project & idea management dashboard built in the style of Theo / Linear for tracking the **Aether** ecosystem (Windows debloater, peripheral configuration companion, minimal browser, and shared Fluent / Mica UI kit).
+Minimal project and idea vault for tracking tools, architecture decisions, and roadmap milestones.
 
-## Live URL
-- GitHub Pages: **https://rvyyv-n.github.io/aether-bank/**
+## Live
 
-## Tech Stack
-- React 19 + TypeScript
-- Vite + Tailwind CSS v4
-- Lucide React
-- LocalStorage persistence + JSON export/import
+- **Web**: https://rvyyv-n.github.io/aether-bank/
 
 ## Features
-- **Kanban Board**: 6 status columns with one-click status transitions and milestone progress tracking
-- **CRM Table View**: High-density view with sorting, category filters, and direct status toggles
-- **Roadmap View**: Phase-by-phase execution plan for the $0 open-source suite
-- **Interactive Project Drawer**: Detailed problem statements, architecture notes, checklists, and quick terminal commands
-- **Keyboard Shortcuts**: `N` (new), `/` (search), `1`/`2`/`3` (views), `ESC` (close)
+
+- **OLED Dark & Light Mode**: Fast toggle via header or hotkey `T`.
+- **Kanban Board**: 6-stage lifecycle tracking with one-click status transitions.
+- **CRM Table View**: High-density data grid with inline status selection.
+- **Roadmap View**: Phase-based delivery milestones.
+- **Project Drawer**: Checklists, terminal shortcuts, specs, and persistent notes.
+- **Keyboard-Driven**: `N` (new), `T` (theme), `/` (search), `1`/`2`/`3` (views), `ESC` (close).
+- **Zero Config**: Offline-capable with local storage persistence and JSON export.
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+Build:
+
+```bash
+npm run build
+```
