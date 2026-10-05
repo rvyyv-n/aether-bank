@@ -9,36 +9,36 @@ interface RoadmapViewProps {
 
 const PHASES = [
   {
-    phase: 'Phase 1 · Core',
-    target: 'Sprint 1',
-    title: 'System Shell & Primitives',
+    phase: 'Phase 1 · Apps',
+    target: 'Shipped',
+    title: 'Voice & Habit Platforms',
     icon: Zap,
-    projectIds: ['hyperlight', 'vesper'],
-    description: 'Native window shell with direct API interaction, declarative rollback engine, and core design tokens.'
+    projectIds: ['bookcook', 'rise'],
+    description: 'Local-first family recipe vault with hands-free cooking mode, and frictionless block-based diet planner with weekly weigh-ins.'
   },
   {
-    phase: 'Phase 2 · Input',
-    target: 'Sprint 2',
-    title: 'Peripheral Companion',
+    phase: 'Phase 2 · Native',
+    target: 'Active Spike',
+    title: 'High-Refresh Graphics & Low Latency',
     icon: Cpu,
-    projectIds: ['kite'],
-    description: 'User-space hardware configuration over standard WebHID protocols without kernel drivers.'
+    projectIds: ['aether', 'vulkan'],
+    description: 'Direct3D 11 flip-model presentation, 360Hz clip review HUD with lossless trim, and legacy-hardware VulkanMod pipeline.'
   },
   {
-    phase: 'Phase 3 · Web',
-    target: 'Sprint 3',
-    title: 'Browser & Static Hub',
+    phase: 'Phase 3 · CLI',
+    target: 'Shipped',
+    title: 'Terminal Engines & Foundations',
     icon: Globe,
-    projectIds: ['prism', 'relay'],
-    description: 'Lightweight webview container architecture with compiled adblock filtering and zero-runtime distribution.'
+    projectIds: ['catgen', 'learning-py'],
+    description: 'Terminal-native ASCII art studio with Bubble Tea TUI, and comprehensive CS50 introduction to Python programming corpus.'
   },
   {
-    phase: 'Phase 4 · Release',
-    target: 'Production',
-    title: 'Automation & Signing',
+    phase: 'Phase 4 · Tooling',
+    target: 'Sprint Active',
+    title: 'Local CRM, Sites & Agent Extensions',
     icon: Shield,
-    projectIds: ['orbit'],
-    description: 'Matrix build workflows, open-source code signing to bypass security warnings, and package manager manifests.'
+    projectIds: ['banker', 'rise-site', 'usage-limits-mod', 'portfolio-site'],
+    description: 'Local-first project vault, zero-framework product marketing site, terminal agent telemetry hook, and terminal design tokens.'
   }
 ];
 

@@ -8,7 +8,7 @@ import { RoadmapView } from './components/RoadmapView';
 import { ProjectDrawer } from './components/ProjectDrawer';
 import { NewProjectModal } from './components/NewProjectModal';
 
-const STORAGE_KEY = 'banker_vault_v2';
+const STORAGE_KEY = 'banker_vault_v3';
 const THEME_KEY = 'banker_theme_v1';
 
 export function App() {
