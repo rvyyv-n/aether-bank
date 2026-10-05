@@ -380,9 +380,9 @@ export const UsageView: React.FC = () => {
         </div>
         <div className="slop-card p-3.5">
           <div className={cardLabel}>Est. spend</div>
-          <div className="text-xl font-semibold mt-1 tracking-tight text-[var(--fg)]">{fmtMoney(analysis.spend)}</div>
+          <div className="text-xl font-semibold mt-1 tracking-tight text-[var(--fg)]">{analysis.spend > 0 ? fmtMoney(analysis.spend) : "—"}</div>
           <div className="text-[11px] text-[var(--fg-3)] mt-0.5">
-            {analysis.unpriced > 0 ? `excl. ${fmtNum(analysis.unpriced)} unpriced` : 'list prices'}
+            {analysis.spend === 0 ? 'no price data' : analysis.unpriced > 0 ? `excl. ${fmtNum(analysis.unpriced)} unpriced` : 'list prices'}
           </div>
         </div>
       </div>

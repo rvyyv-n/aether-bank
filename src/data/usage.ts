@@ -32,12 +32,12 @@ export function buildSampleUsage(): UsageEntry[] {
     return seed / 2147483647;
   };
   const mix: { provider: Provider; model: string; weight: number; scale: number }[] = [
-    { provider: 'anthropic', model: 'Opus 5.5', weight: 0.25, scale: 220_000 },
-    { provider: 'anthropic', model: 'Sonnet 5.5', weight: 0.6, scale: 340_000 },
-    { provider: 'anthropic', model: 'Haiku 4.5', weight: 0.3, scale: 120_000 },
-    { provider: 'google', model: 'Gemini 3.8 Pro', weight: 0.3, scale: 260_000 },
-    { provider: 'google', model: 'Gemini 3.8 Flash', weight: 0.55, scale: 420_000 },
-    { provider: 'openai', model: 'GPT-5', weight: 0.15, scale: 150_000 },
+    { provider: 'anthropic', model: 'Opus 5.5', weight: 0.8, scale: 220_000 },
+    { provider: 'anthropic', model: 'Sonnet 5.5', weight: 0.95, scale: 340_000 },
+    { provider: 'anthropic', model: 'Haiku 4.5', weight: 0.85, scale: 120_000 },
+    { provider: 'google', model: 'Gemini 3.8 Pro', weight: 0.75, scale: 260_000 },
+    { provider: 'google', model: 'Gemini 3.8 Flash', weight: 0.9, scale: 420_000 },
+    { provider: 'openai', model: 'GPT-5', weight: 0.6, scale: 150_000 },
   ];
   const entries: UsageEntry[] = [];
   const today = new Date();

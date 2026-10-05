@@ -93,6 +93,14 @@ async function capture() {
     copyToArtifact(analyticsPath, 'banker-analytics.png');
     console.log('Captured banker-analytics.png');
 
+    // 5b. Usage view (hotkey '5'; sample data because file:// has no /usage.json)
+    await page.keyboard.press('5');
+    await new Promise(r => setTimeout(r, 800));
+    const usagePath = path.join(OUT_DIR, 'banker-usage.png');
+    await page.screenshot({ path: usagePath });
+    copyToArtifact(usagePath, 'banker-usage.png');
+    console.log('Captured banker-usage.png');
+
     // 6. Switch to Light Mode (hotkey 'T') on Board
     await page.keyboard.press('1'); // back to board
     await page.keyboard.press('t'); // toggle theme
@@ -111,6 +119,21 @@ async function capture() {
     copyToArtifact(mobileDarkPath, 'banker-mobile-dark.png');
     fs.copyFileSync(mobileDarkPath, path.join(OUT_DIR, 'banker-mobile.png'));
     console.log('Captured banker-mobile-dark.png');
+
+    // 8. Mobile usage page, then mobile light board
+    const navButtons = await page.$$('.mobile-nav button');
+    await navButtons[3].click();
+    await new Promise(r => setTimeout(r, 800));
+    const mobileUsagePath = path.join(OUT_DIR, 'banker-mobile-usage.png');
+    await page.screenshot({ path: mobileUsagePath });
+    console.log('Captured banker-mobile-usage.png');
+
+    await navButtons[0].click();
+    await page.keyboard.press('t');
+    await new Promise(r => setTimeout(r, 600));
+    const mobileLightPath = path.join(OUT_DIR, 'banker-mobile-light.png');
+    await page.screenshot({ path: mobileLightPath });
+    console.log('Captured banker-mobile-light.png');
 
   } catch (err) {
     console.error('Error during capture:', err);

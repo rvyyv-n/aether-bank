@@ -22,6 +22,7 @@ A local-first developer workbench for tracking software tools, technical specifi
 
 - [What it does](#what-it-does)
 - [Views](#views)
+- [Token usage](#token-usage)
 - [Running locally with your own projects](#running-locally-with-your-own-projects)
 - [Privacy and storage](#privacy-and-storage)
 - [How it's built](#how-its-built)
@@ -35,7 +36,7 @@ lifecycle: from initial spark and architectural spike through execution,
 polishing, and release.
 
 - **Fast stage progression.** Move projects through six distinct phases
-  (*Backlog*, *Planned*, *Spike / R&D*, *In Progress*, *Polishing*, and
+  (*Backlog*, *Planned*, *Exploring*, *In Progress*, *Polishing*, and
   *Shipped*) with one-click navigation arrows.
 - **Checklists with live progress.** Every project tracks its milestones,
   updating progress meters in real time.
@@ -45,6 +46,10 @@ polishing, and release.
   git status queries, and dev commands in one tap.
 - **Scratchpad.** Write notes and brainstorm thoughts directly inside each
   drawer without switching apps.
+- **Token usage across your tools.** A Usage page reads your local Claude Code
+  and Antigravity logs and shows tokens, messages and estimated spend by model,
+  harness and project.
+- **Built for phones.** Bottom navigation, a swipeable board, and card lists.
 - **Zero data loss.** Everything syncs to browser storage instantly, with
   one-click JSON export for backups and cross-machine handoffs.
 
@@ -89,6 +94,19 @@ lifecycle distribution matrices, priority weighting, and tech stack intelligence
   <img src="screenshots/banker-analytics.png" alt="Banker Analytics and Velocity view" width="100%" />
 </a>
 
+### Usage
+
+Token usage by model, harness and project, in the style of Slopalytics. Switch
+between **Tokens**, **Messages** and **Est. spend**, pick a 7, 14, 30 day or all-time
+window, and view the **Share** (100% stacked) or **Volume** chart. Drag a finger
+across the chart to read a day. A ranked table shows per-day averages and the
+change in share against the previous period. See [Token usage](#token-usage) for where
+the numbers come from.
+
+<a href="https://rvyyv-n.github.io/banker/">
+  <img src="screenshots/banker-usage.png" alt="Banker Usage view" width="100%" />
+</a>
+
 ### Light mode
 
 Crisp, paper-like neutral styling with stark typography. Press <kbd>T</kbd>
@@ -100,7 +118,9 @@ anywhere or tap the sun/moon icon to switch between OLED Dark and Light mode.
 
 ### Mobile
 
-Responsive mobile layout built for quick capture and status audits on the go.
+Built for one-handed use. A bottom tab bar switches sections, the board scrolls
+sideways one column at a time, the table becomes a list of cards, and filters open
+as a full-screen sheet. Tap targets are at least 40px.
 
 <p align="center">
   <a href="https://rvyyv-n.github.io/banker/">
@@ -109,6 +129,10 @@ Responsive mobile layout built for quick capture and status audits on the go.
   &nbsp;
   <a href="https://rvyyv-n.github.io/banker/">
     <img src="screenshots/banker-mobile-light.png" alt="Banker mobile in light mode" width="48%" />
+  </a>
+  &nbsp;
+  <a href="https://rvyyv-n.github.io/banker/">
+    <img src="screenshots/banker-mobile-usage.png" alt="Banker mobile usage page" width="48%" />
   </a>
 </p>
 
@@ -134,10 +158,37 @@ To run Banker on your local machine and point it to your repositories:
    - **Pre-seeding via code**: Edit `src/data/initialData.ts` to define your own default catalog of repositories and initial milestones.
    - **Backups & Sync**: Use **Export** in the header to save a `banker-vault.json` snapshot of your project state anytime.
 
+## Token usage
+
+The Usage page shows real numbers when Banker runs on your own machine
+(`npm run dev`, `npm run preview` or `npm run serve`). A small collector,
+[`scripts/usage-collector.cjs`](scripts/usage-collector.cjs), reads:
+
+| Source                     | Location                                          |
+| -------------------------- | ------------------------------------------------- |
+| Claude Code sessions       | `~/.claude/projects/**/*.jsonl`                  |
+| Antigravity (Gemini) chats | `~/.gemini/antigravity-acp/conversations/*.db`   |
+
+and serves the daily totals at `/usage.json`. Messages are de-duplicated, spend is
+estimated from list prices in T3 Code's cached price table when it exists, and
+anything without a price is left out of the spend total. **Tokens** means fresh
+tokens (input, output and cache writes); cache reads are shown separately because
+they are usually far larger.
+
+- Tools that don't leave local logs can be added with **Log usage** on the page.
+- On the hosted GitHub Pages site there are no local logs, so the page shows sample
+  data and says so.
+- The Antigravity token fields are decoded from an undocumented format, so treat
+  those counts as estimates.
+- `/usage.json` is served to anything that can reach the server, including other
+  devices on your network, and it contains project names. Don't expose the server
+  publicly.
+
 ## Privacy and storage
 
 Banker is strictly local-first. Your ideas, notes, status changes, and
-custom projects stay entirely in your browser's local storage.
+custom projects stay entirely in your browser's local storage. Usage data is read
+from your own machine by the local server and is never sent anywhere else.
 
 - No external analytics, telemetry, or user accounts.
 - Zero tracking scripts or third-party network requests.
@@ -157,10 +208,13 @@ src/
   index.css               pure OLED dark (#000000) and paper light CSS tokens
   data/
     initialData.ts        initial project catalog and milestone seeds
+    usage.ts              usage types, providers and sample data
   components/
     Header.tsx            Slopalytics-style navigation header with section & view tabs
     Sidebar.tsx           Slopalytics-style filter sidebar with status, priority, and quick directory
-    BankerLogo.tsx        minimal geometric vault vector mark
+    BankerLogo.tsx        three stacked ledger bars mark
+    MobileNav.tsx         bottom tab bar for phones
+    UsageView.tsx         token usage by model, harness and project
     KanbanBoard.tsx       six-column stage board with dev shortcuts & milestones
     TableView.tsx         high-density developer data grid with 1-click command & path copy
     RoadmapView.tsx       four-phase ecosystem execution timeline
@@ -168,8 +222,10 @@ src/
     ProjectDrawer.tsx     slide-over drawer with checklists and scratchpad
     NewProjectModal.tsx   fast idea capture modal
 screenshots/              retina edge-to-edge screenshots of views and mobile layout
+scripts/
+  usage-collector.cjs     scans local Claude Code and Antigravity logs for token usage
 capture.cjs               automated headless Chrome screenshot capture script
-server.cjs                lightweight standalone local static HTTP server
+server.cjs                standalone local server for the built app and /usage.json
 ```
 
 ## Development
@@ -187,8 +243,9 @@ Open the address Vite prints (default `http://localhost:3333`).
 | ------------------ | ------------------------------------------------------------ |
 | `npm run dev`      | Start the Vite dev server with hot module reloading          |
 | `npm run build`    | Typecheck and build the production bundle to `dist/`         |
+| `npm run check`    | Lint, typecheck and build (what CI runs)                     |
 | `npm run preview`  | Preview the production build locally with Vite               |
-| `npm run serve`    | Run the standalone Node static server on port 3333           |
+| `npm run serve`    | Serve `dist/` and live usage on port 3333, reachable on your LAN |
 | `node capture.cjs` | Retake high-resolution screenshots via headless Chrome       |
 
 ### Keyboard shortcuts
@@ -201,12 +258,15 @@ Open the address Vite prints (default `http://localhost:3333`).
 | <kbd>1</kbd>       | Switch to the Kanban board          |
 | <kbd>2</kbd>       | Switch to the CRM table view        |
 | <kbd>3</kbd>       | Switch to the Roadmap view          |
+| <kbd>4</kbd>       | Switch to the Analytics view        |
+| <kbd>5</kbd>       | Switch to the Usage view            |
 | <kbd>Esc</kbd>     | Close the active drawer or modal    |
 
 ## Deployment
 
 Pushes to `main` trigger [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml),
-which checks out the repository, installs dependencies, builds the application,
+which checks out the repository, installs dependencies, runs `npm run check`
+(lint, typecheck and build),
 and publishes the static bundle directly to GitHub Pages.
 
 ## License
