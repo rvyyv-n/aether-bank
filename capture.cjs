@@ -30,11 +30,11 @@ async function capture() {
     const page = await browser.newPage();
 
     // 0. Render 512x512 icon.png from icon.svg
-    await page.setViewport({ width: 512, height: 512, deviceScaleFactor: 2 });
+    await page.setViewport({ width: 512, height: 512, deviceScaleFactor: 1 });
     await page.goto(ICON_SVG_URL, { waitUntil: 'load' });
     const iconRoot = path.join(__dirname, 'icon.png');
     const iconPublic = path.join(__dirname, 'public', 'icon.png');
-    await page.screenshot({ path: iconRoot, omitBackground: false });
+    await (await page.$('svg')).screenshot({ path: iconRoot, omitBackground: true });
     fs.copyFileSync(iconRoot, iconPublic);
     console.log('Generated icon.png and public/icon.png');
 

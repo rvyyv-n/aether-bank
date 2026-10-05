@@ -61,7 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
         className="brand"
         aria-label="Banker home"
       >
-        <BankerLogo size={20} className="flex-shrink-0 text-[var(--fg)]" />
+        <BankerLogo size={20} className="flex-shrink-0 text-[var(--accent)]" />
         <strong>Banker</strong>
       </a>
 
