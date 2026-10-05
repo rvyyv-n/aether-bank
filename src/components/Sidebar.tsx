@@ -23,7 +23,7 @@ interface SidebarProps {
 
 const STATUSES: { id: ProjectStatus; label: string; color: string }[] = [
   { id: 'in_progress', label: 'In Progress', color: '#10b981' },
-  { id: 'spike', label: 'Spike & R&D', color: '#f59e0b' },
+  { id: 'spike', label: 'Exploring', color: '#f59e0b' },
   { id: 'planned', label: 'Planned', color: '#3b82f6' },
   { id: 'polishing', label: 'Polishing', color: '#0ea5e9' },
   { id: 'shipped', label: 'Shipped', color: '#a855f7' },
@@ -129,7 +129,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Status Filter (Slopalytics strike/toggle style) */}
       <div>
         <div className="filter-section-title">
-          <span>Lifecycle Status</span>
+          <span>Status</span>
           {selectedStatus !== 'all' && (
             <button
               onClick={() => setSelectedStatus('all')}
@@ -210,7 +210,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Category / Ecosystem Filter */}
       <div>
         <div className="filter-section-title">
-          <span>Ecosystem Category</span>
+          <span>Category</span>
           {selectedCategory !== 'all' && (
             <button
               onClick={() => setSelectedCategory('all')}

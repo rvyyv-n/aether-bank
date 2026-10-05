@@ -68,7 +68,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
           </div>
           <div className="text-xs text-[var(--fg-2)] mt-1 flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span>{inProgressCount} active &middot; {spikeCount} spikes</span>
+            <span>{inProgressCount} active &middot; {spikeCount} exploring</span>
           </div>
         </div>
 

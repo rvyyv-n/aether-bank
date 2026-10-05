@@ -132,7 +132,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               >
                 <option value="backlog">Backlog</option>
                 <option value="planned">Planned</option>
-                <option value="spike">Spike</option>
+                <option value="spike">Exploring</option>
                 <option value="in_progress">In Progress</option>
               </select>
             </div>

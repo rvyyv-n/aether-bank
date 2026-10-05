@@ -162,7 +162,7 @@ export const TableView: React.FC<TableViewProps> = ({
                         >
                           <option value="backlog">Backlog</option>
                           <option value="planned">Planned</option>
-                          <option value="spike">Spike & R&D</option>
+                          <option value="spike">Exploring</option>
                           <option value="in_progress">In Progress</option>
                           <option value="polishing">Polishing</option>
                           <option value="shipped">Shipped</option>

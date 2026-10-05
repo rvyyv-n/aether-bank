@@ -24,7 +24,7 @@ interface KanbanBoardProps {
 const COLUMNS: { id: ProjectStatus; label: string; color: string }[] = [
   { id: 'backlog', label: 'Backlog', color: '#71717a' },
   { id: 'planned', label: 'Planned', color: '#3b82f6' },
-  { id: 'spike', label: 'Spike & R&D', color: '#f59e0b' },
+  { id: 'spike', label: 'Exploring', color: '#f59e0b' },
   { id: 'in_progress', label: 'In Progress', color: '#10b981' },
   { id: 'polishing', label: 'Polishing', color: '#0ea5e9' },
   { id: 'shipped', label: 'Shipped', color: '#a855f7' },

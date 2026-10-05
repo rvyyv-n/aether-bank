@@ -10,7 +10,8 @@ import {
   Table2,
   TrendingUp,
   Compass,
-  ArrowUpDown
+  ArrowUpDown,
+  Gauge
 } from 'lucide-react';
 import type { ProjectIdea } from '../types';
 import { BankerLogo } from './BankerLogo';
@@ -18,8 +19,8 @@ import { BankerLogo } from './BankerLogo';
 interface HeaderProps {
   projects: ProjectIdea[];
   filteredCount: number;
-  activeSection: 'vault' | 'roadmap' | 'analytics';
-  setActiveSection: (sec: 'vault' | 'roadmap' | 'analytics') => void;
+  activeSection: 'vault' | 'roadmap' | 'analytics' | 'usage';
+  setActiveSection: (sec: 'vault' | 'roadmap' | 'analytics' | 'usage') => void;
   viewMode: 'board' | 'table';
   setViewMode: (mode: 'board' | 'table') => void;
   sortBy: 'priority' | 'status' | 'title' | 'progress' | 'updated';
@@ -50,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <header className="app-header">
-      {/* Brand logo in Slopalytics style: strong > span(accent) + rest */}
+      {/* Brand */}
       <a
         href="#"
         onClick={(e) => {
@@ -60,10 +61,8 @@ export const Header: React.FC<HeaderProps> = ({
         className="brand"
         aria-label="Banker home"
       >
-        <BankerLogo size={18} className="text-[var(--accent)] flex-shrink-0" />
-        <strong>
-          <span>bank</span>er
-        </strong>
+        <BankerLogo size={20} className="flex-shrink-0 text-[var(--fg)]" />
+        <strong>Banker</strong>
       </a>
 
       {/* Main Section Navigation Tabs (Slopalytics style) */}
@@ -85,6 +84,12 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveSection('analytics')}
         >
           Analytics
+        </button>
+        <button
+          className={activeSection === 'usage' ? 'active' : ''}
+          onClick={() => setActiveSection('usage')}
+        >
+          Usage
         </button>
       </nav>
 
@@ -131,11 +136,24 @@ export const Header: React.FC<HeaderProps> = ({
           <>
             <button className="active">
               <Compass className="h-3.5 w-3.5 mr-1.5 opacity-70" />
-              Execution Phases
+              Phases
             </button>
             <span className="tab-divider" aria-hidden="true" />
             <span className="text-xs text-[var(--fg-3)] flex items-center font-mono">
-              4 Sequenced Tracks
+              4 tracks
+            </span>
+          </>
+        )}
+
+        {activeSection === 'usage' && (
+          <>
+            <button className="active">
+              <Gauge className="h-3.5 w-3.5 mr-1.5 opacity-70" />
+              Tokens
+            </button>
+            <span className="tab-divider" aria-hidden="true" />
+            <span className="text-xs text-[var(--fg-3)] flex items-center font-mono">
+              by provider &amp; model
             </span>
           </>
         )}
@@ -144,7 +162,7 @@ export const Header: React.FC<HeaderProps> = ({
           <>
             <button className="active">
               <TrendingUp className="h-3.5 w-3.5 mr-1.5 opacity-70" />
-              Performance & Velocity
+              Progress
             </button>
             <span className="tab-divider" aria-hidden="true" />
             <span className="text-xs text-[var(--fg-3)] flex items-center font-mono">

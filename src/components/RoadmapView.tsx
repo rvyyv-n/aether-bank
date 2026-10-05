@@ -18,7 +18,7 @@ const PHASES = [
   },
   {
     phase: 'Phase 2 \u00b7 Native',
-    target: 'Active Spike',
+    target: 'Exploring',
     title: 'High-Refresh Graphics & Low Latency',
     icon: Cpu,
     projectIds: ['aether', 'vulkan'],

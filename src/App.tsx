@@ -7,6 +7,7 @@ import { KanbanBoard } from './components/KanbanBoard';
 import { TableView } from './components/TableView';
 import { RoadmapView } from './components/RoadmapView';
 import { AnalyticsView } from './components/AnalyticsView';
+import { UsageView } from './components/UsageView';
 import { ProjectDrawer } from './components/ProjectDrawer';
 import { NewProjectModal } from './components/NewProjectModal';
 
@@ -36,7 +37,7 @@ export function App() {
     return INITIAL_PROJECTS;
   });
 
-  const [activeSection, setActiveSection] = useState<'vault' | 'roadmap' | 'analytics'>('vault');
+  const [activeSection, setActiveSection] = useState<'vault' | 'roadmap' | 'analytics' | 'usage'>('vault');
   const [viewMode, setViewMode] = useState<'board' | 'table'>('board');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -110,6 +111,8 @@ export function App() {
         setActiveSection('roadmap');
       } else if (e.key === '4') {
         setActiveSection('analytics');
+      } else if (e.key === '5') {
+        setActiveSection('usage');
       }
     };
 
@@ -299,6 +302,8 @@ export function App() {
               onSelectProject={setSelectedProject}
             />
           )}
+
+          {activeSection === 'usage' && <UsageView />}
         </main>
 
         {/* Slopalytics Right-Hand Sidebar */}

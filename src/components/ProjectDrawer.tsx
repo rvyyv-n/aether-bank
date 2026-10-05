@@ -137,7 +137,7 @@ const DrawerContent: React.FC<{
           <div className="grid grid-cols-2 gap-3 p-3.5 rounded-lg border border-[var(--line)] bg-[var(--bg)]">
             <div>
               <label className="text-[10px] font-mono text-[var(--fg-3)] uppercase block mb-1">
-                Lifecycle Stage
+                Status
               </label>
               <select
                 value={project.status}
@@ -152,7 +152,7 @@ const DrawerContent: React.FC<{
               >
                 <option value="backlog">Backlog</option>
                 <option value="planned">Planned</option>
-                <option value="spike">Spike & R&D</option>
+                <option value="spike">Exploring</option>
                 <option value="in_progress">In Progress</option>
                 <option value="polishing">Polishing</option>
                 <option value="shipped">Shipped</option>

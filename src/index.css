@@ -123,14 +123,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 }
 
 .brand strong {
-  font-size: 23px;
-  font-weight: 500;
-  letter-spacing: -1.2px;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
   line-height: 1;
-}
-
-.brand strong span {
-  color: var(--accent);
 }
 
 .section-tabs {
