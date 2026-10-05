@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const URL = 'file:///' + path.join(__dirname, 'dist', 'index.html').replace(/\\/g, '/');
+const URL = 'https://rvyyv-n.github.io/aether-bank/';
 const OUT_DIR = path.join(__dirname, 'screenshots');
 const ARTIFACT_DIR = 'C:\\Users\\rayyan\\.gemini\\antigravity-acp\\brain\\9e5afd4d-5d36-4b2d-8455-c190b3f6c150';
 
