@@ -60,12 +60,15 @@ button, input, textarea, select {
   -webkit-tap-highlight-color: transparent;
 }
 
-button {
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  padding: 0;
-  text-align: left;
+/* In the base layer so Tailwind padding utilities (py-1, px-3, ...) win over the reset */
+@layer base {
+  button {
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    text-align: left;
+  }
 }
 
 button:focus-visible, input:focus-visible, textarea:focus-visible {
@@ -564,6 +567,20 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   textarea,
   .search input {
     font-size: 16px !important;
+  }
+  /* 40px minimum hit areas for card actions and controls */
+  .main-content button,
+  .main-content select,
+  .main-content a[href],
+  .view-tabs select {
+    min-height: 40px;
+  }
+  .main-content a[href],
+  .main-content .kanban-scroll button[title^="Move"] {
+    min-width: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
   .kanban-scroll {
     scrollbar-width: none;
