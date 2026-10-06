@@ -1196,3 +1196,59 @@ a:focus-visible, [tabindex="0"]:focus-visible {
     display: none;
   }
 }
+
+/* Vault overview: active work as roomy cards, everything else as plain rows */
+@layer components {
+  .focus-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+    gap: 14px;
+  }
+
+  .focus-card {
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .focus-card:hover,
+  .focus-card:focus-visible {
+    border-color: var(--line-2);
+    background: var(--hover);
+    outline: none;
+  }
+
+  .focus-card h3 {
+    margin: 10px 0 0;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  .focus-card p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--fg-2);
+    line-height: 1.45;
+  }
+
+  .list-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 11px 6px;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+    text-align: left;
+    transition: background 0.15s;
+  }
+
+  .list-row:hover {
+    background: var(--hover);
+  }
+}

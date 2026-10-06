@@ -19,8 +19,8 @@ interface HeaderProps {
   filteredCount: number;
   activeSection: 'vault' | 'roadmap' | 'analytics' | 'usage';
   setActiveSection: (sec: 'vault' | 'roadmap' | 'analytics' | 'usage') => void;
-  viewMode: 'board' | 'table';
-  setViewMode: (mode: 'board' | 'table') => void;
+  viewMode: 'overview' | 'table';
+  setViewMode: (mode: 'overview' | 'table') => void;
   sortBy: 'priority' | 'status' | 'title' | 'progress' | 'updated';
   setSortBy: (sort: 'priority' | 'status' | 'title' | 'progress' | 'updated') => void;
   theme: 'dark' | 'light';
@@ -95,16 +95,16 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
       </nav>
 
-      {/* Board / table switch; the other sections carry their own controls */}
+      {/* Overview / table switch; the other sections carry their own controls */}
       <nav className="view-tabs" aria-label="Sub views">
         {activeSection === 'vault' && (
           <>
             <button
-              className={viewMode === 'board' ? 'active' : ''}
-              onClick={() => setViewMode('board')}
+              className={viewMode === 'overview' ? 'active' : ''}
+              onClick={() => setViewMode('overview')}
             >
               <LayoutGrid className="h-3.5 w-3.5 mr-1.5 opacity-70" />
-              Board
+              Overview
             </button>
             <button
               className={viewMode === 'table' ? 'active' : ''}

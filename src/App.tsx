@@ -3,7 +3,7 @@ import type { ProjectIdea, ProjectStatus, PriorityLevel } from './types';
 import { INITIAL_PROJECTS } from './data/initialData';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
-import { KanbanBoard } from './components/KanbanBoard';
+import { VaultOverview } from './components/VaultOverview';
 import { TableView } from './components/TableView';
 import { RoadmapView } from './components/RoadmapView';
 import { AnalyticsView } from './components/AnalyticsView';
@@ -40,7 +40,7 @@ export function App() {
   });
 
   const [activeSection, setActiveSection] = useState<'vault' | 'roadmap' | 'analytics' | 'usage'>('vault');
-  const [viewMode, setViewMode] = useState<'board' | 'table'>('board');
+  const [viewMode, setViewMode] = useState<'overview' | 'table'>('overview');
   const [searchQuery, setSearchQuery] = useState('');
   // Filters list what is switched off, so new categories show up by default
   const [hiddenStatuses, setHiddenStatuses] = useState<ProjectStatus[]>([]);
@@ -120,7 +120,7 @@ export function App() {
         setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
       } else if (e.key === '1') {
         setActiveSection('vault');
-        setViewMode('board');
+        setViewMode('overview');
       } else if (e.key === '2') {
         setActiveSection('vault');
         setViewMode('table');
@@ -265,7 +265,7 @@ export function App() {
   };
 
   const paletteCommands: PaletteCommand[] = [
-    { id: 'board', group: 'Go to', label: 'Board', hint: '1', run: () => goTo('vault', 'board') },
+    { id: 'overview', group: 'Go to', label: 'Overview', hint: '1', run: () => goTo('vault', 'overview') },
     { id: 'table', group: 'Go to', label: 'Table', hint: '2', run: () => goTo('vault', 'table') },
     { id: 'roadmap', group: 'Go to', label: 'Roadmap', hint: '3', run: () => goTo('roadmap') },
     { id: 'analytics', group: 'Go to', label: 'Analytics', hint: '4', run: () => goTo('analytics') },
@@ -306,11 +306,10 @@ export function App() {
       {/* Main Body Layout: Fluid Content + Slopalytics Right Sidebar */}
       <div className="body-layout">
         <main key={activeSection + viewMode} className="main-content view-enter p-4 sm:p-6">
-          {activeSection === 'vault' && viewMode === 'board' && (
-            <KanbanBoard
+          {activeSection === 'vault' && viewMode === 'overview' && (
+            <VaultOverview
               projects={filteredProjects}
               onSelectProject={setSelectedProject}
-              onUpdateStatus={handleUpdateStatus}
             />
           )}
 
