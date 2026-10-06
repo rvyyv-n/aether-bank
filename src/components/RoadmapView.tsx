@@ -74,12 +74,14 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, activity, on
                 &middot; {p.name} &middot; {p.title}
               </span>
             </h3>
-            <span className="hint">
+            <span className="hint inline-flex items-center gap-3">
               {p.target} &middot; {pct}% ({done}/{milestones.length})
+              <span className="w-28 hidden sm:inline-block">
+                <ProgressBar pct={pct} />
+              </span>
             </span>
           </div>
           <p className="side-note mt-1 mb-2">{p.description}</p>
-          <ProgressBar pct={pct} />
           {matched.length === 0 ? (
             <p className="side-note mt-3">No projects in this phase match the filters.</p>
           ) : (

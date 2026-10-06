@@ -1413,7 +1413,6 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   --st-spike: #e0a84b;
   --st-in_progress: #5bb97a;
   --st-polishing: #4fb8c4;
-  --st-shipped: #a39e98;
 
   --cat-0: #e08a6d;
   --cat-1: #6c9bd2;
@@ -1433,7 +1432,6 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   --st-spike: #a56a12;
   --st-in_progress: #2f8a4f;
   --st-polishing: #1f7f8c;
-  --st-shipped: #6a655f;
 
   --cat-0: #b5522f;
   --cat-1: #3f6fa8;
