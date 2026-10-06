@@ -1,16 +1,29 @@
-// Scans local AI harness logs and returns daily token usage.
-//   - Claude Code:  ~/.claude/projects/**/*.jsonl   (per-message usage)
-//   - Antigravity:  ~/.gemini/antigravity-acp/conversations/*.db   (gen_metadata protobuf)
+// Scans every local AI harness log it knows and returns daily token usage.
+//   - Claude Code:  $CLAUDE_CONFIG_DIR or ~/.claude, projects/**/*.jsonl   (per-message usage;
+//                   also covers T3 Code and the Claude desktop Code tab, which write here)
+//   - Codex:        $CODEX_HOME or ~/.codex, sessions/**/*.jsonl   (token_count events)
+//   - Gemini CLI:   ~/.gemini/tmp/*/chats/*.json(l)   (per-message tokens)
+//   - Antigravity:  ~/.gemini/antigravity-acp and ~/.gemini/antigravity-cli, conversations/*.db
+//                   (gen_metadata protobuf)
 // Prices come from T3's cached LiteLLM table when present.
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 const HOME = os.homedir();
-const CLAUDE_DIR = path.join(HOME, '.claude', 'projects');
-const GEMINI_DIR = path.join(HOME, '.gemini', 'antigravity-acp', 'conversations');
+const CLAUDE_DIRS = [
+  ...(process.env.CLAUDE_CONFIG_DIR || '').split(path.delimiter).filter(Boolean),
+  path.join(HOME, '.claude'),
+].map((d) => path.join(d, 'projects'));
+const CODEX_DIR = path.join(process.env.CODEX_HOME || path.join(HOME, '.codex'), 'sessions');
+const GEMINI_HOME = path.join(HOME, '.gemini');
+const ANTIGRAVITY_DIRS = [
+  { dir: path.join(GEMINI_HOME, 'antigravity-acp', 'conversations'), harness: 'Antigravity (T3)' },
+  { dir: path.join(GEMINI_HOME, 'antigravity-cli', 'conversations'), harness: 'Antigravity CLI' },
+];
+const GEMINI_CLI_DIR = path.join(GEMINI_HOME, 'tmp');
 const RATES_FILE = path.join(HOME, '.t3', 'userdata', 'usage-model-rates.json');
-const CACHE_FILE = path.join(os.tmpdir(), 'banker-usage-cache-v1.json');
+const CACHE_FILE = path.join(os.tmpdir(), 'banker-usage-cache-v3.json');
 
 // ---------- helpers ----------
 function walk(dir, ext, out = []) {
@@ -41,12 +54,25 @@ function projectLabel(dirName) {
   return dirName;
 }
 
+// Harnesses like Antigravity append the effort level to the model id
+const baseModel = (id) => id.replace(/-(?:minimal|low|medium|high|xhigh|max)$/, '');
+
+// The provider follows the model, not the harness (Antigravity can run Claude)
+function providerOf(model, fallback) {
+  if (/^claude|^anthropic/.test(model)) return 'anthropic';
+  if (/^gemini|^google/.test(model)) return 'google';
+  if (/^gpt|^o\d|^codex|^openai/.test(model)) return 'openai';
+  return fallback;
+}
+
 function prettyModel(id) {
-  const s = id.replace(/-\d{8}$/, '');
+  const s = baseModel(id).replace(/-\d{8}$/, '');
   let m = s.match(/^claude-(opus|sonnet|haiku|fable)-(\d+)(?:-(\d+))?$/);
   if (m) return `${m[1][0].toUpperCase()}${m[1].slice(1)} ${m[2]}${m[3] ? '.' + m[3] : ''}`;
-  m = s.match(/^gemini-(\d+(?:\.\d+)?)-(flash|pro)/);
-  if (m) return `Gemini ${m[1]} ${m[2][0].toUpperCase()}${m[2].slice(1)}`;
+  m = s.match(/^gemini-(\d+(?:\.\d+)?)-(flash|pro)(-lite)?/);
+  if (m) return `Gemini ${m[1]} ${m[2][0].toUpperCase()}${m[2].slice(1)}${m[3] ? ' Lite' : ''}`;
+  m = s.match(/^gpt-(\d+(?:\.\d+)?)(?:-(codex|mini|nano))?(?:-(mini|max))?/);
+  if (m) return `GPT-${m[1]}${m[2] ? ' ' + m[2][0].toUpperCase() + m[2].slice(1) : ''}${m[3] ? ' ' + m[3][0].toUpperCase() + m[3].slice(1) : ''}`;
   return s;
 }
 
@@ -65,8 +91,8 @@ const rateCache = new Map();
 function rateFor(model) {
   if (rateCache.has(model)) return rateCache.get(model);
   const doc = loadRates();
-  const base = model.replace(/-\d{8}$/, '');
-  const candidates = [model, base, `anthropic/${model}`, `anthropic/${base}`, `anthropic.${base}`, `gemini/${model}`, `gemini/${base}`];
+  const base = baseModel(model).replace(/-\d{8}$/, '');
+  const candidates = [model, base, `anthropic/${model}`, `anthropic/${base}`, `anthropic.${base}`, `gemini/${model}`, `gemini/${base}`, `openai/${model}`, `openai/${base}`];
   let hit = null;
   for (const c of candidates) {
     if (doc[c] && doc[c].input_cost_per_token != null) {
@@ -185,6 +211,12 @@ function scanGeminiFile(file) {
     db = new DatabaseSync(file, { readOnly: true });
     const rows = db.prepare('select idx, data from gen_metadata').all();
     const conv = path.basename(file, '.db');
+    let fileTs = 0;
+    try {
+      fileTs = fs.statSync(file).mtimeMs;
+    } catch {
+      /* keep 0 */
+    }
     for (const r of rows) {
       const top = parsePb(Buffer.from(r.data));
       const body = sub(top, 1);
@@ -193,7 +225,7 @@ function scanGeminiFile(file) {
       const output = num(usage, 3);
       const cacheRead = num(usage, 5);
       if (!input && !output && !cacheRead) continue;
-      const ts = num(sub(sub(body, 9), 4), 1) * 1000;
+      const ts = num(sub(sub(body, 9), 4), 1) * 1000 || fileTs;
       const model = str(body, 19) || str(body, 21);
       if (!model) continue;
       out.push([`g:${conv}:${r.idx}`, { ts, model, proj: 'Antigravity', in: input, out: output, cr: cacheRead, cw: 0 }]);
@@ -210,6 +242,95 @@ function scanGeminiFile(file) {
   return out;
 }
 
+// ---------- Codex ----------
+// rollout-*.jsonl: session_meta (cwd), turn_context (model), event_msg/token_count
+// (last_token_usage per turn; input includes cached input).
+function scanCodexFile(file) {
+  const out = [];
+  let model = 'gpt-5-codex';
+  let proj = 'Codex';
+  const lines = fs.readFileSync(file, 'utf8').split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    if (!lines[i]) continue;
+    let j;
+    try {
+      j = JSON.parse(lines[i]);
+    } catch {
+      continue;
+    }
+    const p = j.payload || {};
+    if (j.type === 'session_meta' && p.cwd) proj = path.basename(p.cwd) || proj;
+    if (j.type === 'turn_context' && p.model) model = p.model;
+    if (j.type === 'event_msg' && p.type === 'token_count' && p.info && p.info.last_token_usage) {
+      const u = p.info.last_token_usage;
+      const cached = u.cached_input_tokens || 0;
+      out.push([
+        `x:${file}:${i}`,
+        {
+          ts: Date.parse(j.timestamp) || 0,
+          model,
+          proj,
+          in: Math.max(0, (u.input_tokens || 0) - cached),
+          out: u.output_tokens || 0,
+          cr: cached,
+          cw: 0,
+        },
+      ]);
+    }
+  }
+  return out;
+}
+
+// ---------- Gemini CLI ----------
+// Chats are either one JSON document or JSONL whose lines carry message snapshots
+// ({ $set: { messages } }); replies hold { tokens, model }.
+function scanGeminiCliFile(file) {
+  let proj = 'Gemini CLI';
+  try {
+    proj = path.basename(fs.readFileSync(path.join(path.dirname(path.dirname(file)), '.project_root'), 'utf8').trim()) || proj;
+  } catch {
+    /* no project root recorded */
+  }
+  const msgs = new Map();
+  const take = (list) => {
+    if (!Array.isArray(list)) return;
+    for (const m of list) {
+      if (!m || !m.tokens || !m.id) continue;
+      const t = m.tokens;
+      const cached = t.cached || 0;
+      msgs.set(`gc:${m.id}`, {
+        ts: Date.parse(m.timestamp) || 0,
+        model: m.model || 'gemini',
+        proj,
+        in: Math.max(0, (t.input || 0) - cached),
+        out: (t.output || 0) + (t.thoughts || 0),
+        cr: cached,
+        cw: 0,
+      });
+    }
+  };
+  const text = fs.readFileSync(file, 'utf8');
+  const docs = [];
+  try {
+    docs.push(JSON.parse(text));
+  } catch {
+    for (const line of text.split('\n')) {
+      if (!line.includes('tokens')) continue;
+      try {
+        docs.push(JSON.parse(line));
+      } catch {
+        /* skip partial line */
+      }
+    }
+  }
+  for (const d of docs) {
+    take(d.messages);
+    take(d.$set && d.$set.messages);
+    if (d.tokens) take([d]);
+  }
+  return [...msgs.entries()];
+}
+
 // ---------- collect ----------
 function loadCache() {
   try {
@@ -224,10 +345,28 @@ function collect() {
   const next = {};
   const all = new Map(); // global dedupe (resumed sessions replay old messages)
 
+  let geminiProjects = [];
+  try {
+    geminiProjects = fs.readdirSync(GEMINI_CLI_DIR);
+  } catch {
+    /* Gemini CLI not installed */
+  }
+  const geminiCliFiles = geminiProjects.flatMap((proj) => {
+    const chats = path.join(GEMINI_CLI_DIR, proj, 'chats');
+    return [...walk(chats, '.jsonl'), ...walk(chats, '.json')];
+  });
+
   const sources = [
-    ...walk(CLAUDE_DIR, '.jsonl').map((f) => ({ f, kind: 'claude', harness: 'Claude Code', provider: 'anthropic' })),
-    ...walk(GEMINI_DIR, '.db').map((f) => ({ f, kind: 'gemini', harness: 'Antigravity', provider: 'google' })),
+    ...[...new Set(CLAUDE_DIRS)].flatMap((dir) =>
+      walk(dir, '.jsonl').map((f) => ({ f, kind: 'claude', harness: 'Claude Code', provider: 'anthropic' }))
+    ),
+    ...walk(CODEX_DIR, '.jsonl').map((f) => ({ f, kind: 'codex', harness: 'Codex', provider: 'openai' })),
+    ...geminiCliFiles.map((f) => ({ f, kind: 'gemini-cli', harness: 'Gemini CLI', provider: 'google' })),
+    ...ANTIGRAVITY_DIRS.flatMap(({ dir, harness }) =>
+      walk(dir, '.db').map((f) => ({ f, kind: 'gemini', harness, provider: 'google' }))
+    ),
   ];
+  const SCANNERS = { claude: scanClaudeFile, codex: scanCodexFile, 'gemini-cli': scanGeminiCliFile, gemini: scanGeminiFile };
 
   for (const s of sources) {
     let st;
@@ -249,10 +388,16 @@ function collect() {
       }
     }
     let rows = cache[s.f] && cache[s.f].sig === sig ? cache[s.f].rows : null;
-    if (!rows) rows = s.kind === 'claude' ? scanClaudeFile(s.f) : scanGeminiFile(s.f);
+    if (!rows) {
+      try {
+        rows = SCANNERS[s.kind](s.f);
+      } catch {
+        rows = [];
+      }
+    }
     next[s.f] = { sig, rows };
     for (const [k, rec] of rows) {
-      if (!all.has(k)) all.set(k, { ...rec, harness: s.harness, provider: s.provider });
+      if (!all.has(k)) all.set(k, { ...rec, harness: s.harness, provider: providerOf(rec.model, s.provider) });
     }
   }
   try {
@@ -268,11 +413,12 @@ function collect() {
   for (const r of all.values()) {
     if (!r.ts) continue;
     const date = new Date(r.ts).toISOString().slice(0, 10);
-    const key = [date, r.harness, r.model, r.proj].join('|');
+    const model = baseModel(r.model);
+    const key = [date, r.harness, model, r.proj].join('|');
     let d = daily.get(key);
     if (!d) {
       const rate = rateFor(r.model);
-      d = { d: date, h: r.harness, p: r.provider, m: r.model, n: prettyModel(r.model), j: r.proj, in: 0, out: 0, cr: 0, cw: 0, msgs: 0, cost: rate ? 0 : null };
+      d = { d: date, h: r.harness, p: r.provider, m: model, n: prettyModel(model), j: r.proj, in: 0, out: 0, cr: 0, cw: 0, msgs: 0, cost: rate ? 0 : null };
       daily.set(key, d);
     }
     d.in += r.in;
@@ -290,7 +436,8 @@ function collect() {
 
   return {
     generatedAt: new Date().toISOString(),
-    sources: { claudeFiles: sources.filter((s) => s.kind === 'claude').length, antigravityConversations: sources.filter((s) => s.kind === 'gemini').length },
+    // Files found per harness, so the page can say what was scanned
+    sources: sources.reduce((acc, s) => ((acc[s.harness] = (acc[s.harness] || 0) + 1), acc), {}),
     range: { from: first === Infinity ? null : new Date(first).toISOString(), to: last ? new Date(last).toISOString() : null },
     rows: [...daily.values()].sort((a, b) => a.d.localeCompare(b.d)),
   };
