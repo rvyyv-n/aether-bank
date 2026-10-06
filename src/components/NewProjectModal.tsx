@@ -26,8 +26,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [category, setCategory] = useState('Tools');
-  const [status, setStatus] = useState<ProjectStatus>('backlog');
-  const [priority, setPriority] = useState<PriorityLevel>('P2');
+  const [status, setStatus] = useState<ProjectStatus>('planned');
+  const [priority, setPriority] = useState<PriorityLevel>('medium');
   const [techStackInput, setTechStackInput] = useState('');
   const [description, setDescription] = useState('');
   const [path, setPath] = useState('');
@@ -153,7 +153,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
                 onChange={(e) => setStatus(e.target.value as ProjectStatus)}
                 className="field"
               >
-                <StatusOptions only={['backlog', 'planned', 'spike', 'in_progress']} />
+                <StatusOptions only={['planned', 'spike', 'in_progress']} />
               </select>
             </label>
             <label className="block">

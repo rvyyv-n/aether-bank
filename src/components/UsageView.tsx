@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, Trash2 } from 'lucide-react';
-import { SortHead } from './ui';
+import { SortHead, AgentLogo } from './ui';
 import {
   PROVIDERS,
   PROVIDER_MODELS,
@@ -247,7 +247,7 @@ export const UsageView: React.FC<{ sideSlot: HTMLElement | null }> = ({ sideSlot
 
   // ---- chart geometry ----
   const W = 360;
-  const H = 190;
+  const H = 300;
   const n = days.length;
   const dayTotals = useMemo(
     () => days.map((_, i) => analysis.series.reduce((s, x) => s + x.values[i], 0)),
@@ -259,14 +259,11 @@ export const UsageView: React.FC<{ sideSlot: HTMLElement | null }> = ({ sideSlot
     const step = n > 1 ? W / (n - 1) : W;
     const x = (i: number) => (n === 1 ? W / 2 : (i / (n - 1)) * W);
     const y = (v: number) => H - (v / maxY) * H;
-    // Runs of consecutive days with activity; idle days leave a gap instead of a spike.
-    const runs: [number, number][] = [];
-    for (let i = 0; i < n; i++) {
-      if (dayTotals[i] <= 0) continue;
-      const last = runs[runs.length - 1];
-      if (last && last[1] === i - 1) last[1] = i;
-      else runs.push([i, i]);
-    }
+    // Share joins the days that have usage (idle days carry no mix to show); volume keeps every day,
+    // so idle days fall to zero.
+    const active: number[] = [];
+    for (let i = 0; i < n; i++) if (dayTotals[i] > 0) active.push(i);
+    const runs: number[][] = mode === 'share' ? (active.length ? [active] : []) : [Array.from({ length: n }, (_, i) => i)];
     const cum = new Array<number>(n).fill(0);
     const out: { key: string; color: string; d: string }[] = [];
     for (const s of analysis.series) {
@@ -275,12 +272,12 @@ export const UsageView: React.FC<{ sideSlot: HTMLElement | null }> = ({ sideSlot
         const t = dayTotals[i];
         cum[i] += mode === 'share' ? (t ? (s.values[i] / t) * 100 : 0) : s.values[i];
       }
-      runs.forEach(([from, to], ri) => {
-        const idx = Array.from({ length: to - from + 1 }, (_, k) => from + k);
+      runs.forEach((idx, ri) => {
+        const lone = idx.length === 1;
         // a lone active day gets a thin column so it stays visible
-        const xs = from === to ? [x(from) - step * 0.3, x(from) + step * 0.3] : idx.map(x);
-        const top = from === to ? [y(cum[from]), y(cum[from])] : idx.map((i) => y(cum[i]));
-        const bot = from === to ? [y(lower[from]), y(lower[from])] : idx.map((i) => y(lower[i]));
+        const xs = lone ? [x(idx[0]) - step * 0.3, x(idx[0]) + step * 0.3] : idx.map(x);
+        const top = lone ? [y(cum[idx[0]]), y(cum[idx[0]])] : idx.map((i) => y(cum[i]));
+        const bot = lone ? [y(lower[idx[0]]), y(lower[idx[0]])] : idx.map((i) => y(lower[i]));
         const up = xs.map((px, k) => `${px.toFixed(1)},${top[k].toFixed(1)}`);
         const down = xs.map((px, k) => `${px.toFixed(1)},${bot[k].toFixed(1)}`).reverse();
         out.push({ key: `${s.key}-${ri}`, color: s.color, d: `M${up.join('L')}L${down.join('L')}Z` });
@@ -414,7 +411,9 @@ export const UsageView: React.FC<{ sideSlot: HTMLElement | null }> = ({ sideSlot
       <section>
         <div className="section-head">
           <h3>{mode === 'share' ? `Daily share of ${dimNoun}` : `Daily ${metricNoun}`}</h3>
-          <span className="hint">{days[0].slice(5)} – {days[n - 1].slice(5)} · UTC</span>
+          <span className="hint">
+            {days[0].slice(5)} – {days[n - 1].slice(5)} · UTC{mode === 'share' ? ' · days without usage are skipped' : ''}
+          </span>
         </div>
         {analysis.grand === 0 ? (
           <div className="h-48 flex items-center justify-center side-note border border-dashed border-[var(--line)] rounded-md mt-2">
@@ -605,6 +604,7 @@ export const UsageView: React.FC<{ sideSlot: HTMLElement | null }> = ({ sideSlot
                       onChange={() => setHiddenHarnesses(shown ? [...hiddenHarnesses, h] : hiddenHarnesses.filter((x) => x !== h))}
                       className="accent-[var(--accent)]"
                     />
+                    <AgentLogo name={h} />
                     <span className={`flex-1 truncate ${shown ? '' : 'text-[var(--fg-3)]'}`}>{h}</span>
                     <span className="row-count">{fmtNum(t)}</span>
                   </label>

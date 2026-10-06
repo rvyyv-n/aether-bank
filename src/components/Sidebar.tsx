@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ProjectIdea, ProjectStatus, PriorityLevel } from '../types';
 import { CircleDot, Flag, FolderOpen, Search, Tag, X } from 'lucide-react';
-import { STATUS_META, PRIORITY_META, progressOf } from '../data/status';
+import { STATUS_META, PRIORITY_META, PRIORITY_ORDER, categoryColor, progressOf } from '../data/status';
 import { StatusDot } from './ui';
 
 export type Section = 'vault' | 'roadmap' | 'analytics' | 'usage';
@@ -31,10 +31,10 @@ interface SidebarProps {
   onResetData: () => void;
 }
 
-const PRIORITIES: PriorityLevel[] = ['P0', 'P1', 'P2', 'P3'];
+const PRIORITIES: PriorityLevel[] = PRIORITY_ORDER;
 
 // Active work first in the filter list
-const STATUS_FILTER_ORDER: ProjectStatus[] = ['in_progress', 'spike', 'planned', 'polishing', 'shipped', 'backlog'];
+const STATUS_FILTER_ORDER: ProjectStatus[] = ['in_progress', 'spike', 'planned', 'polishing', 'shipped'];
 
 /** Click switches one value off or on; double-click shows only that value. */
 function makeToggle<T>(all: T[], hidden: T[], setHidden: (next: T[]) => void) {
@@ -190,9 +190,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               aria-pressed={!hiddenPriorities.includes(p)}
               onClick={() => priorityToggle.onClick(p)}
               onDoubleClick={() => priorityToggle.onDoubleClick(p)}
-              title={`${p} · ${PRIORITY_META[p]}`}
+              title={`${PRIORITY_META[p]} priority`}
             >
-              {p}
+              {PRIORITY_META[p]}
               <span className="row-count ml-1">{projects.filter((x) => x.priority === p).length}</span>
             </button>
           ))}
@@ -216,6 +216,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => categoryToggle.onClick(cat)}
               onDoubleClick={() => categoryToggle.onDoubleClick(cat)}
             >
+              <i className="cat-dot" style={{ background: categoryColor(cat) }} />
               {cat}
             </button>
           ))}

@@ -1,37 +1,44 @@
 import React from 'react';
 import type { ProjectIdea } from '../types';
-import { StatusDot, PriorityBadge, ProgressBar } from './ui';
-import { STATUS_META } from '../data/status';
+import { Layers } from 'lucide-react';
+import { ProgressBar } from './ui';
+import { ProjectCard } from './ProjectCard';
+import type { ActivityMap } from '../data/repos';
 
 interface RoadmapViewProps {
   projects: ProjectIdea[];
+  activity: ActivityMap;
   onSelectProject: (project: ProjectIdea) => void;
 }
 
 const PHASES = [
   {
-    phase: 'Phase 1 \u00b7 Apps',
+    phase: 'Phase 1',
+    name: 'Apps',
     target: 'Shipped',
     title: 'Voice & Habit Platforms',
     projectIds: ['bookcook', 'rise'],
     description: 'Local-first family recipe vault with hands-free cooking mode, and frictionless block-based diet planner with weekly weigh-ins.'
   },
   {
-    phase: 'Phase 2 \u00b7 Native',
+    phase: 'Phase 2',
+    name: 'Native',
     target: 'Exploring',
     title: 'High-Refresh Graphics & Low Latency',
     projectIds: ['aether', 'vulkan'],
     description: 'Direct3D 11 flip-model presentation, 360Hz clip review HUD with lossless trim, and legacy-hardware VulkanMod pipeline.'
   },
   {
-    phase: 'Phase 3 \u00b7 CLI',
+    phase: 'Phase 3',
+    name: 'CLI',
     target: 'Shipped',
     title: 'Terminal Engines & Foundations',
     projectIds: ['catgen', 'learning-py'],
     description: 'Terminal-native ASCII art studio with Bubble Tea TUI, and comprehensive CS50 introduction to Python programming corpus.'
   },
   {
-    phase: 'Phase 4 \u00b7 Tooling',
+    phase: 'Phase 4',
+    name: 'Tooling',
     target: 'Sprint Active',
     title: 'Local CRM, Sites & Agent Extensions',
     projectIds: ['banker', 'rise-site', 'usage-limits-mod', 'portfolio-site'],
@@ -39,7 +46,7 @@ const PHASES = [
   }
 ];
 
-export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProject }) => (
+export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, activity, onSelectProject }) => (
   <div className="page">
     <div className="page-head">
       <div>
@@ -51,7 +58,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProj
       </div>
     </div>
 
-    {PHASES.map((p, i) => {
+    {PHASES.map((p) => {
       const matched = projects.filter((item) => p.projectIds.includes(item.id));
       const milestones = matched.flatMap((m) => m.milestones);
       const done = milestones.filter((m) => m.completed).length;
@@ -60,9 +67,12 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProj
       return (
         <section key={p.phase}>
           <div className="section-head">
-            <h3>
+            <h3 className="inline-flex items-center gap-2">
+              <Layers className="h-3.5 w-3.5 text-[var(--accent)]" />
               {p.phase}
-              <span className="text-[var(--fg-3)] font-normal"> &middot; {p.title}</span>
+              <span className="text-[var(--fg-3)] font-normal">
+                &middot; {p.name} &middot; {p.title}
+              </span>
             </h3>
             <span className="hint">
               {p.target} &middot; {pct}% ({done}/{milestones.length})
@@ -70,29 +80,21 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProj
           </div>
           <p className="side-note mt-1 mb-2">{p.description}</p>
           <ProgressBar pct={pct} />
-          <div className="mt-2">
-            {matched.map((proj, idx) => {
-              const d = proj.milestones.filter((m) => m.completed).length;
-              return (
-                <button
+          {matched.length === 0 ? (
+            <p className="side-note mt-3">No projects in this phase match the filters.</p>
+          ) : (
+            <div className="focus-grid mt-3">
+              {matched.map((proj) => (
+                <ProjectCard
                   key={proj.id}
-                  onClick={() => onSelectProject(proj)}
-                  className="rank-row w-full text-left cursor-pointer hover:bg-[var(--hover)]"
-                >
-                  <span className="num">{idx === 0 ? i + 1 : ''}</span>
-                  <span className="min-w-0 flex items-center gap-2">
-                    <StatusDot status={proj.status} />
-                    <span className="truncate">{proj.title}</span>
-                    <PriorityBadge priority={proj.priority} />
-                  </span>
-                  <span className="hide-phone val text-[var(--fg-3)]">{STATUS_META[proj.status].label}</span>
-                  <span className="val">
-                    {d}/{proj.milestones.length}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                  project={proj}
+                  activity={activity[proj.id]}
+                  compact
+                  onOpen={() => onSelectProject(proj)}
+                />
+              ))}
+            </div>
+          )}
         </section>
       );
     })}

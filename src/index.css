@@ -1409,17 +1409,131 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 
 /* Status colours: lighter on dark, deeper on light so the dots stay readable */
 :root {
-  --st-backlog: #77716c;
-  --st-planned: #8fa3b8;
-  --st-spike: #d4a373;
-  --st-in_progress: #8fae8b;
-  --st-polishing: #7fadad;
+  --st-planned: #6c9bd2;
+  --st-spike: #e0a84b;
+  --st-in_progress: #5bb97a;
+  --st-polishing: #4fb8c4;
+  --st-shipped: #a39e98;
+
+  --cat-0: #e08a6d;
+  --cat-1: #6c9bd2;
+  --cat-2: #d98b8b;
+  --cat-3: #e0a84b;
+  --cat-4: #4fb8c4;
+  --cat-5: #5bb97a;
+  --cat-6: #a3b86c;
+  --cat-7: #b0a07a;
+
+  --pri-high: #f27d7d;
+  --pri-medium: #e0a84b;
 }
 
 :root[data-theme="light"] {
-  --st-backlog: #77716c;
-  --st-planned: #55728f;
-  --st-spike: #a0651a;
-  --st-in_progress: #4d7a48;
-  --st-polishing: #3f7a7a;
+  --st-planned: #3f6fa8;
+  --st-spike: #a56a12;
+  --st-in_progress: #2f8a4f;
+  --st-polishing: #1f7f8c;
+  --st-shipped: #6a655f;
+
+  --cat-0: #b5522f;
+  --cat-1: #3f6fa8;
+  --cat-2: #b04f4f;
+  --cat-3: #a56a12;
+  --cat-4: #1f7f8c;
+  --cat-5: #2f8a4f;
+  --cat-6: #6b7f2a;
+  --cat-7: #7d6c3f;
+
+  --pri-high: #b42323;
+  --pri-medium: #96600f;
+}
+
+/* Priority badge and category dot */
+.pri-badge {
+  padding: 0 7px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  font-size: 11.5px;
+  line-height: 18px;
+  color: var(--fg-3);
+  white-space: nowrap;
+}
+
+.pri-high {
+  color: var(--pri-high);
+  border-color: color-mix(in srgb, var(--pri-high) 40%, transparent);
+  background: color-mix(in srgb, var(--pri-high) 12%, transparent);
+}
+
+.pri-medium {
+  color: var(--pri-medium);
+  border-color: color-mix(in srgb, var(--pri-medium) 40%, transparent);
+  background: color-mix(in srgb, var(--pri-medium) 10%, transparent);
+}
+
+.cat-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.inline-flex > .cat-dot {
+  margin-right: 0;
+}
+
+/* Footer */
+.site-footer {
+  padding: 28px 0 8px;
+  font-size: 12px;
+  color: var(--fg-3);
+}
+
+.site-footer a {
+  color: var(--fg-2);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--accent);
+}
+
+/* Plain bordered panel, used on the analytics page */
+.panel {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.list-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--fg-2);
+}
+
+.list-link:hover {
+  color: var(--accent);
+}
+
+/* Agent marks in the usage sidebar */
+.agent-logo {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  object-fit: contain;
+}
+
+.agent-mono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--hover);
+  font-size: 11px;
+  color: var(--fg-2);
 }

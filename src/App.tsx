@@ -13,6 +13,7 @@ import { UsageView } from './components/UsageView';
 import { ProjectDrawer } from './components/ProjectDrawer';
 import { ProjectPage } from './components/ProjectPage';
 import { useActivity } from './data/repos';
+import { normalizeProject, PRIORITY_ORDER } from './data/status';
 import { NewProjectModal } from './components/NewProjectModal';
 import { CommandPalette, type PaletteCommand } from './components/CommandPalette';
 
@@ -44,7 +45,7 @@ export function App() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        return JSON.parse(stored);
+        return (JSON.parse(stored) as ProjectIdea[]).map(normalizeProject);
       }
     } catch (e) {
       console.error('Failed to parse stored projects', e);
@@ -203,8 +204,7 @@ export function App() {
 
   function compare(a: ProjectIdea, b: ProjectIdea) {
       if (sortBy === 'priority') {
-        const pOrder: Record<PriorityLevel, number> = { P0: 0, P1: 1, P2: 2, P3: 3 };
-        return pOrder[a.priority] - pOrder[b.priority];
+        return PRIORITY_ORDER.indexOf(a.priority) - PRIORITY_ORDER.indexOf(b.priority);
       }
       if (sortBy === 'status') {
         const sOrder: Record<ProjectStatus, number> = {
@@ -212,7 +212,6 @@ export function App() {
           spike: 1,
           polishing: 2,
           planned: 3,
-          backlog: 4,
           shipped: 5,
         };
         return sOrder[a.status] - sOrder[b.status];
@@ -396,6 +395,7 @@ export function App() {
           {!pageProject && activeSection === 'roadmap' && (
             <RoadmapView
               projects={filteredProjects}
+              activity={activity}
               onSelectProject={setSelectedProject}
             />
           )}
@@ -403,6 +403,7 @@ export function App() {
           {!pageProject && activeSection === 'analytics' && (
             <AnalyticsView
               projects={filteredProjects}
+              activity={activity}
               onSelectProject={setSelectedProject}
               sortBy={sortBy}
               sortReversed={sortReversed}
@@ -411,6 +412,13 @@ export function App() {
           )}
 
           {!pageProject && activeSection === 'usage' && <UsageView sideSlot={sideSlot} />}
+
+          <footer className="site-footer">
+            Made by{' '}
+            <a href="https://github.com/rvyyv-n" target="_blank" rel="noreferrer">
+              rvyyv-n
+            </a>
+          </footer>
         </main>
 
         {/* Slopalytics Right-Hand Sidebar */}

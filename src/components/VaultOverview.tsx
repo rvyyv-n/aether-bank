@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import type { ProjectIdea, ProjectStatus, SortProps } from '../types';
-import { Check, ChevronRight, Copy, ListTodo, PackageCheck, Zap } from 'lucide-react';
-import { StatusDot, PriorityBadge, ProgressBar, SortHead, RepoLine } from './ui';
+import { ChevronRight, ListTodo, PackageCheck, Zap } from 'lucide-react';
+import { StatusDot, PriorityBadge, SortHead } from './ui';
+import { ProjectCard } from './ProjectCard';
 import { idleLabel, type Activity, type ActivityMap } from '../data/repos';
 import { STATUS_META, progressOf } from '../data/status';
 
@@ -12,70 +13,7 @@ interface VaultOverviewProps extends SortProps {
 }
 
 const ACTIVE: ProjectStatus[] = ['in_progress', 'polishing'];
-const NEXT: ProjectStatus[] = ['spike', 'planned', 'backlog'];
-
-const ActiveCard: React.FC<{ project: ProjectIdea; activity?: Activity; onOpen: () => void }> = ({ project, activity, onOpen }) => {
-  const [copied, setCopied] = useState(false);
-  const { done, total, pct } = progressOf(project);
-  const next = project.milestones.find((m) => !m.completed);
-  const cmd = project.commands?.[0]?.cmd;
-
-  const copy = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!cmd) return;
-    navigator.clipboard.writeText(cmd);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
-
-  return (
-    <article
-      className="focus-card"
-      tabIndex={0}
-      role="button"
-      onClick={onOpen}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onOpen();
-        }
-      }}
-    >
-      <div className="flex items-center gap-2 text-[12px] text-[var(--fg-3)]">
-        <StatusDot status={project.status} />
-        <span>{STATUS_META[project.status].label}</span>
-        <span>&middot; {project.category}</span>
-        <span className="ml-auto">
-          <PriorityBadge priority={project.priority} />
-        </span>
-      </div>
-      <h3>{project.title}</h3>
-      <p>{project.subtitle}</p>
-
-      <div className="mt-4">
-        <div className="flex items-baseline justify-between text-[12px] text-[var(--fg-3)] mb-1.5">
-          <span>{next ? 'Next' : 'All milestones done'}</span>
-          <span className="tabular-nums">
-            {done}/{total} &middot; {pct}%
-          </span>
-        </div>
-        <ProgressBar pct={pct} />
-        {next && <div className="mt-2 text-[13px] text-[var(--fg)] truncate">{next.text}</div>}
-      </div>
-
-      <div className="mt-4 flex items-center gap-3 text-[12px] text-[var(--fg-3)]">
-        <span className="truncate">{project.techStack.slice(0, 3).join(', ')}</span>
-        {cmd && (
-          <button className="ml-auto flex items-center gap-1.5 hover:text-[var(--fg)] shrink-0" onClick={copy} title={`Copy: ${cmd}`}>
-            <span className="font-mono truncate max-w-[9rem]">{cmd}</span>
-            {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-          </button>
-        )}
-      </div>
-      <RepoLine activity={activity} className="mt-3" />
-    </article>
-  );
-};
+const NEXT: ProjectStatus[] = ['spike', 'planned'];
 
 const Row: React.FC<{ project: ProjectIdea; activity?: Activity; onOpen: () => void }> = ({ project, activity, onOpen }) => {
   const { done, total } = progressOf(project);
@@ -88,7 +26,9 @@ const Row: React.FC<{ project: ProjectIdea; activity?: Activity; onOpen: () => v
       </span>
       <span className="hide-phone text-[12px] text-[var(--fg-3)]">{STATUS_META[project.status].label}</span>
       <span className="hide-phone w-20 text-right text-[12px] text-[var(--fg-3)]">{idleLabel(activity?.daysIdle)}</span>
-      <PriorityBadge priority={project.priority} />
+      <span className="w-16 flex justify-center">
+        <PriorityBadge priority={project.priority} />
+      </span>
       <span className="w-10 text-right text-[12px] tabular-nums text-[var(--fg-3)]">
         {done}/{total}
       </span>
@@ -113,7 +53,7 @@ export const VaultOverview: React.FC<VaultOverviewProps> = ({
       <span className="flex-1">{head('title', 'Project')}</span>
       <span className="hide-phone">{head('status', 'Status')}</span>
       <span className="hide-phone w-20 text-right">Active</span>
-      <span className="w-8 text-center">{head('priority', 'Pri')}</span>
+      <span className="w-16 flex justify-center">{head('priority', 'Priority')}</span>
       <span className="w-10 flex justify-end">{head('progress', 'Done')}</span>
     </div>
   );
@@ -150,7 +90,7 @@ export const VaultOverview: React.FC<VaultOverviewProps> = ({
           </div>
           <div className="focus-grid mt-3">
             {active.map((p) => (
-              <ActiveCard key={p.id} project={p} activity={activity[p.id]} onOpen={() => onSelectProject(p)} />
+              <ProjectCard key={p.id} project={p} activity={activity[p.id]} onOpen={() => onSelectProject(p)} />
             ))}
           </div>
         </section>

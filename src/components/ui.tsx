@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowDown, ArrowUp, Clock, GitBranch } from 'lucide-react';
 import type { ProjectStatus, PriorityLevel } from '../types';
 import { idleLabel, type Activity } from '../data/repos';
-import { STATUS_ORDER, STATUS_META, PRIORITY_META, DONE_COLOR } from '../data/status';
+import { STATUS_ORDER, STATUS_META, PRIORITY_META, DONE_COLOR, categoryColor } from '../data/status';
 
 export const StatusDot: React.FC<{ status: ProjectStatus; className?: string }> = ({
   status,
@@ -25,19 +25,30 @@ export const StatusOptions: React.FC<{ only?: ProjectStatus[] }> = ({ only = STA
   </>
 );
 
-const PRIORITY_CLASS: Record<PriorityLevel, string> = {
-  P0: 'font-semibold bg-rose-500/10 text-rose-500 border-rose-500/25',
-  P1: 'bg-amber-500/10 text-amber-500 border-amber-500/25',
-  P2: 'text-[var(--fg-2)] border-[var(--line)]',
-  P3: 'text-[var(--fg-3)] border-[var(--line)]',
+export const PriorityBadge: React.FC<{ priority: PriorityLevel }> = ({ priority }) => (
+  <span className={`pri-badge pri-${priority}`} title={`${PRIORITY_META[priority]} priority`}>
+    {PRIORITY_META[priority]}
+  </span>
+);
+
+/** Mark for a coding agent, loaded from public/logos/<name>.svg; falls back to a letter tile. */
+export const AgentLogo: React.FC<{ name: string }> = ({ name }) => {
+  const [missing, setMissing] = useState(false);
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return missing ? (
+    <span className="agent-logo agent-mono" aria-hidden="true">
+      {name.charAt(0)}
+    </span>
+  ) : (
+    <img className="agent-logo" src={`./logos/${slug}.svg`} alt="" onError={() => setMissing(true)} />
+  );
 };
 
-export const PriorityBadge: React.FC<{ priority: PriorityLevel }> = ({ priority }) => (
-  <span
-    className={`px-1.5 rounded text-[11px] leading-4 font-mono font-medium border ${PRIORITY_CLASS[priority]}`}
-    title={`${priority} · ${PRIORITY_META[priority]}`}
-  >
-    {priority}
+/** Category name with its fixed colour. */
+export const CategoryTag: React.FC<{ name: string; className?: string }> = ({ name, className = '' }) => (
+  <span className={`inline-flex items-center gap-1.5 ${className}`}>
+    <i className="cat-dot" style={{ background: categoryColor(name) }} />
+    {name}
   </span>
 );
 

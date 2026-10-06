@@ -35,8 +35,9 @@ Banker provides a single place to track software tools through their entire
 lifecycle: from initial spark and architectural spike through execution,
 polishing, and release.
 
-- **Six stages.** Move projects through *Backlog*, *Planned*, *Exploring*,
-  *In Progress*, *Polishing* and *Shipped* from the table or the project page.
+- **Five stages.** Move projects through *Planned*, *Exploring*, *In Progress*,
+  *Polishing* and *Shipped* from the table or the project page, with High,
+  Medium or Low priority and a colour for every category.
 - **Git-aware cards.** Projects with a repo path show their branch, uncommitted
   files, unpushed commits and how long since the last commit or coding session.
   Read locally by the server, never sent anywhere.
@@ -230,6 +231,7 @@ src/
     MobileNav.tsx         bottom tab bar for phones
     UsageView.tsx         token usage by model, harness and project
     VaultOverview.tsx     active cards, sortable queue and shipped list
+    ProjectCard.tsx       project card shared by the overview, roadmap and analytics
     ProjectBody.tsx       editable project fields shared by the drawer and page
     ProjectPage.tsx       full-page project view with repo and activity rail
     TableView.tsx         high-density developer data grid with 1-click command & path copy
@@ -237,6 +239,7 @@ src/
     AnalyticsView.tsx     Slopalytics-style velocity, distribution, and tech stack intelligence
     ProjectDrawer.tsx     slide-over drawer with checklists and scratchpad
     NewProjectModal.tsx   fast idea capture modal
+public/logos/            agent marks shown in the usage sidebar, looked up by agent name
 screenshots/              retina edge-to-edge screenshots of views and mobile layout
 scripts/
   repo-status.cjs         read-only git status and last activity for project folders

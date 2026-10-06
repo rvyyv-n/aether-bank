@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import type { ProjectIdea, PriorityLevel, SortProps } from '../types';
-import { StatusDot, PriorityBadge, ProgressBar, SortHead } from './ui';
-import { STATUS_ORDER, STATUS_META, DONE_COLOR } from '../data/status';
+import type { ProjectIdea, SortProps } from '../types';
+import { Boxes, Flag, Layers, TrendingUp } from 'lucide-react';
+import { StatusDot, ProgressBar, SortHead } from './ui';
+import { ProjectCard } from './ProjectCard';
+import { STATUS_ORDER, STATUS_META, PRIORITY_META, PRIORITY_ORDER, DONE_COLOR } from '../data/status';
+import type { ActivityMap } from '../data/repos';
 
 interface AnalyticsViewProps extends SortProps {
   projects: ProjectIdea[];
+  activity: ActivityMap;
   onSelectProject: (project: ProjectIdea) => void;
 }
 
@@ -16,11 +20,16 @@ const CHARTS: [Chart, string][] = [
   ['tech', 'Stack'],
 ];
 
-const PRIORITIES: PriorityLevel[] = ['P0', 'P1', 'P2', 'P3'];
-
 const doneCount = (p: ProjectIdea) => p.milestones.filter((m) => m.completed).length;
 
-export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelectProject, sortBy, sortReversed, onSort }) => {
+export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
+  projects,
+  activity,
+  onSelectProject,
+  sortBy,
+  sortReversed,
+  onSort,
+}) => {
   const [chart, setChart] = useState<Chart>('velocity');
 
   const totalMilestones = projects.reduce((n, p) => n + p.milestones.length, 0);
@@ -33,6 +42,22 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
   const techMap: Record<string, number> = {};
   projects.forEach((p) => p.techStack.forEach((t) => (techMap[t] = (techMap[t] || 0) + 1)));
   const tech = Object.entries(techMap).sort((a, b) => b[1] - a[1]);
+
+  const head = (key: SortProps['sortBy'], label: string) => (
+    <SortHead label={label} active={sortBy === key} reversed={sortReversed} onClick={() => onSort(key)} />
+  );
+
+  const projectLinks = (list: ProjectIdea[]) =>
+    list.length === 0 ? (
+      <span className="text-[var(--fg-3)] text-[12px]">None</span>
+    ) : (
+      list.map((p) => (
+        <button key={p.id} onClick={() => onSelectProject(p)} className="list-link">
+          <StatusDot status={p.status} className="w-[7px] h-[7px]" />
+          {p.title}
+        </button>
+      ))
+    );
 
   return (
     <div className="page">
@@ -76,57 +101,28 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
         <div className="stat">
           <span>Technologies</span>
           <strong>{tech.length}</strong>
-          <small className="truncate">
-            {tech.slice(0, 3).map(([t]) => t).join(', ') || 'None yet'}
-          </small>
+          <small className="truncate">{tech.slice(0, 3).map(([t]) => t).join(', ') || 'None yet'}</small>
         </div>
       </div>
 
       {chart === 'velocity' && (
         <section>
           <div className="section-head">
-            <h3>Milestone progress</h3>
-            <span className="hint">Open a project from its row</span>
+            <h3 className="inline-flex items-center gap-2">
+              <TrendingUp className="h-3.5 w-3.5 text-[var(--accent)]" />
+              Milestone progress
+            </h3>
+            <span className="flex gap-4 text-[12px]">
+              {head('title', 'Project')}
+              {head('status', 'Status')}
+              {head('priority', 'Priority')}
+              {head('progress', 'Done')}
+            </span>
           </div>
-          <div className="mt-2">
-            <div className="rank-row rank-head">
-              <span />
-              <span className="flex gap-4">
-                <SortHead label="Project" active={sortBy === 'title'} reversed={sortReversed} onClick={() => onSort('title')} />
-                <SortHead label="Status" active={sortBy === 'status'} reversed={sortReversed} onClick={() => onSort('status')} />
-                <SortHead label="Priority" active={sortBy === 'priority'} reversed={sortReversed} onClick={() => onSort('priority')} />
-              </span>
-              <span className="val">
-                <SortHead label="Done" active={sortBy === 'progress'} reversed={sortReversed} onClick={() => onSort('progress')} />
-              </span>
-              <span className="hide-phone val" />
-            </div>
-            {projects.map((p, i) => {
-              const done = doneCount(p);
-              const total = p.milestones.length;
-              const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => onSelectProject(p)}
-                  className="rank-row w-full text-left cursor-pointer hover:bg-[var(--hover)]"
-                >
-                  <span className="num">{i + 1}</span>
-                  <span className="min-w-0">
-                    <span className="flex items-center gap-2">
-                      <StatusDot status={p.status} />
-                      <span className="truncate">{p.title}</span>
-                      <PriorityBadge priority={p.priority} />
-                    </span>
-                    <ProgressBar pct={pct} className="mt-1.5 max-w-md" />
-                  </span>
-                  <span className="val">
-                    {pct}%<small>{done}/{total}</small>
-                  </span>
-                  <span className="hide-phone val text-[var(--fg-3)]">{p.category}</span>
-                </button>
-              );
-            })}
+          <div className="focus-grid mt-3">
+            {projects.map((p) => (
+              <ProjectCard key={p.id} project={p} activity={activity[p.id]} compact onOpen={() => onSelectProject(p)} />
+            ))}
           </div>
         </section>
       )}
@@ -135,19 +131,22 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
         <>
           <section>
             <div className="section-head">
-              <h3>By stage</h3>
+              <h3 className="inline-flex items-center gap-2">
+                <Layers className="h-3.5 w-3.5 text-[var(--accent)]" />
+                By stage
+              </h3>
             </div>
-            <div className="stats mt-3">
+            <div className="focus-grid mt-3">
               {STATUS_ORDER.map((st) => {
                 const matched = projects.filter((p) => p.status === st);
                 return (
-                  <div key={st} className="stat">
-                    <span className="flex items-center gap-1.5">
+                  <div key={st} className="panel">
+                    <div className="flex items-center gap-2 text-[12px] text-[var(--fg-3)]">
                       <StatusDot status={st} />
                       {STATUS_META[st].label}
-                    </span>
-                    <strong>{matched.length}</strong>
-                    <small className="truncate">{matched.map((p) => p.title).join(', ') || 'None'}</small>
+                      <strong className="ml-auto text-[22px] font-medium text-[var(--fg)]">{matched.length}</strong>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">{projectLinks(matched)}</div>
                   </div>
                 );
               })}
@@ -156,30 +155,23 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
 
           <section>
             <div className="section-head">
-              <h3>By priority</h3>
+              <h3 className="inline-flex items-center gap-2">
+                <Flag className="h-3.5 w-3.5 text-[var(--accent)]" />
+                By priority
+              </h3>
             </div>
-            <div className="stats mt-3">
-              {PRIORITIES.map((pr) => {
+            <div className="focus-grid mt-3">
+              {PRIORITY_ORDER.map((pr) => {
                 const matched = projects.filter((p) => p.priority === pr);
                 const tasks = matched.reduce((n, p) => n + p.milestones.length, 0);
                 return (
-                  <div key={pr} className="stat">
-                    <span>{pr}</span>
-                    <strong>{matched.length}</strong>
-                    <small>
-                      {tasks} milestones
-                    </small>
-                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
-                      {matched.map((p) => (
-                        <button
-                          key={p.id}
-                          onClick={() => onSelectProject(p)}
-                          className="text-button text-[12px]"
-                        >
-                          {p.title}
-                        </button>
-                      ))}
+                  <div key={pr} className="panel">
+                    <div className="flex items-center gap-2 text-[12px] text-[var(--fg-3)]">
+                      <span className={`pri-badge pri-${pr}`}>{PRIORITY_META[pr]}</span>
+                      <span>{tasks} milestones</span>
+                      <strong className="ml-auto text-[22px] font-medium text-[var(--fg)]">{matched.length}</strong>
                     </div>
+                    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">{projectLinks(matched)}</div>
                   </div>
                 );
               })}
@@ -191,24 +183,24 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
       {chart === 'tech' && (
         <section>
           <div className="section-head">
-            <h3>Technology use</h3>
+            <h3 className="inline-flex items-center gap-2">
+              <Boxes className="h-3.5 w-3.5 text-[var(--accent)]" />
+              Technology use
+            </h3>
             <span className="hint">Projects per technology</span>
           </div>
-          <div className="mt-2">
-            {tech.map(([name, n], i) => {
-              const pct = Math.round((n / projects.length) * 100);
+          <div className="focus-grid mt-3">
+            {tech.map(([name, n]) => {
+              const pct = Math.round((n / Math.max(1, projects.length)) * 100);
               return (
-                <div key={name} className="rank-row">
-                  <span className="num">{i + 1}</span>
-                  <span className="min-w-0">
-                    <span className="block truncate">{name}</span>
-                    <ProgressBar pct={pct} className="mt-1.5" />
-                  </span>
-                  <span className="val">
-                    {n}
-                    <small>{pct}%</small>
-                  </span>
-                  <span />
+                <div key={name} className="panel !py-3.5">
+                  <div className="flex items-baseline justify-between text-[14px]">
+                    <span className="truncate text-[var(--fg)]">{name}</span>
+                    <span className="tabular-nums text-[var(--fg-3)] text-[12px]">
+                      {n} · {pct}%
+                    </span>
+                  </div>
+                  <ProgressBar pct={pct} className="mt-2" />
                 </div>
               );
             })}

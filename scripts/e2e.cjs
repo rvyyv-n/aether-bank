@@ -31,7 +31,7 @@ const CONTRAST_PAIRS = [
   ['--accent', '--bg', 3, 'accent on page'],
   ['--on-accent', '--accent', 4.5, 'button text on accent'],
 ];
-const STATUS_DOTS = ['backlog', 'planned', 'spike', 'in_progress', 'polishing'].map((s) => `var(--st-${s})`);
+const STATUS_DOTS = ['planned', 'spike', 'in_progress', 'polishing'].map((s) => `var(--st-${s})`);
 
 function freePort() {
   return new Promise((resolve, reject) => {

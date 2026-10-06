@@ -1,5 +1,5 @@
-export type ProjectStatus = 'backlog' | 'planned' | 'spike' | 'in_progress' | 'polishing' | 'shipped';
-export type PriorityLevel = 'P0' | 'P1' | 'P2' | 'P3';
+export type ProjectStatus = 'planned' | 'spike' | 'in_progress' | 'polishing' | 'shipped';
+export type PriorityLevel = 'high' | 'medium' | 'low';
 
 export interface MilestoneItem {
   id: string;

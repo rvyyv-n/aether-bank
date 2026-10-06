@@ -115,7 +115,7 @@ export const ProjectBody: React.FC<{
             >
               {(Object.keys(PRIORITY_META) as PriorityLevel[]).map((p) => (
                 <option key={p} value={p}>
-                  {p} · {PRIORITY_META[p]}
+                  {PRIORITY_META[p]}
                 </option>
               ))}
             </select>

@@ -5,7 +5,7 @@ import {
   Copy,
   Check
 } from 'lucide-react';
-import { StatusDot, StatusOptions, PriorityBadge, ProgressBar, SortHead, RepoLine } from './ui';
+import { StatusDot, StatusOptions, PriorityBadge, ProgressBar, SortHead, RepoLine, CategoryTag } from './ui';
 import type { ActivityMap } from '../data/repos';
 import { progressOf } from '../data/status';
 
@@ -137,9 +137,7 @@ export const TableView: React.FC<TableViewProps> = ({
                         <span className="font-medium text-xs text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors">
                           {project.title}
                         </span>
-                        <span className="text-[11.5px] text-[var(--fg-3)]">
-                          {project.category}
-                        </span>
+                        <CategoryTag name={project.category} className="text-[11.5px] text-[var(--fg-3)]" />
                       </div>
                       <div className="text-[12px] text-[var(--fg-2)] truncate max-w-sm mt-0.5">
                         {project.subtitle}
