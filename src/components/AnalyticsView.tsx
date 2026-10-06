@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import type { ProjectIdea, PriorityLevel } from '../types';
-import { TrendingUp } from 'lucide-react';
-import { StatusDot, ProgressBar } from './ui';
+import { StatusDot, PriorityBadge, ProgressBar } from './ui';
 import { STATUS_ORDER, STATUS_META, DONE_COLOR } from '../data/status';
 
 interface AnalyticsViewProps {
@@ -9,303 +8,201 @@ interface AnalyticsViewProps {
   onSelectProject: (project: ProjectIdea) => void;
 }
 
+type Chart = 'velocity' | 'distribution' | 'tech';
+
+const CHARTS: [Chart, string][] = [
+  ['velocity', 'Progress'],
+  ['distribution', 'Stages'],
+  ['tech', 'Stack'],
+];
+
+const PRIORITIES: PriorityLevel[] = ['P0', 'P1', 'P2', 'P3'];
+
+const doneCount = (p: ProjectIdea) => p.milestones.filter((m) => m.completed).length;
+
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelectProject }) => {
-  const [activeChart, setActiveChart] = useState<'velocity' | 'distribution' | 'tech'>('velocity');
-  const [hoveredProject, setHoveredProject] = useState<ProjectIdea | null>(null);
+  const [chart, setChart] = useState<Chart>('velocity');
 
-  // Compute metrics
-  const totalProjects = projects.length;
-  const totalMilestones = projects.reduce((acc, p) => acc + p.milestones.length, 0);
-  const completedMilestones = projects.reduce(
-    (acc, p) => acc + p.milestones.filter((m) => m.completed).length,
-    0
-  );
-  const overallProgress = totalMilestones > 0 
-    ? Math.round((completedMilestones / totalMilestones) * 100) 
-    : 0;
+  const totalMilestones = projects.reduce((n, p) => n + p.milestones.length, 0);
+  const completedMilestones = projects.reduce((n, p) => n + doneCount(p), 0);
+  const overall = totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0;
 
-  const shippedCount = projects.filter((p) => p.status === 'shipped').length;
-  const inProgressCount = projects.filter((p) => p.status === 'in_progress').length;
-  const spikeCount = projects.filter((p) => p.status === 'spike').length;
+  const count = (status: ProjectIdea['status']) => projects.filter((p) => p.status === status).length;
+  const shipped = count('shipped');
 
-  // Tech stack counts
   const techMap: Record<string, number> = {};
-  projects.forEach((p) => {
-    p.techStack.forEach((t) => {
-      techMap[t] = (techMap[t] || 0) + 1;
-    });
-  });
-  const sortedTech = Object.entries(techMap).sort((a, b) => b[1] - a[1]);
-
+  projects.forEach((p) => p.techStack.forEach((t) => (techMap[t] = (techMap[t] || 0) + 1)));
+  const tech = Object.entries(techMap).sort((a, b) => b[1] - a[1]);
 
   return (
-    <div className="sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6">
-      {/* Metric Cards (Slopalytics minimalist cards) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="slop-card p-4">
-          <div className="text-[11px] font-mono text-[var(--fg-3)] uppercase tracking-wider">
-            Total Projects
-          </div>
-          <div className="text-2xl font-semibold mt-1 tracking-tight text-[var(--fg)]">
-            {totalProjects}
-          </div>
-          <div className="text-xs text-[var(--fg-2)] mt-1 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span>{inProgressCount} active &middot; {spikeCount} exploring</span>
-          </div>
+    <div className="page">
+      <div className="page-head">
+        <div>
+          <h1>
+            Analytics
+            <span>{projects.length} projects</span>
+          </h1>
+          <p>Where every project stands and what it is built with.</p>
         </div>
-
-        <div className="slop-card p-4">
-          <div className="text-[11px] font-mono text-[var(--fg-3)] uppercase tracking-wider">
-            Overall Completion
-          </div>
-          <div className="text-2xl font-semibold mt-1 tracking-tight text-[var(--accent)]">
-            {overallProgress}%
-          </div>
-          <div className="text-xs text-[var(--fg-2)] mt-1">
-            {completedMilestones} of {totalMilestones} milestones
-          </div>
-        </div>
-
-        <div className="slop-card p-4">
-          <div className="text-[11px] font-mono text-[var(--fg-3)] uppercase tracking-wider">
-            Shipped Products
-          </div>
-          <div className="text-2xl font-semibold mt-1 tracking-tight" style={{ color: DONE_COLOR }}>
-            {shippedCount}
-          </div>
-          <div className="text-xs text-[var(--fg-2)] mt-1">
-            Production & community releases
-          </div>
-        </div>
-
-        <div className="slop-card p-4">
-          <div className="text-[11px] font-mono text-[var(--fg-3)] uppercase tracking-wider">
-            Tech Ecosystem
-          </div>
-          <div className="text-2xl font-semibold mt-1 tracking-tight text-[var(--fg)]">
-            {sortedTech.length}
-          </div>
-          <div className="text-xs text-[var(--fg-2)] mt-1 truncate">
-            Top: {sortedTech.slice(0, 3).map((t) => t[0]).join(', ')}
-          </div>
+        <div className="seg">
+          {CHARTS.map(([id, label]) => (
+            <button key={id} aria-pressed={chart === id} onClick={() => setChart(id)}>
+              {label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Main Chart Section */}
-      <div className="slop-card p-4 sm:p-6">
-        {/* Chart Header & View Switcher */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-[var(--line)] gap-3">
-          <div>
-            <h2 className="text-base font-semibold text-[var(--fg)] m-0 flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-[var(--accent)]" />
-              <span>Vault Analytics & Execution Velocity</span>
-            </h2>
-            <p className="text-xs text-[var(--fg-2)] mt-0.5 m-0">
-              Interactive project completion benchmarks and architectural footprint.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-1.5 p-0.5 rounded-lg border border-[var(--line)] bg-[var(--surface)] self-start sm:self-auto">
-            <button
-              onClick={() => setActiveChart('velocity')}
-              className={`px-3 py-1 rounded text-xs transition cursor-pointer ${
-                activeChart === 'velocity'
-                  ? 'bg-[var(--fg)] text-[var(--bg)] font-semibold'
-                  : 'text-[var(--fg-2)] hover:text-[var(--fg)]'
-              }`}
-            >
-              Velocity
-            </button>
-            <button
-              onClick={() => setActiveChart('distribution')}
-              className={`px-3 py-1 rounded text-xs transition cursor-pointer ${
-                activeChart === 'distribution'
-                  ? 'bg-[var(--fg)] text-[var(--bg)] font-semibold'
-                  : 'text-[var(--fg-2)] hover:text-[var(--fg)]'
-              }`}
-            >
-              Stage Matrix
-            </button>
-            <button
-              onClick={() => setActiveChart('tech')}
-              className={`px-3 py-1 rounded text-xs transition cursor-pointer ${
-                activeChart === 'tech'
-                  ? 'bg-[var(--fg)] text-[var(--bg)] font-semibold'
-                  : 'text-[var(--fg-2)] hover:text-[var(--fg)]'
-              }`}
-            >
-              Stack
-            </button>
-          </div>
+      <div className="stats">
+        <div className="stat">
+          <span>Projects</span>
+          <strong>{projects.length}</strong>
+          <small>
+            {count('in_progress')} active · {count('spike')} exploring
+          </small>
         </div>
+        <div className="stat">
+          <span>Completion</span>
+          <strong className="text-[var(--accent)]">{overall}%</strong>
+          <small>
+            {completedMilestones} of {totalMilestones} milestones
+          </small>
+        </div>
+        <div className="stat">
+          <span>Shipped</span>
+          <strong style={{ color: DONE_COLOR }}>{shipped}</strong>
+          <small>Released projects</small>
+        </div>
+        <div className="stat">
+          <span>Technologies</span>
+          <strong>{tech.length}</strong>
+          <small className="truncate">
+            {tech.slice(0, 3).map(([t]) => t).join(', ') || 'None yet'}
+          </small>
+        </div>
+      </div>
 
-        {/* Chart 1: Velocity & Milestones Progress Bar Chart */}
-        {activeChart === 'velocity' && (
-          <div className="pt-6 space-y-4">
-            <div className="flex items-center justify-between text-xs font-mono text-[var(--fg-3)]">
-              <span>PROJECT / MILESTONES RATIO</span>
-              <span>COMPLETION RATE</span>
+      {chart === 'velocity' && (
+        <section>
+          <div className="section-head">
+            <h3>Milestone progress</h3>
+            <span className="hint">Open a project from its row</span>
+          </div>
+          <div className="mt-2">
+            {projects.map((p, i) => {
+              const done = doneCount(p);
+              const total = p.milestones.length;
+              const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => onSelectProject(p)}
+                  className="rank-row w-full text-left cursor-pointer hover:bg-[var(--hover)]"
+                >
+                  <span className="num">{i + 1}</span>
+                  <span className="min-w-0">
+                    <span className="flex items-center gap-2">
+                      <StatusDot status={p.status} />
+                      <span className="truncate">{p.title}</span>
+                      <PriorityBadge priority={p.priority} />
+                    </span>
+                    <ProgressBar pct={pct} className="mt-1.5" />
+                  </span>
+                  <span className="val">
+                    {pct}%<small>{done}/{total}</small>
+                  </span>
+                  <span className="hide-phone val text-[var(--fg-3)]">{p.category}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {chart === 'distribution' && (
+        <>
+          <section>
+            <div className="section-head">
+              <h3>By stage</h3>
             </div>
-
-            <div className="space-y-3">
-              {projects.map((proj) => {
-                const completed = proj.milestones.filter((m) => m.completed).length;
-                const total = proj.milestones.length;
-                const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
-                const isHovered = hoveredProject?.id === proj.id;
-
+            <div className="stats mt-3">
+              {STATUS_ORDER.map((st) => {
+                const matched = projects.filter((p) => p.status === st);
                 return (
-                  <div
-                    key={proj.id}
-                    onClick={() => onSelectProject(proj)}
-                    onMouseEnter={() => setHoveredProject(proj)}
-                    onMouseLeave={() => setHoveredProject(null)}
-                    className={`p-3 rounded-lg border transition cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-                      isHovered
-                        ? 'border-[var(--line-2)] bg-[var(--hover)]'
-                        : 'border-[var(--line)] bg-[var(--surface)]'
-                    }`}
-                  >
-                    <div className="min-w-[200px] flex-1">
-                      <div className="flex items-center gap-2">
-                        <StatusDot status={proj.status} />
-                        <span className="font-medium text-xs text-[var(--fg)]">
-                          {proj.title}
-                        </span>
-                        <span className="text-[10px] font-mono text-[var(--fg-3)] border border-[var(--line)] px-1.5 py-0.2 rounded">
-                          {proj.priority}
-                        </span>
-                        <span className="text-[10px] font-mono text-[var(--fg-3)]">
-                          {proj.category}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-[var(--fg-2)] mt-1 truncate">
-                        {proj.subtitle}
-                      </p>
-                    </div>
+                  <div key={st} className="stat">
+                    <span className="flex items-center gap-1.5">
+                      <StatusDot status={st} />
+                      {STATUS_META[st].label}
+                    </span>
+                    <strong>{matched.length}</strong>
+                    <small className="truncate">{matched.map((p) => p.title).join(', ') || 'None'}</small>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
 
-                    <div className="w-full sm:w-64 flex items-center gap-3">
-                      <ProgressBar pct={pct} className="flex-1  h-2" />
-                      <div className="w-16 text-right font-mono text-xs text-[var(--fg)] font-medium">
-                        {pct}%
-                      </div>
-                      <div className="w-12 text-right font-mono text-[11px] text-[var(--fg-3)]">
-                        {completed}/{total}
-                      </div>
+          <section>
+            <div className="section-head">
+              <h3>By priority</h3>
+            </div>
+            <div className="stats mt-3">
+              {PRIORITIES.map((pr) => {
+                const matched = projects.filter((p) => p.priority === pr);
+                const tasks = matched.reduce((n, p) => n + p.milestones.length, 0);
+                return (
+                  <div key={pr} className="stat">
+                    <span>{pr}</span>
+                    <strong>{matched.length}</strong>
+                    <small>
+                      {tasks} milestones
+                    </small>
+                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+                      {matched.map((p) => (
+                        <button
+                          key={p.id}
+                          onClick={() => onSelectProject(p)}
+                          className="text-button text-[11px]"
+                        >
+                          {p.title}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 );
               })}
             </div>
+          </section>
+        </>
+      )}
+
+      {chart === 'tech' && (
+        <section>
+          <div className="section-head">
+            <h3>Technology use</h3>
+            <span className="hint">Projects per technology</span>
           </div>
-        )}
-
-        {/* Chart 2: Distribution by Status & Priority */}
-        {activeChart === 'distribution' && (
-          <div className="pt-6 space-y-6">
-            <div>
-              <div className="text-xs font-mono text-[var(--fg-3)] mb-3">
-                LIFECYCLE PIPELINE BREAKDOWN
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
-                {STATUS_ORDER.map(
-                  (st) => {
-                    const matched = projects.filter((p) => p.status === st);
-                    return (
-                      <div
-                        key={st}
-                        className="p-3 rounded-lg border border-[var(--line)] bg-[var(--surface)] flex flex-col justify-between min-h-[90px]"
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <StatusDot status={st} />
-                          <span className="text-xs font-medium text-[var(--fg)]">
-                            {STATUS_META[st].label}
-                          </span>
-                        </div>
-                        <div className="mt-2 text-xl font-bold font-mono text-[var(--fg)]">
-                          {matched.length}
-                        </div>
-                        <div className="text-[10px] text-[var(--fg-3)] truncate">
-                          {matched.map((p) => p.title).join(', ') || 'No projects'}
-                        </div>
-                      </div>
-                    );
-                  }
-                )}
-              </div>
-            </div>
-
-            <div>
-              <div className="text-xs font-mono text-[var(--fg-3)] mb-3">
-                PRIORITY WEIGHT DISTRIBUTION
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {(['P0', 'P1', 'P2', 'P3'] as PriorityLevel[]).map((pr) => {
-                  const matched = projects.filter((p) => p.priority === pr);
-                  const totalMilestonesInPr = matched.reduce((a, b) => a + b.milestones.length, 0);
-                  return (
-                    <div
-                      key={pr}
-                      className="p-3.5 rounded-lg border border-[var(--line)] bg-[var(--surface)]"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-mono font-bold text-[var(--accent)]">
-                          {pr}
-                        </span>
-                        <span className="text-xs font-mono text-[var(--fg-3)]">
-                          {matched.length} projects
-                        </span>
-                      </div>
-                      <div className="mt-2 font-mono text-lg font-semibold text-[var(--fg)]">
-                        {totalMilestonesInPr} <span className="text-xs text-[var(--fg-3)] font-normal">tasks</span>
-                      </div>
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {matched.map((p) => (
-                          <span
-                            key={p.id}
-                            onClick={() => onSelectProject(p)}
-                            className="text-[10px] font-mono text-[var(--fg-2)] hover:text-[var(--fg)] bg-[var(--hover)] px-1.5 py-0.5 rounded cursor-pointer"
-                          >
-                            {p.title}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Chart 3: Tech Stack Frequency */}
-        {activeChart === 'tech' && (
-          <div className="pt-6 space-y-3">
-            <div className="flex items-center justify-between text-xs font-mono text-[var(--fg-3)]">
-              <span>TECHNOLOGY / FRAMEWORK</span>
-              <span>PROJECT OCCURRENCE</span>
-            </div>
-            {sortedTech.map(([tech, count]) => {
-              const pct = Math.round((count / totalProjects) * 100);
+          <div className="mt-2">
+            {tech.map(([name, n], i) => {
+              const pct = Math.round((n / projects.length) * 100);
               return (
-                <div
-                  key={tech}
-                  className="p-2.5 rounded-lg border border-[var(--line)] bg-[var(--surface)] flex items-center justify-between gap-4"
-                >
-                  <div className="w-40 font-mono text-xs font-medium text-[var(--fg)] truncate">
-                    {tech}
-                  </div>
-                  <ProgressBar pct={pct} className="flex-1" />
-                  <div className="w-20 text-right font-mono text-xs text-[var(--fg-2)]">
-                    {count} {count === 1 ? 'project' : 'projects'} ({pct}%)
-                  </div>
+                <div key={name} className="rank-row">
+                  <span className="num">{i + 1}</span>
+                  <span className="min-w-0">
+                    <span className="block truncate">{name}</span>
+                    <ProgressBar pct={pct} className="mt-1.5" />
+                  </span>
+                  <span className="val">
+                    {n}
+                    <small>{pct}%</small>
+                  </span>
+                  <span />
                 </div>
               );
             })}
           </div>
-        )}
-      </div>
+        </section>
+      )}
     </div>
   );
 };
