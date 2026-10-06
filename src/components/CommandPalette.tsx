@@ -12,8 +12,8 @@ export interface PaletteCommand {
   run: () => void;
 }
 
+/** Mounted only while open, so every opening starts with an empty query. */
 interface CommandPaletteProps {
-  open: boolean;
   onClose: () => void;
   projects: ProjectIdea[];
   commands: PaletteCommand[];
@@ -43,7 +43,6 @@ function matchScore(query: string, text: string): number {
 }
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
-  open,
   onClose,
   projects,
   commands,
@@ -86,18 +85,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   }, [query, projects, commands]);
 
   useEffect(() => {
-    if (!open) return;
-    setQuery('');
-    setActive(0);
-  }, [open]);
-
-  useEffect(() => {
     listRef.current
       ?.querySelector<HTMLElement>(`[data-index="${active}"]`)
       ?.scrollIntoView({ block: 'nearest' });
   }, [active]);
-
-  if (!open) return null;
 
   const runItem = (item: Item | undefined) => {
     if (!item) return;

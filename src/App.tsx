@@ -372,13 +372,14 @@ export function App() {
         onDeleteProject={handleDeleteProject}
       />
 
-      <CommandPalette
-        open={isPaletteOpen}
-        onClose={() => setIsPaletteOpen(false)}
-        projects={projects}
-        commands={paletteCommands}
-        onSelectProject={setSelectedProject}
-      />
+      {isPaletteOpen && (
+        <CommandPalette
+          onClose={() => setIsPaletteOpen(false)}
+          projects={projects}
+          commands={paletteCommands}
+          onSelectProject={setSelectedProject}
+        />
+      )}
 
       {/* New Project Idea Modal */}
       <NewProjectModal
