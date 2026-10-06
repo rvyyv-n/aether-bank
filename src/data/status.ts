@@ -11,12 +11,12 @@ export const STATUS_ORDER: ProjectStatus[] = [
 ];
 
 export const STATUS_META: Record<ProjectStatus, { label: string; color: string }> = {
-  backlog: { label: 'Backlog', color: '#71717a' },
-  planned: { label: 'Planned', color: '#3b82f6' },
-  spike: { label: 'Exploring', color: '#f59e0b' },
-  in_progress: { label: 'In Progress', color: '#10b981' },
-  polishing: { label: 'Polishing', color: '#0ea5e9' },
-  shipped: { label: 'Shipped', color: '#a855f7' },
+  backlog: { label: 'Backlog', color: '#77716c' },
+  planned: { label: 'Planned', color: '#8fa3b8' },
+  spike: { label: 'Exploring', color: '#d4a373' },
+  in_progress: { label: 'In Progress', color: '#8fae8b' },
+  polishing: { label: 'Polishing', color: '#7fadad' },
+  shipped: { label: 'Shipped', color: '#c5ac98' },
 };
 
 export const PRIORITY_META: Record<PriorityLevel, string> = {

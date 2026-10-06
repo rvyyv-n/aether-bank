@@ -71,7 +71,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProj
           <p className="side-note mt-1 mb-2">{p.description}</p>
           <ProgressBar pct={pct} />
           <div className="mt-2">
-            {matched.map((proj) => {
+            {matched.map((proj, idx) => {
               const d = proj.milestones.filter((m) => m.completed).length;
               return (
                 <button
@@ -79,7 +79,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ projects, onSelectProj
                   onClick={() => onSelectProject(proj)}
                   className="rank-row w-full text-left cursor-pointer hover:bg-[var(--hover)]"
                 >
-                  <span className="num">{i + 1}</span>
+                  <span className="num">{idx === 0 ? i + 1 : ''}</span>
                   <span className="min-w-0 flex items-center gap-2">
                     <StatusDot status={proj.status} />
                     <span className="truncate">{proj.title}</span>

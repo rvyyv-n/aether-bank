@@ -5,8 +5,8 @@
   --surface: #0d0b0a;
   --hover: #141210;
   --fg: #ffffff;
-  --fg-2: #aaa39d;
-  --fg-3: #77716c;
+  --fg-2: #c9c2bb;
+  --fg-3: #9b948d;
   --line: #1c1a18;
   --line-2: #36312d;
   --accent: #c5ac98;
@@ -36,8 +36,6 @@ html.light {
 
 /* Base resets & typography */
 html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   background-color: var(--bg);
   color: var(--fg);
@@ -133,7 +131,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 .brand strong {
   font-size: 22px;
   font-weight: 450;
-  letter-spacing: -1px;
+  letter-spacing: 0;
   line-height: 1;
 }
 
@@ -189,7 +187,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   white-space: nowrap;
   color: var(--fg-2);
   align-items: center;
-  font-size: 12.5px;
+  font-size: 13.5px;
   display: flex;
   position: relative;
   transition: color 0.15s ease;
@@ -245,7 +243,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   border: 1px solid var(--line);
   border-radius: 6px;
   color: var(--fg-3);
-  font-size: 12px;
+  font-size: 13px;
   transition: color 0.15s, border-color 0.15s;
 }
 
@@ -256,7 +254,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 
 .quick-switch kbd {
   font: inherit;
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: var(--fg-3);
   margin-left: 6px;
 }
@@ -282,7 +280,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 .btn-accent {
   background: var(--fg);
   color: var(--bg);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   border-radius: 6px;
   padding: 6px 12px;
@@ -336,7 +334,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   color: var(--fg-3);
   font-variant-numeric: tabular-nums;
   margin-left: 6px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 400;
 }
 
@@ -361,7 +359,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   border: 0;
   outline: none;
   flex: 1;
-  font-size: 12.5px;
+  font-size: 13.5px;
 }
 
 .search input::placeholder {
@@ -370,7 +368,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 
 .search kbd {
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--fg-3);
 }
 
@@ -385,19 +383,19 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 .section-head h3 {
   flex: 1;
   margin: 0;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 550;
   color: var(--fg);
 }
 
 .section-head .hint {
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: var(--fg-3);
 }
 
 .text-button {
   color: var(--accent);
-  font-size: 12px;
+  font-size: 13px;
   transition: opacity 0.15s;
 }
 
@@ -408,11 +406,11 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 .side-note {
   color: var(--fg-2);
   margin: 0;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .row-count {
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: var(--fg-3);
   font-variant-numeric: tabular-nums;
 }
@@ -428,7 +426,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 12.5px;
+  font-size: 13.5px;
   color: var(--fg-3);
   text-align: left;
   transition: background-color 0.15s, color 0.15s;
@@ -474,7 +472,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 
 .strike-filter button {
   color: var(--fg);
-  font-size: 12px;
+  font-size: 13px;
   transition: color 0.15s;
 }
 
@@ -519,7 +517,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 .tag {
   padding: 0 6px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 18px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   color: var(--fg-2);
@@ -531,7 +529,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 /* Section label used in the drawer and forms */
 .field-label {
   display: block;
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -545,7 +543,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   border: 1px solid var(--line);
   border-radius: 6px;
   padding: 6px 10px;
-  font-size: 12.5px;
+  font-size: 13.5px;
   color: var(--fg);
   transition: border-color 0.15s;
 }
@@ -564,7 +562,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 }
 
 .btn-ghost {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   border-radius: 6px;
   padding: 6px 12px;
@@ -639,7 +637,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   flex-direction: column;
   gap: 3px;
   min-width: 0;
-  font-size: 12.5px;
+  font-size: 13.5px;
   color: var(--fg);
 }
 
@@ -648,7 +646,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 }
 
 .drawer-props > * > span:first-child {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--fg-3);
 }
 
@@ -659,7 +657,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   border: 1px solid transparent;
   border-radius: 5px;
   background: transparent;
-  font-size: 12.5px;
+  font-size: 13.5px;
   cursor: pointer;
 }
 
@@ -790,7 +788,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 
 .palette-group {
   padding: 10px 8px 4px;
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: var(--fg-3);
 }
 
@@ -812,7 +810,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 }
 
 .palette-meta {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--fg-3);
   flex-shrink: 1;
   min-width: 0;
@@ -821,7 +819,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 .palette-hint {
   margin-left: auto;
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--fg-3);
   white-space: nowrap;
 }
@@ -871,8 +869,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 /* Shared page layout so every view reads the same */
 @layer components {
   .page {
-    max-width: 64rem;
-    margin: 0 auto;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 22px;
@@ -890,7 +887,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
     margin: 0;
     font-size: 22px;
     font-weight: 450;
-    letter-spacing: -0.6px;
+    letter-spacing: 0;
     color: var(--fg);
   }
 
@@ -905,7 +902,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 
   .page-head p {
     margin: 4px 0 0;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--fg-3);
   }
 
@@ -915,7 +912,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
     flex-wrap: wrap;
     align-items: center;
     gap: 4px 14px;
-    font-size: 12.5px;
+    font-size: 13.5px;
   }
 
   .seg button {
@@ -956,7 +953,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 
   .stat > span {
     display: block;
-    font-size: 10.5px;
+    font-size: 11.5px;
     color: var(--fg-3);
   }
 
@@ -967,13 +964,13 @@ a:focus-visible, [tabindex="0"]:focus-visible {
     font-weight: 500;
     color: var(--fg);
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.3px;
+    letter-spacing: 0;
   }
 
   .stat > small {
     display: block;
     margin-top: 1px;
-    font-size: 10.5px;
+    font-size: 11.5px;
     color: var(--fg-3);
     font-variant-numeric: tabular-nums;
   }
@@ -986,12 +983,12 @@ a:focus-visible, [tabindex="0"]:focus-visible {
     gap: 0 14px;
     padding: 10px 0;
     border-top: 1px solid var(--line);
-    font-size: 12.5px;
+    font-size: 13.5px;
     color: var(--fg);
   }
 
   .rank-row .num {
-    font-size: 10.5px;
+    font-size: 11.5px;
     color: var(--fg-3);
     font-variant-numeric: tabular-nums;
   }
@@ -1004,7 +1001,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 
   .rank-row .val small {
     display: block;
-    font-size: 10px;
+    font-size: 11px;
     color: var(--fg-3);
   }
 
@@ -1018,7 +1015,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   .rank-head {
     padding: 0 0 6px;
     border-top: 0;
-    font-size: 10.5px;
+    font-size: 11.5px;
     color: var(--fg-3);
   }
 }
@@ -1161,7 +1158,7 @@ a:focus-visible, [tabindex="0"]:focus-visible {
     justify-content: center;
     gap: 3px;
     height: 56px;
-    font-size: 10.5px;
+    font-size: 11.5px;
     color: var(--fg-3);
   }
   .mobile-nav button.active {

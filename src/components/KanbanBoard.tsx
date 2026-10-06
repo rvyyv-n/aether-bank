@@ -57,7 +57,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   {STATUS_META[status].label}
                 </h3>
               </div>
-              <span className="text-[11px] font-mono text-[var(--fg-3)]">
+              <span className="text-[12px] font-mono text-[var(--fg-3)]">
                 {columnProjects.length}
               </span>
             </div>
@@ -65,7 +65,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
             {/* Cards */}
             <div className="flex flex-col gap-2">
               {columnProjects.length === 0 ? (
-                <div className="py-6 border border-dashed border-[var(--line)] rounded-md text-center text-[var(--fg-3)] text-[11px]">
+                <div className="py-6 border border-dashed border-[var(--line)] rounded-md text-center text-[var(--fg-3)] text-[12px]">
                   Nothing here
                 </div>
               ) : (
@@ -93,7 +93,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     >
                       {/* Category & Priority */}
                       <div className="flex items-center justify-between gap-1 mb-1.5">
-                        <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--fg-3)]">
+                        <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--fg-3)]">
                           {project.category}
                         </span>
                         <PriorityBadge priority={project.priority} />
@@ -109,7 +109,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
                       {/* Next milestone */}
                       {nextMilestone && (
-                        <div className="mt-2.5 flex items-start gap-1.5 text-[11px] text-[var(--fg-2)]">
+                        <div className="mt-2.5 flex items-start gap-1.5 text-[12px] text-[var(--fg-2)]">
                           <CircleDot className="h-3 w-3 mt-0.5 text-[var(--accent)] flex-shrink-0" />
                           <span className="line-clamp-1" title={nextMilestone.text}>
                             {nextMilestone.text}
@@ -135,7 +135,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                       {primaryCommand && (
                         <button
                           onClick={(e) => copyToClipboard(e, primaryCommand.cmd, `k-cmd-${project.id}`)}
-                          className="mt-2.5 w-full flex items-center justify-between gap-2 px-2 py-1 rounded border border-[var(--line)] hover:border-[var(--line-2)] font-mono text-[10.5px] text-[var(--fg-2)] hover:text-[var(--fg)] bg-[var(--bg)] transition"
+                          className="mt-2.5 w-full flex items-center justify-between gap-2 px-2 py-1 rounded border border-[var(--line)] hover:border-[var(--line-2)] font-mono text-[11.5px] text-[var(--fg-2)] hover:text-[var(--fg)] bg-[var(--bg)] transition"
                           title={`Copy: ${primaryCommand.cmd}`}
                         >
                           <span className="flex items-center gap-1.5 min-w-0">
@@ -154,7 +154,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                       {total > 0 && (
                         <div className="mt-3 flex items-center gap-2" title={`${done} of ${total} milestones`}>
                           <ProgressBar pct={pct} className="flex-1" />
-                          <span className="text-[10.5px] font-mono text-[var(--fg-3)] tabular-nums">
+                          <span className="text-[11.5px] font-mono text-[var(--fg-3)] tabular-nums">
                             {done}/{total}
                           </span>
                         </div>
@@ -167,7 +167,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                             <button
                               onClick={(e) => copyToClipboard(e, project.path!, `k-path-${project.id}`)}
                               title={`Copy path: ${project.path}`}
-                              className="flex items-center gap-1 font-mono text-[11px] text-[var(--fg-3)] hover:text-[var(--fg)] min-w-0 max-w-[120px]"
+                              className="flex items-center gap-1 font-mono text-[12px] text-[var(--fg-3)] hover:text-[var(--fg)] min-w-0 max-w-[120px]"
                             >
                               {copiedId === `k-path-${project.id}` ? (
                                 <Check className="h-3 w-3 text-emerald-500 flex-shrink-0" />
@@ -177,7 +177,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                               <span className="truncate">{project.path.split(/[/\\]/).pop()}</span>
                             </button>
                           ) : (
-                            <span className="text-[10.5px] text-[var(--fg-3)] font-mono">Idea</span>
+                            <span className="text-[11.5px] text-[var(--fg-3)] font-mono">Idea</span>
                           )}
 
                           {project.upstreamRefs && project.upstreamRefs.length > 0 && (

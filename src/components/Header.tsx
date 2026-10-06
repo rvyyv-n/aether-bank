@@ -114,7 +114,7 @@ export const Header: React.FC<HeaderProps> = ({
               Table
             </button>
             <span className="tab-divider" aria-hidden="true" />
-            <span className="text-[11px] tabular-nums text-[var(--fg-3)] hidden sm:inline">
+            <span className="text-[12px] tabular-nums text-[var(--fg-3)] hidden sm:inline">
               {filteredCount === projects.length ? `${projects.length} ideas` : `${filteredCount}/${projects.length}`}
             </span>
             <div className="flex items-center gap-1.5 text-xs text-[var(--fg-3)]">

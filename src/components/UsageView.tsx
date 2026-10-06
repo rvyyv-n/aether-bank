@@ -371,7 +371,7 @@ export const UsageView: React.FC = () => {
           <span>Cache reads</span>
           <strong>{fmtNum(analysis.cached)}</strong>
           <small>
-            <button className="text-button text-[10.5px]" onClick={() => setWithCache((c) => !c)}>
+            <button className="text-button text-[11.5px]" onClick={() => setWithCache((c) => !c)}>
               {withCache ? 'Counted in tokens' : 'Not in tokens. Count them'}
             </button>
           </small>
@@ -402,7 +402,7 @@ export const UsageView: React.FC = () => {
           </div>
         ) : (
           <div className="flex gap-2 mt-2">
-            <div className="flex flex-col justify-between text-[10px] text-[var(--fg-3)] tabular-nums text-right w-9 shrink-0 py-0.5" style={{ height: H }}>
+            <div className="flex flex-col justify-between text-[11px] text-[var(--fg-3)] tabular-nums text-right w-9 shrink-0 py-0.5" style={{ height: H }}>
               {yTicks.map((t, i) => <span key={i}>{t}</span>)}
             </div>
             <div className="flex-1 min-w-0 relative">
@@ -426,7 +426,7 @@ export const UsageView: React.FC = () => {
               </svg>
               {scrub != null && scrubDay && (
                 <div
-                  className="absolute top-1 z-10 rounded-lg border border-[var(--line-2)] bg-[var(--surface)] px-2.5 py-1.5 text-[11px] pointer-events-none shadow-lg"
+                  className="absolute top-1 z-10 rounded-lg border border-[var(--line-2)] bg-[var(--surface)] px-2.5 py-1.5 text-[12px] pointer-events-none shadow-lg"
                   style={{ left: `${(xAt(scrub) / W) * 100}%`, transform: `translateX(${scrub > n / 2 ? '-105%' : '5%'})` }}
                 >
                   <div className="text-[var(--fg-3)] tabular-nums mb-1">{scrubDay}</div>
@@ -439,7 +439,7 @@ export const UsageView: React.FC = () => {
                   ))}
                 </div>
               )}
-              <div className="flex justify-between text-[10px] tabular-nums text-[var(--fg-3)] mt-1.5">
+              <div className="flex justify-between text-[11px] tabular-nums text-[var(--fg-3)] mt-1.5">
                 <span>{days[0].slice(5)}</span>
                 <span>{days[Math.floor((n - 1) / 2)].slice(5)}</span>
                 <span>{days[n - 1].slice(5)}</span>
@@ -485,7 +485,7 @@ export const UsageView: React.FC = () => {
           </div>
           {sources.length > 0 ? (
             sources.map(([name, files]) => (
-              <div key={name} className="flex items-center gap-3 py-2 border-t border-[var(--line)] text-[12.5px]">
+              <div key={name} className="flex items-center gap-3 py-2 border-t border-[var(--line)] text-[13.5px]">
                 <span className="flex-1 truncate text-[var(--fg)]">{name}</span>
                 <span className="row-count">{files}</span>
               </div>
@@ -493,7 +493,7 @@ export const UsageView: React.FC = () => {
           ) : (
             <p className="side-note">{liveState === 'loading' ? 'Reading…' : 'No local logs found.'}</p>
           )}
-          <p className="side-note mt-3 !text-[11px] !text-[var(--fg-3)]">
+          <p className="side-note mt-3 !text-[12px] !text-[var(--fg-3)]">
             Every coding agent on this machine that keeps token counts in its local logs. Log the rest by hand.
           </p>
         </section>
@@ -554,7 +554,7 @@ export const UsageView: React.FC = () => {
 
           {manual.length > 0
             ? manual.slice(0, 8).map((e) => (
-                <div key={e.id} className="edit-row flex items-center gap-3 py-2 border-t border-[var(--line)] text-[12.5px]">
+                <div key={e.id} className="edit-row flex items-center gap-3 py-2 border-t border-[var(--line)] text-[13.5px]">
                   <span className="row-count">{e.date}</span>
                   <span className="text-[var(--fg)] truncate">{e.model}</span>
                   <span className="ml-auto row-count">{fmtNum(e.inputTokens)} / {fmtNum(e.outputTokens)}</span>

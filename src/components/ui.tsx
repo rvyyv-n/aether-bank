@@ -32,7 +32,7 @@ const PRIORITY_CLASS: Record<PriorityLevel, string> = {
 
 export const PriorityBadge: React.FC<{ priority: PriorityLevel }> = ({ priority }) => (
   <span
-    className={`px-1.5 rounded text-[10px] leading-4 font-mono font-medium border ${PRIORITY_CLASS[priority]}`}
+    className={`px-1.5 rounded text-[11px] leading-4 font-mono font-medium border ${PRIORITY_CLASS[priority]}`}
     title={`${priority} · ${PRIORITY_META[priority]}`}
   >
     {priority}

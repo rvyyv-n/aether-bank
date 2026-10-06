@@ -78,7 +78,7 @@ export const TableView: React.FC<TableViewProps> = ({
               >
                 <StatusOptions />
               </select>
-              <span className="ml-auto text-[11px] font-mono text-[var(--fg-3)]">{completed}/{total} &middot; {pct}%</span>
+              <span className="ml-auto text-[12px] font-mono text-[var(--fg-3)]">{completed}/{total} &middot; {pct}%</span>
             </div>
             <ProgressBar pct={pct} className="mt-2" />
           </div>
@@ -86,23 +86,23 @@ export const TableView: React.FC<TableViewProps> = ({
       })}
     </div>
     <div className="hidden md:block w-full">
-      <div className="overflow-x-auto">
+      <div>
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="border-b border-[var(--line)] text-[var(--fg-3)] text-[10.5px] select-none">
+            <tr className="border-b border-[var(--line)] text-[var(--fg-3)] text-[11.5px] select-none">
               <th className="py-2 pr-4 font-normal whitespace-nowrap">Priority</th>
               <th className="py-2 pr-4 font-normal whitespace-nowrap">Project</th>
               <th className="py-2 pr-4 font-normal whitespace-nowrap">Status</th>
               <th className="py-2 pr-4 font-normal whitespace-nowrap">Milestones</th>
               <th className="py-2 pr-4 font-normal whitespace-nowrap">Tech Stack</th>
-              <th className="py-2 pr-4 font-normal whitespace-nowrap">Dev Command</th>
+              <th className="py-2 pr-4 font-normal whitespace-nowrap hidden xl:table-cell">Dev Command</th>
               <th className="py-2 pr-4 font-normal whitespace-nowrap">Updated</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--line)] font-normal">
             {projects.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-12 text-center text-xs text-[var(--fg-3)] font-mono">
+                <td colSpan={6} className="py-12 text-center text-xs text-[var(--fg-3)] font-mono">
                   No projects matching active filters.
                 </td>
               </tr>
@@ -128,11 +128,11 @@ export const TableView: React.FC<TableViewProps> = ({
                         <span className="font-medium text-xs text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors">
                           {project.title}
                         </span>
-                        <span className="text-[10.5px] text-[var(--fg-3)]">
+                        <span className="text-[11.5px] text-[var(--fg-3)]">
                           {project.category}
                         </span>
                       </div>
-                      <div className="text-[11px] text-[var(--fg-2)] truncate max-w-sm mt-0.5">
+                      <div className="text-[12px] text-[var(--fg-2)] truncate max-w-sm mt-0.5">
                         {project.subtitle}
                       </div>
                     </td>
@@ -155,7 +155,7 @@ export const TableView: React.FC<TableViewProps> = ({
 
                     {/* Milestones Progress */}
                     <td className="py-3 pr-4 align-middle min-w-[150px]">
-                      <div className="flex items-center justify-between text-[11px] font-mono text-[var(--fg-3)] mb-1">
+                      <div className="flex items-center justify-between text-[12px] font-mono text-[var(--fg-3)] mb-1">
                         <span>{completed}/{total}</span>
                         <span>{pct}%</span>
                       </div>
@@ -164,7 +164,7 @@ export const TableView: React.FC<TableViewProps> = ({
 
                     {/* Tech Stack */}
                     <td className="py-3 pr-4 align-middle">
-                      <div className="text-[11px] text-[var(--fg-2)] max-w-[220px] truncate">
+                      <div className="text-[12px] text-[var(--fg-2)] max-w-[220px] truncate">
                         {project.techStack.slice(0, 3).join(', ')}
                         {project.techStack.length > 3 && (
                           <span className="text-[var(--fg-3)]"> +{project.techStack.length - 3}</span>
@@ -173,7 +173,7 @@ export const TableView: React.FC<TableViewProps> = ({
                     </td>
 
                     {/* Dev Command */}
-                    <td className="py-3 pr-4 whitespace-nowrap align-middle" onClick={(e) => e.stopPropagation()}>
+                    <td className="py-3 pr-4 whitespace-nowrap align-middle hidden xl:table-cell" onClick={(e) => e.stopPropagation()}>
                       {primaryCommand ? (
                         <button
                           onClick={(e) =>
@@ -183,7 +183,7 @@ export const TableView: React.FC<TableViewProps> = ({
                               `tbl-cmd-${project.id}`
                             )
                           }
-                          className="flex items-center gap-1.5 px-2 py-1 rounded border border-[var(--line)] hover:border-[var(--line-2)] font-mono text-[11px] text-[var(--fg-2)] hover:text-[var(--fg)] bg-[var(--bg)] transition cursor-pointer"
+                          className="flex items-center gap-1.5 px-2 py-1 rounded border border-[var(--line)] hover:border-[var(--line-2)] font-mono text-[12px] text-[var(--fg-2)] hover:text-[var(--fg)] bg-[var(--bg)] transition cursor-pointer"
                           title={`Copy: ${primaryCommand.cmd}`}
                         >
                           <Terminal className="h-3 w-3 opacity-60" />
@@ -195,16 +195,16 @@ export const TableView: React.FC<TableViewProps> = ({
                           )}
                         </button>
                       ) : project.path ? (
-                        <span className="text-[11px] font-mono text-[var(--fg-3)] truncate max-w-[120px] block">
+                        <span className="text-[12px] font-mono text-[var(--fg-3)] truncate max-w-[120px] block">
                           {project.path.split(/[/\\\\]/).pop()}
                         </span>
                       ) : (
-                        <span className="text-[11px] font-mono text-[var(--fg-3)]">&mdash;</span>
+                        <span className="text-[12px] font-mono text-[var(--fg-3)]">&mdash;</span>
                       )}
                     </td>
 
                     {/* Updated */}
-                    <td className="py-3 pr-4 whitespace-nowrap font-mono text-[11px] text-[var(--fg-3)] align-middle">
+                    <td className="py-3 pr-4 whitespace-nowrap font-mono text-[12px] text-[var(--fg-3)] align-middle">
                       {formatShortDate(project.updatedAt)}
                     </td>
 

@@ -201,7 +201,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         ) : (
           <div>
             {filteredProjects.map((proj) => {
-              const { done, total, pct } = progressOf(proj);
+              const { done, total } = progressOf(proj);
               const isSelected = selectedProjectId === proj.id;
               return (
                 <button
@@ -216,11 +216,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span className="row-count">
                     {done}/{total}
                   </span>
-                  <span
-                    className="row-bar"
-                    style={{ width: `${pct}%`, background: STATUS_META[proj.status].color }}
-                    aria-hidden="true"
-                  />
                 </button>
               );
             })}

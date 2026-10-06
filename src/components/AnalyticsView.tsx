@@ -106,7 +106,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
                       <span className="truncate">{p.title}</span>
                       <PriorityBadge priority={p.priority} />
                     </span>
-                    <ProgressBar pct={pct} className="mt-1.5" />
+                    <ProgressBar pct={pct} className="mt-1.5 max-w-md" />
                   </span>
                   <span className="val">
                     {pct}%<small>{done}/{total}</small>
@@ -162,7 +162,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
                         <button
                           key={p.id}
                           onClick={() => onSelectProject(p)}
-                          className="text-button text-[11px]"
+                          className="text-button text-[12px]"
                         >
                           {p.title}
                         </button>

@@ -211,7 +211,7 @@ const DrawerContent: React.FC<{
                   onCommit={(v) => update({ path: optional(v) })}
                   placeholder="Not on disk yet"
                   ariaLabel="Repo path"
-                  className="font-mono text-[12px]"
+                  className="font-mono text-[13px]"
                 />
                 {project.path && (
                   <button
@@ -237,7 +237,7 @@ const DrawerContent: React.FC<{
               ariaLabel="Description"
               className="text-[13px] leading-relaxed text-[var(--fg-2)]"
             />
-            <div className="mt-3 mb-0.5 text-[11px] text-[var(--fg-3)]">Problem</div>
+            <div className="mt-3 mb-0.5 text-[12px] text-[var(--fg-3)]">Problem</div>
             <InlineText
               multiline
               value={project.problemStatement ?? ''}
@@ -321,7 +321,7 @@ const DrawerContent: React.FC<{
                   onCommit={(v) => update({ commands: commands.map((x, i) => (i === idx ? { ...x, label: v } : x)) })}
                   placeholder="Label"
                   ariaLabel="Command label"
-                  className="!w-[110px] flex-shrink-0 text-[12px] text-[var(--fg-3)]"
+                  className="!w-[110px] flex-shrink-0 text-[13px] text-[var(--fg-3)]"
                 />
                 <InlineText
                   value={c.cmd}
@@ -333,7 +333,7 @@ const DrawerContent: React.FC<{
                     })
                   }
                   ariaLabel="Command"
-                  className="font-mono text-[12px] text-[var(--fg)]"
+                  className="font-mono text-[13px] text-[var(--fg)]"
                 />
                 <button
                   onClick={() => copyToClipboard(c.cmd, `cmd-${idx}`)}
@@ -356,7 +356,7 @@ const DrawerContent: React.FC<{
                 onCommit={(v) => v && update({ commands: [...commands, { label: commands.length ? 'Run' : 'Dev', cmd: v }] })}
                 placeholder="Add a command, e.g. npm run dev"
                 ariaLabel="New command"
-                className="font-mono text-[12px]"
+                className="font-mono text-[13px]"
               />
             </div>
           </Section>
@@ -379,7 +379,7 @@ const DrawerContent: React.FC<{
                   value={r.name}
                   onCommit={(v) => update({ upstreamRefs: refs.map((x, i) => (i === idx ? { ...x, name: v || x.name } : x)) })}
                   ariaLabel="Link name"
-                  className="!w-[130px] flex-shrink-0 text-[12.5px] text-[var(--fg)]"
+                  className="!w-[130px] flex-shrink-0 text-[13.5px] text-[var(--fg)]"
                 />
                 <InlineText
                   value={r.url}
@@ -470,11 +470,11 @@ const DrawerContent: React.FC<{
               onCommit={(v) => update({ notes: v })}
               placeholder="Thoughts, findings, decisions..."
               ariaLabel="Notes"
-              className="font-mono text-[12px] leading-relaxed text-[var(--fg-2)] min-h-[64px]"
+              className="font-mono text-[13px] leading-relaxed text-[var(--fg-2)] min-h-[64px]"
             />
           </Section>
 
-          <div className="pt-6 text-[11px] text-[var(--fg-3)]">Updated {formatDate(project.updatedAt)}</div>
+          <div className="pt-6 text-[12px] text-[var(--fg-3)]">Updated {formatDate(project.updatedAt)}</div>
         </div>
       </div>
     </div>
