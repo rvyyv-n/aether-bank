@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Plus, Trash2 } from 'lucide-react';
 import {
   PROVIDERS,
@@ -77,7 +78,7 @@ function entriesToRows(entries: UsageEntry[]): UsageRow[] {
   }));
 }
 
-export const UsageView: React.FC = () => {
+export const UsageView: React.FC<{ sideSlot: HTMLElement | null }> = ({ sideSlot }) => {
   const [now] = useState(() => Date.now());
   const [live, setLive] = useState<UsagePayload | null>(null);
   const [liveState, setLiveState] = useState<'loading' | 'ok' | 'offline'>('loading');
@@ -97,6 +98,7 @@ export const UsageView: React.FC = () => {
   const [scrub, setScrub] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [withCache, setWithCache] = useState(false);
+  const [hiddenHarnesses, setHiddenHarnesses] = useState<string[]>([]);
   const [form, setForm] = useState({
     date: dayKey(now),
     provider: 'anthropic' as Provider,
@@ -136,6 +138,15 @@ export const UsageView: React.FC = () => {
     return [...base, ...entriesToRows(manual)];
   }, [live, liveState, manual]);
 
+  // Harness totals for the sidebar list, busiest first
+  const harnessList = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const r of allRows) m.set(r.h, (m.get(r.h) ?? 0) + tokensOf(r));
+    return [...m.entries()].sort((a, b) => b[1] - a[1]);
+  }, [allRows]);
+
+  const visibleRows = useMemo(() => allRows.filter((r) => !hiddenHarnesses.includes(r.h)), [allRows, hiddenHarnesses]);
+
   // window of days (oldest -> newest), and the equally long window before it
   const { days, prevDays } = useMemo(() => {
     let span = range;
@@ -159,7 +170,7 @@ export const UsageView: React.FC = () => {
     let tokens = 0, cached = 0, msgs = 0, spend = 0, unpriced = 0, input = 0, output = 0;
     let prevGrand = 0;
 
-    for (const r of allRows) {
+    for (const r of visibleRows) {
       const k = keyOf(r);
       const v = valueOf(r, metric, withCache);
       if (inWin.has(r.d)) {
@@ -230,7 +241,7 @@ export const UsageView: React.FC = () => {
     }));
 
     return { series, rows, grand, tokens, input, output, cached, msgs, spend, unpriced, hasPrev: prevGrand > 0 };
-  }, [allRows, days, prevDays, metric, dimension, withCache]);
+  }, [visibleRows, days, prevDays, metric, dimension, withCache]);
 
   // ---- chart geometry ----
   const W = 360;
@@ -476,28 +487,7 @@ export const UsageView: React.FC = () => {
         {analysis.rows.length === 0 && <p className="side-note py-4">Nothing to rank yet.</p>}
       </section>
 
-      <div className="grid gap-8 sm:grid-cols-2">
-        {/* What was scanned */}
-        <section>
-          <div className="section-head">
-            <h3>Sources</h3>
-            <span className="hint">log files found</span>
-          </div>
-          {sources.length > 0 ? (
-            sources.map(([name, files]) => (
-              <div key={name} className="flex items-center gap-3 py-2 border-t border-[var(--line)] text-[13.5px]">
-                <span className="flex-1 truncate text-[var(--fg)]">{name}</span>
-                <span className="row-count">{files}</span>
-              </div>
-            ))
-          ) : (
-            <p className="side-note">{liveState === 'loading' ? 'Reading…' : 'No local logs found.'}</p>
-          )}
-          <p className="side-note mt-3 !text-[12px] !text-[var(--fg-3)]">
-            Every coding agent on this machine that keeps token counts in its local logs. Log the rest by hand.
-          </p>
-        </section>
-
+      <div>
         {/* Manual log (for harnesses without local logs) */}
         <section>
           <div className="section-head">
@@ -568,6 +558,62 @@ export const UsageView: React.FC = () => {
             : !showForm && <p className="side-note">None yet.</p>}
         </section>
       </div>
+      {sideSlot &&
+        createPortal(
+          <>
+            <div className="side-heading">
+              <h2>
+                Harnesses<span>{harnessList.length}</span>
+              </h2>
+            </div>
+            <div className="flex gap-4 pb-2">
+              <button className="text-button" onClick={() => setHiddenHarnesses([])}>
+                Select all
+              </button>
+              <button className="text-button" onClick={() => setHiddenHarnesses(harnessList.map(([h]) => h))}>
+                Clear
+              </button>
+            </div>
+            <div>
+              {harnessList.map(([h, t]) => {
+                const shown = !hiddenHarnesses.includes(h);
+                return (
+                  <label key={h} className="model-row cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={shown}
+                      onChange={() => setHiddenHarnesses(shown ? [...hiddenHarnesses, h] : hiddenHarnesses.filter((x) => x !== h))}
+                      className="accent-[var(--accent)]"
+                    />
+                    <span className={`flex-1 truncate ${shown ? '' : 'text-[var(--fg-3)]'}`}>{h}</span>
+                    <span className="row-count">{fmtNum(t)}</span>
+                  </label>
+                );
+              })}
+              {harnessList.length === 0 && (
+                <p className="side-note">{liveState === 'loading' ? 'Reading…' : 'No local logs found.'}</p>
+              )}
+            </div>
+            <p className="side-note">
+              The selection applies to every number and chart on this page. Sidebar counts are tokens, cache reads
+              excluded.
+            </p>
+            <details className="side-note">
+              <summary className="cursor-pointer">Data &amp; sources</summary>
+              <p className="mt-2">
+                Read from the local logs of every coding agent on this machine that keeps token counts. Log the rest by
+                hand.
+              </p>
+              {sources.map(([name, files]) => (
+                <div key={name} className="flex items-center gap-3 py-1">
+                  <span className="flex-1 truncate">{name}</span>
+                  <span className="row-count">{files} files</span>
+                </div>
+              ))}
+            </details>
+          </>,
+          sideSlot,
+        )}
     </div>
   );
 };

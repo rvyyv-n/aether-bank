@@ -4,7 +4,12 @@ import { Search, X } from 'lucide-react';
 import { STATUS_META, PRIORITY_META, progressOf } from '../data/status';
 import { StatusDot } from './ui';
 
+export type Section = 'vault' | 'roadmap' | 'analytics' | 'usage';
+
 interface SidebarProps {
+  section: Section;
+  /** The Usage page renders its own sidebar content into this element */
+  slotRef: (el: HTMLElement | null) => void;
   projects: ProjectIdea[];
   filteredProjects: ProjectIdea[];
   filteredCount: number;
@@ -44,6 +49,8 @@ function makeToggle<T>(all: T[], hidden: T[], setHidden: (next: T[]) => void) {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
+  section,
+  slotRef,
   projects,
   filteredProjects,
   filteredCount,
@@ -75,11 +82,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const priorityToggle = makeToggle(PRIORITIES, hiddenPriorities, setHiddenPriorities);
   const categoryToggle = makeToggle(categories, hiddenCategories, setHiddenCategories);
 
+  if (section === 'usage') {
+    return (
+      <aside className={`sidebar ${isOpenMobile ? 'open' : ''}`} aria-label="Usage filters">
+        {isOpenMobile && (
+          <button onClick={onCloseMobile} className="icon-button md:hidden" aria-label="Close filters">
+            <X className="h-4 w-4" />
+          </button>
+        )}
+        <div ref={slotRef} />
+      </aside>
+    );
+  }
+
+  const showSearch = section === 'vault' || section === 'roadmap';
+  const showPriority = section !== 'roadmap';
+  const showDirectory = section === 'vault' || section === 'roadmap';
+
   return (
     <aside className={`sidebar ${isOpenMobile ? 'open' : ''}`} aria-label="Filters and projects">
       <div className="side-heading">
         <h2>
-          Projects
+          {section === 'analytics' ? 'Filters' : 'Projects'}
           <span>
             {filteredCount !== totalCount ? `${filteredCount} of ${totalCount}` : totalCount}
           </span>
@@ -96,6 +120,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
       </div>
 
+      {showSearch && (
       <div className="search">
         <Search className="h-3.5 w-3.5 flex-shrink-0" />
         <input
@@ -117,6 +142,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <kbd>/</kbd>
         )}
       </div>
+      )}
 
       {/* Status */}
       <div className="filter-group">
@@ -146,6 +172,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Priority */}
+      {showPriority && (
       <div className="filter-group">
         <div className="section-head">
           <h3>Priority</h3>
@@ -165,6 +192,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ))}
         </div>
       </div>
+      )}
 
       {/* Category */}
       <div className="filter-group">
@@ -186,6 +214,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Directory, following the filters above */}
+      {showDirectory && (
       <div className="filter-group directory">
         <div className="section-head">
           <h3>Directory</h3>
@@ -222,6 +251,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         )}
       </div>
+      )}
 
       {/* Data actions (phones only; on larger screens they live in the header) */}
       <div className="md:hidden flex gap-5 pt-3 border-t border-[var(--line)]">

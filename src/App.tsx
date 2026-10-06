@@ -52,6 +52,7 @@ export function App() {
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const [sideSlot, setSideSlot] = useState<HTMLElement | null>(null);
 
   // Sync theme to document element
   useEffect(() => {
@@ -335,11 +336,13 @@ export function App() {
             />
           )}
 
-          {activeSection === 'usage' && <UsageView />}
+          {activeSection === 'usage' && <UsageView sideSlot={sideSlot} />}
         </main>
 
         {/* Slopalytics Right-Hand Sidebar */}
         <Sidebar
+          section={activeSection}
+          slotRef={setSideSlot}
           projects={projects}
           filteredCount={filteredProjects.length}
           totalCount={projects.length}
