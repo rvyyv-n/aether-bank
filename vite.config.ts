@@ -8,10 +8,16 @@ const require = createRequire(import.meta.url)
 // Serves live token usage from local harness logs in dev and preview.
 function usageEndpoint(): Plugin {
   const handler = (req: { url?: string }, res: { setHeader: (k: string, v: string) => void; end: (b: string) => void }, next: () => void) => {
-    if (req.url?.split('?')[0] !== '/usage.json') return next()
+    const route = req.url?.split('?')[0]
+    if (route !== '/usage.json' && route !== '/repos.json') return next()
     const { collect } = require('./scripts/usage-collector.cjs')
     res.setHeader('Content-Type', 'application/json')
     res.setHeader('Cache-Control', 'no-store')
+    if (route === '/repos.json') {
+      const { repoStatus, lastSeen } = require('./scripts/repo-status.cjs')
+      const paths = new URL(req.url ?? '', 'http://localhost').searchParams.getAll('p')
+      return res.end(JSON.stringify({ repos: repoStatus(paths), seen: lastSeen(collect().rows) }))
+    }
     res.end(JSON.stringify(collect()))
   }
   return {

@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { collect } = require('./scripts/usage-collector.cjs');
+const { repoStatus, lastSeen } = require('./scripts/repo-status.cjs');
 
 const PORT = Number(process.env.PORT) || 3333;
 
@@ -15,6 +16,10 @@ function getUsage() {
     usageAt = Date.now();
   }
   return usageCache;
+}
+function getRepos(url) {
+  const paths = new URL(url, 'http://localhost').searchParams.getAll('p');
+  return JSON.stringify({ repos: repoStatus(paths), seen: lastSeen(JSON.parse(getUsage()).rows) });
 }
 const DIST = path.join(__dirname, 'dist');
 
@@ -32,6 +37,16 @@ const server = http.createServer((req, res) => {
     try {
       res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
       res.end(getUsage());
+    } catch (e) {
+      res.writeHead(500);
+      res.end(String(e));
+    }
+    return;
+  }
+  if (req.url.split('?')[0] === '/repos.json') {
+    try {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
+      res.end(getRepos(req.url));
     } catch (e) {
       res.writeHead(500);
       res.end(String(e));
