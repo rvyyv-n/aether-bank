@@ -926,7 +926,11 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   }
 
   .seg button[aria-pressed="true"] {
-    color: var(--accent);
+    color: var(--fg);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
   }
 
   .seg-sep {

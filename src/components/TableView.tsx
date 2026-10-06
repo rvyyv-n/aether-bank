@@ -104,7 +104,7 @@ export const TableView: React.FC<TableViewProps> = ({
               <th className="py-2 pr-4 font-normal whitespace-nowrap">{head('status', 'Status')}</th>
               <th className="py-2 pr-4 font-normal whitespace-nowrap">{head('progress', 'Milestones')}</th>
               <th className="py-2 pr-4 font-normal whitespace-nowrap">Tech Stack</th>
-              <th className="py-2 pr-4 font-normal whitespace-nowrap hidden xl:table-cell">Dev Command</th>
+              <th className="py-2 pr-4 font-normal whitespace-nowrap hidden 2xl:table-cell">Dev Command</th>
               <th className="py-2 pr-4 font-normal whitespace-nowrap">{head('updated', 'Updated')}</th>
             </tr>
           </thead>
@@ -183,7 +183,7 @@ export const TableView: React.FC<TableViewProps> = ({
                     </td>
 
                     {/* Dev Command */}
-                    <td className="py-3 pr-4 whitespace-nowrap align-middle hidden xl:table-cell" onClick={(e) => e.stopPropagation()}>
+                    <td className="py-3 pr-4 whitespace-nowrap align-middle hidden 2xl:table-cell" onClick={(e) => e.stopPropagation()}>
                       {primaryCommand ? (
                         <button
                           onClick={(e) =>
