@@ -59,12 +59,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         kind: 'project' as const,
         key: `p-${project.id}`,
         project,
+        // Loose matching on the title; other fields need the query as written
         score: Math.min(
-          ...[project.title, project.category, project.subtitle, ...project.techStack]
-            .map((t, i) => {
-              const s = matchScore(q, t);
-              return s === -1 ? Infinity : s + (i === 0 ? 0 : 3);
-            })
+          matchScore(q, project.title) === -1 ? Infinity : matchScore(q, project.title),
+          ...[project.category, project.subtitle, ...project.techStack].map((t) =>
+            t.toLowerCase().includes(q.toLowerCase()) ? 4 : Infinity
+          )
         ),
       }))
       .filter((i) => i.score !== Infinity);

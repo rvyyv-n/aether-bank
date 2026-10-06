@@ -53,15 +53,14 @@ body {
   overflow-x: hidden;
 }
 
-/* Button & input resets */
-button, input, textarea, select {
-  font-family: inherit;
-  color: inherit;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* In the base layer so Tailwind padding utilities (py-1, px-3, ...) win over the reset */
+/* Resets live in the base layer so Tailwind utilities (padding, font, colour) win over them */
 @layer base {
+  button, input, textarea, select {
+    font-family: inherit;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   button {
     cursor: pointer;
     background: transparent;
@@ -582,6 +581,185 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   border-color: var(--line-2);
 }
 
+/* In the components layer so Tailwind size and colour utilities can override them */
+@layer components {
+/* Text that edits in place: no chrome until hovered or focused */
+.inline-input {
+  display: block;
+  width: calc(100% + 12px);
+  min-width: 0;
+  margin: 0 -6px;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  resize: none;
+  field-sizing: content;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.inline-input::placeholder {
+  color: var(--fg-3);
+  font-style: normal;
+}
+
+.inline-input:hover {
+  border-color: var(--line);
+}
+
+.inline-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+.drawer-section {
+  border-top: 1px solid var(--line);
+  margin-top: 22px;
+  padding-top: 16px;
+}
+
+.drawer-section .section-head {
+  margin-bottom: 8px;
+}
+
+/* Property grid under the title */
+.drawer-props {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 18px;
+  margin-top: 18px;
+}
+
+.drawer-props > label,
+.drawer-props > .prop-wide {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  font-size: 12.5px;
+  color: var(--fg);
+}
+
+.drawer-props > .prop-wide {
+  grid-column: 1 / -1;
+}
+
+.drawer-props > * > span:first-child {
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.prop-select {
+  width: calc(100% + 12px);
+  margin: 0 -6px;
+  padding: 3px 4px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.prop-select:hover {
+  border-color: var(--line);
+}
+
+.prop-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.prop-select option {
+  background: var(--surface);
+  color: var(--fg);
+}
+
+/* Editable list row with actions that appear on hover */
+.edit-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+}
+
+.edit-row .inline-input {
+  flex: 1;
+  width: auto;
+  margin: 0;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.edit-row:hover .row-actions,
+.edit-row:focus-within .row-actions {
+  opacity: 1;
+}
+
+.row-action {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 4px;
+  color: var(--fg-3);
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.row-action:hover {
+  color: var(--fg);
+  background: var(--hover);
+}
+
+/* Square checkbox, as in slopalytics selections */
+.check {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  color: var(--on-accent);
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.check:hover {
+  border-color: var(--accent);
+}
+
+.check.checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.tag-removable {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 3px;
+}
+
+.tag-removable button {
+  color: var(--fg-3);
+  display: inline-flex;
+}
+
+.tag-removable button:hover {
+  color: var(--fg);
+}
+}
+
 /* Quick switcher, styled like the slopalytics context menu */
 .palette {
   width: 560px;
@@ -798,6 +976,12 @@ a:focus-visible, [tabindex="0"]:focus-visible {
   }
   .strike-filter {
     gap: 2px 18px;
+  }
+  .row-actions {
+    opacity: 1;
+  }
+  .drawer-props {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .strike-filter button {
     min-height: 36px;

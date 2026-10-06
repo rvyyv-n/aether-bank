@@ -367,6 +367,7 @@ export function App() {
       {/* Slide-over Project Drawer */}
       <ProjectDrawer
         project={selectedProject}
+        categories={Array.from(new Set(projects.map((p) => p.category)))}
         onClose={() => setSelectedProject(null)}
         onUpdateProject={handleUpdateProject}
         onDeleteProject={handleDeleteProject}

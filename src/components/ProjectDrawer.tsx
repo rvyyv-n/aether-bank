@@ -6,27 +6,30 @@ import type {
 } from '../types';
 import {
   X,
-  CheckSquare,
-  Square,
   FolderGit2,
   ExternalLink,
   Copy,
   Check,
   Terminal,
-  Edit3,
-  Trash2
+  Trash2,
+  Plus,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
-import { StatusDot, StatusOptions, PriorityBadge, ProgressBar } from './ui';
 import { PRIORITY_META, progressOf } from '../data/status';
+import { StatusDot, StatusOptions, ProgressBar } from './ui';
+import { InlineText } from './InlineText';
 
 interface ProjectDrawerProps {
   project: ProjectIdea | null;
+  categories: string[];
   onClose: () => void;
   onUpdateProject: (updated: ProjectIdea) => void;
   onDeleteProject: (projectId: string) => void;
 }
 
 const getNowIso = () => new Date().toISOString();
+const newId = (prefix: string) => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
 
 const formatDate = (iso: string) => {
   const d = new Date(iso);
@@ -35,55 +38,65 @@ const formatDate = (iso: string) => {
     : d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 };
 
-const Section: React.FC<{ label: React.ReactNode; aside?: React.ReactNode; children: React.ReactNode }> = ({
+const Section: React.FC<{ label: string; aside?: React.ReactNode; children: React.ReactNode }> = ({
   label,
   aside,
   children,
 }) => (
-  <section>
-    <div className="flex items-center justify-between">
-      <h3 className="field-label">{label}</h3>
+  <section className="drawer-section">
+    <div className="section-head">
+      <h3>{label}</h3>
       {aside}
     </div>
     {children}
   </section>
 );
 
+const RowDelete: React.FC<{ label: string; onClick: () => void }> = ({ label, onClick }) => (
+  <button onClick={onClick} className="row-action hover:!text-rose-500" title={label} aria-label={label}>
+    <X className="h-3.5 w-3.5" />
+  </button>
+);
+
 const DrawerContent: React.FC<{
   project: ProjectIdea;
+  categories: string[];
   onClose: () => void;
   onUpdateProject: (updated: ProjectIdea) => void;
   onDeleteProject: (projectId: string) => void;
 }> = ({
   project,
+  categories,
   onClose,
   onUpdateProject,
   onDeleteProject,
 }) => {
-  const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
-  const [isEditingNotes, setIsEditingNotes] = useState(false);
-  const [notesValue, setNotesValue] = useState(project.notes || '');
+  const [copied, setCopied] = useState<string | null>(null);
 
-  const copyToClipboard = (text: string, label: string) => {
+  const copyToClipboard = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
-    setCopiedCmd(label);
-    setTimeout(() => setCopiedCmd(null), 2000);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 1800);
   };
 
   const update = (patch: Partial<ProjectIdea>) =>
     onUpdateProject({ ...project, ...patch, updatedAt: getNowIso() });
 
-  const toggleMilestone = (milestoneId: string) =>
-    update({
-      milestones: project.milestones.map((m) =>
-        m.id === milestoneId ? { ...m, completed: !m.completed } : m
-      ),
-    });
+  const optional = (s: string) => (s ? s : undefined);
 
-  const handleSaveNotes = () => {
-    update({ notes: notesValue });
-    setIsEditingNotes(false);
+  // Milestones
+  const milestones = project.milestones;
+  const setMilestones = (next: ProjectIdea['milestones']) => update({ milestones: next });
+  const moveMilestone = (idx: number, by: number) => {
+    const next = [...milestones];
+    const [m] = next.splice(idx, 1);
+    next.splice(idx + by, 0, m);
+    setMilestones(next);
   };
+
+  // Links and commands
+  const refs = project.upstreamRefs ?? [];
+  const commands = project.commands ?? [];
 
   const { done, total, pct } = progressOf(project);
 
@@ -93,15 +106,21 @@ const DrawerContent: React.FC<{
         role="dialog"
         aria-modal="true"
         aria-labelledby="drawer-title"
-        className="drawer-panel w-full max-w-xl bg-[var(--surface)] border-l border-[var(--line)] h-full overflow-y-auto flex flex-col shadow-2xl relative"
+        className="drawer-panel w-full max-w-xl bg-[var(--bg)] border-l border-[var(--line)] h-full overflow-y-auto flex flex-col shadow-2xl relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top bar */}
-        <div className="sticky top-0 z-10 bg-[var(--surface)] px-5 sm:px-6 py-3 border-b border-[var(--line)] flex items-center justify-between">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="tag uppercase tracking-wider">{project.category}</span>
-            {project.license && <span className="tag">{project.license}</span>}
-            <span className="text-[11px] font-mono text-[var(--fg-3)] truncate">{project.id}</span>
+        <div className="sticky top-0 z-10 bg-[var(--bg)] px-5 sm:px-7 h-14 border-b border-[var(--line)] flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0 text-[11.5px] text-[var(--fg-3)]">
+            <StatusDot status={project.status} className="w-[7px] h-[7px]" />
+            <InlineText
+              value={project.category}
+              onCommit={(v) => update({ category: v || project.category })}
+              ariaLabel="Category"
+              list="drawer-categories"
+              className="!w-[120px] text-[var(--fg-2)]"
+            />
+            <span className="font-mono truncate">{project.id}</span>
           </div>
 
           <div className="flex items-center gap-1">
@@ -112,65 +131,61 @@ const DrawerContent: React.FC<{
                   onClose();
                 }
               }}
-              className="icon-button hover:!text-rose-500 hover:!bg-rose-500/10 hover:!border-transparent"
+              className="icon-button hover:!text-rose-500"
               title="Delete project"
               aria-label="Delete project"
             >
               <Trash2 className="h-4 w-4" />
             </button>
-
-            <button
-              onClick={onClose}
-              className="icon-button"
-              title="Close (Esc)"
-              aria-label="Close"
-            >
+            <button onClick={onClose} className="icon-button" title="Close (Esc)" aria-label="Close">
               <X className="h-4 w-4" />
             </button>
           </div>
         </div>
 
+        <datalist id="drawer-categories">
+          {categories.map((c) => (
+            <option key={c} value={c} />
+          ))}
+        </datalist>
+
         {/* Body */}
-        <div className="px-5 sm:px-6 py-6 space-y-6 flex-1 text-xs">
+        <div className="px-5 sm:px-7 pt-6 pb-10 flex-1">
           {/* Title */}
-          <div>
-            <div className="flex items-start justify-between gap-3">
-              <h2 id="drawer-title" className="text-xl font-semibold text-[var(--fg)] tracking-tight m-0">
-                {project.title}
-              </h2>
-              <div className="pt-1.5">
-                <PriorityBadge priority={project.priority} />
-              </div>
-            </div>
-            <p className="text-[13px] text-[var(--fg-2)] mt-1 mb-0 leading-relaxed">
-              {project.subtitle}
-            </p>
-          </div>
+          <h2 id="drawer-title" className="m-0">
+            <InlineText
+              value={project.title}
+              onCommit={(v) => update({ title: v || project.title })}
+              ariaLabel="Title"
+              className="text-[22px] font-medium tracking-tight text-[var(--fg)]"
+            />
+          </h2>
+          <InlineText
+            value={project.subtitle}
+            onCommit={(v) => update({ subtitle: v })}
+            placeholder="One-line summary"
+            ariaLabel="One-liner"
+            className="mt-1 text-[13.5px] text-[var(--fg-2)]"
+          />
 
-          {/* Status & priority */}
-          <div className="grid grid-cols-2 gap-3">
-            <label className="block">
-              <span className="field-label">Status</span>
-              <span className="relative block">
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 flex pointer-events-none">
-                  <StatusDot status={project.status} />
-                </span>
-                <select
-                  value={project.status}
-                  onChange={(e) => update({ status: e.target.value as ProjectStatus })}
-                  className="field !pl-6"
-                >
-                  <StatusOptions />
-                </select>
-              </span>
+          {/* Status, priority, licence, path */}
+          <div className="drawer-props">
+            <label>
+              <span>Status</span>
+              <select
+                value={project.status}
+                onChange={(e) => update({ status: e.target.value as ProjectStatus })}
+                className="prop-select"
+              >
+                <StatusOptions />
+              </select>
             </label>
-
-            <label className="block">
-              <span className="field-label">Priority</span>
+            <label>
+              <span>Priority</span>
               <select
                 value={project.priority}
                 onChange={(e) => update({ priority: e.target.value as PriorityLevel })}
-                className="field"
+                className="prop-select"
               >
                 {(Object.keys(PRIORITY_META) as PriorityLevel[]).map((p) => (
                   <option key={p} value={p}>
@@ -179,208 +194,287 @@ const DrawerContent: React.FC<{
                 ))}
               </select>
             </label>
+            <label>
+              <span>Licence</span>
+              <InlineText
+                value={project.license ?? ''}
+                onCommit={(v) => update({ license: optional(v) })}
+                placeholder="None"
+                ariaLabel="Licence"
+              />
+            </label>
+            <div className="prop-wide">
+              <span>Repo path</span>
+              <div className="flex items-center gap-1 min-w-0">
+                <InlineText
+                  value={project.path ?? ''}
+                  onCommit={(v) => update({ path: optional(v) })}
+                  placeholder="Not on disk yet"
+                  ariaLabel="Repo path"
+                  className="font-mono text-[12px]"
+                />
+                {project.path && (
+                  <button
+                    onClick={() => copyToClipboard(project.path!, 'path')}
+                    className="row-action !opacity-100"
+                    title="Copy path"
+                    aria-label="Copy path"
+                  >
+                    {copied === 'path' ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <FolderGit2 className="h-3.5 w-3.5" />}
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* About */}
-          {(project.description || project.problemStatement) && (
-            <Section label="About">
-              <div className="space-y-2 text-[12.5px] leading-relaxed text-[var(--fg-2)]">
-                {project.description && <p className="m-0">{project.description}</p>}
-                {project.problemStatement && (
-                  <p className="m-0">
-                    <span className="text-[var(--fg)] font-medium">Problem: </span>
-                    {project.problemStatement}
-                  </p>
-                )}
-              </div>
-            </Section>
-          )}
+          <Section label="About">
+            <InlineText
+              multiline
+              value={project.description}
+              onCommit={(v) => update({ description: v })}
+              placeholder="What is it and why does it matter?"
+              ariaLabel="Description"
+              className="text-[13px] leading-relaxed text-[var(--fg-2)]"
+            />
+            <div className="mt-3 mb-0.5 text-[11px] text-[var(--fg-3)]">Problem</div>
+            <InlineText
+              multiline
+              value={project.problemStatement ?? ''}
+              onCommit={(v) => update({ problemStatement: optional(v) })}
+              placeholder="What problem does it solve?"
+              ariaLabel="Problem statement"
+              className="text-[13px] leading-relaxed text-[var(--fg-2)]"
+            />
+          </Section>
 
           {/* Milestones */}
           <Section
-            label={`Milestones · ${done}/${total}`}
-            aside={<span className="text-[11px] font-mono text-[var(--fg-2)] mb-1.5">{pct}%</span>}
-          >
-            <ProgressBar pct={pct} className="mb-2.5" />
-            <div className="space-y-1">
-              {project.milestones.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => toggleMilestone(m.id)}
-                  aria-pressed={m.completed}
-                  className="w-full flex items-start gap-2.5 px-2 py-1.5 rounded-md hover:bg-[var(--hover)] transition select-none"
-                >
-                  {m.completed ? (
-                    <CheckSquare className="h-4 w-4 text-[var(--accent)] flex-shrink-0" />
-                  ) : (
-                    <Square className="h-4 w-4 text-[var(--fg-3)] flex-shrink-0" />
-                  )}
-                  <span
-                    className={`text-[12.5px] leading-snug ${
-                      m.completed ? 'line-through text-[var(--fg-3)]' : 'text-[var(--fg)]'
-                    }`}
-                  >
-                    {m.text}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </Section>
-
-          {/* Workspace & links */}
-          {(project.path || (project.upstreamRefs && project.upstreamRefs.length > 0)) && (
-            <Section label="Workspace & links">
-              <div className="space-y-1.5">
-                {project.path && (
-                  <div className="flex items-center justify-between p-2 rounded-md border border-[var(--line)] bg-[var(--bg)] font-mono text-xs">
-                    <span className="flex items-center gap-2 text-[var(--fg-2)] min-w-0">
-                      <FolderGit2 className="h-3.5 w-3.5 text-[var(--accent)] flex-shrink-0" />
-                      <span className="truncate">{project.path}</span>
-                    </span>
-                    <button
-                      onClick={() => copyToClipboard(project.path!, 'path')}
-                      className="p-1 rounded text-[var(--fg-3)] hover:text-[var(--fg)] transition ml-2"
-                      title="Copy path"
-                      aria-label="Copy path"
-                    >
-                      {copiedCmd === 'path' ? (
-                        <Check className="h-3.5 w-3.5 text-emerald-500" />
-                      ) : (
-                        <Copy className="h-3.5 w-3.5" />
-                      )}
-                    </button>
-                  </div>
-                )}
-
-                {project.upstreamRefs?.map((ref) => (
-                  <a
-                    key={ref.url}
-                    href={ref.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center justify-between gap-3 p-2 rounded-md border border-[var(--line)] bg-[var(--bg)] hover:border-[var(--line-2)] text-xs text-[var(--fg-2)] hover:text-[var(--fg)] transition group"
-                  >
-                    <span className="flex items-center gap-2">
-                      <ExternalLink className="h-3.5 w-3.5 text-[var(--fg-3)] group-hover:text-[var(--accent)] transition" />
-                      <span>{ref.name}</span>
-                    </span>
-                    <span className="font-mono text-[11px] text-[var(--fg-3)] truncate max-w-[220px]">
-                      {ref.url.replace(/^https?:\/\//, '')}
-                    </span>
-                  </a>
-                ))}
-              </div>
-            </Section>
-          )}
-
-          {/* Commands */}
-          {project.commands && project.commands.length > 0 && (
-            <Section label="Commands">
-              <div className="space-y-1.5">
-                {project.commands.map((cmd) => (
-                  <button
-                    key={cmd.cmd}
-                    onClick={() => copyToClipboard(cmd.cmd, cmd.cmd)}
-                    title="Copy command"
-                    className="w-full flex items-center justify-between gap-2 p-2 rounded-md border border-[var(--line)] hover:border-[var(--line-2)] bg-[var(--bg)] font-mono text-xs transition group"
-                  >
-                    <span className="flex items-center gap-2 min-w-0">
-                      <Terminal className="h-3.5 w-3.5 text-[var(--fg-3)] flex-shrink-0" />
-                      <span className="text-[var(--fg-3)] flex-shrink-0">{cmd.label}</span>
-                      <span className="text-[var(--fg)] truncate">{cmd.cmd}</span>
-                    </span>
-                    {copiedCmd === cmd.cmd ? (
-                      <Check className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />
-                    ) : (
-                      <Copy className="h-3.5 w-3.5 text-[var(--fg-3)] group-hover:text-[var(--fg)] flex-shrink-0" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </Section>
-          )}
-
-          {/* Tech stack */}
-          {project.techStack.length > 0 && (
-          <Section label="Tech stack">
-            <div className="flex flex-wrap gap-1.5">
-              {project.techStack.map((tech) => (
-                <span key={tech} className="tag !text-[11px] !leading-5">
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </Section>
-          )}
-
-          {/* Architecture */}
-          {project.architectureNotes && (
-            <Section label="Architecture">
-              <p className="m-0 text-[12.5px] leading-relaxed text-[var(--fg-2)]">
-                {project.architectureNotes}
-              </p>
-            </Section>
-          )}
-
-          {/* Notes */}
-          <Section
-            label="Notes"
+            label="Milestones"
             aside={
-              !isEditingNotes && (
-                <button
-                  onClick={() => setIsEditingNotes(true)}
-                  className="flex items-center gap-1 text-[11px] text-[var(--accent)] hover:underline mb-1.5"
-                >
-                  <Edit3 className="h-3 w-3" />
-                  <span>Edit</span>
-                </button>
-              )
+              <span className="row-count">
+                {done}/{total} · {pct}%
+              </span>
             }
           >
-            {isEditingNotes ? (
-              <div className="space-y-2">
-                <textarea
-                  autoFocus
-                  value={notesValue}
-                  onChange={(e) => setNotesValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleSaveNotes();
-                  }}
-                  rows={6}
-                  className="field font-mono leading-relaxed"
-                  placeholder="Thoughts, findings, decisions..."
-                />
-                <div className="flex items-center justify-end gap-2">
-                  <span className="mr-auto text-[10.5px] text-[var(--fg-3)] font-mono">Ctrl+Enter to save</span>
+            <ProgressBar pct={pct} className="mb-2" />
+            <div>
+              {milestones.map((m, idx) => (
+                <div key={m.id} className="edit-row">
                   <button
-                    onClick={() => {
-                      setNotesValue(project.notes || '');
-                      setIsEditingNotes(false);
-                    }}
-                    className="btn-ghost"
+                    onClick={() =>
+                      setMilestones(milestones.map((x) => (x.id === m.id ? { ...x, completed: !x.completed } : x)))
+                    }
+                    role="checkbox"
+                    aria-checked={m.completed}
+                    aria-label={m.completed ? 'Mark not done' : 'Mark done'}
+                    className={`check ${m.completed ? 'checked' : ''}`}
                   >
-                    Cancel
+                    {m.completed && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
                   </button>
-                  <button onClick={handleSaveNotes} className="btn-accent">
-                    Save
-                  </button>
+                  <InlineText
+                    value={m.text}
+                    onCommit={(v) =>
+                      v
+                        ? setMilestones(milestones.map((x) => (x.id === m.id ? { ...x, text: v } : x)))
+                        : setMilestones(milestones.filter((x) => x.id !== m.id))
+                    }
+                    ariaLabel="Milestone"
+                    className={`text-[13px] ${m.completed ? 'line-through text-[var(--fg-3)]' : 'text-[var(--fg)]'}`}
+                  />
+                  <span className="row-actions">
+                    {idx > 0 && (
+                      <button onClick={() => moveMilestone(idx, -1)} className="row-action" aria-label="Move up" title="Move up">
+                        <ChevronUp className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                    {idx < milestones.length - 1 && (
+                      <button onClick={() => moveMilestone(idx, 1)} className="row-action" aria-label="Move down" title="Move down">
+                        <ChevronDown className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                    <RowDelete label="Remove milestone" onClick={() => setMilestones(milestones.filter((x) => x.id !== m.id))} />
+                  </span>
                 </div>
+              ))}
+              <div className="edit-row">
+                <Plus className="h-3.5 w-3.5 text-[var(--fg-3)] flex-shrink-0" />
+                <InlineText
+                  value=""
+                  clearOnCommit
+                  onCommit={(v) => v && setMilestones([...milestones, { id: newId('m'), text: v, completed: false }])}
+                  placeholder="Add a milestone"
+                  ariaLabel="New milestone"
+                  className="text-[13px]"
+                />
               </div>
-            ) : (
-              <div
-                onClick={() => setIsEditingNotes(true)}
-                className="p-3 rounded-md border border-[var(--line)] bg-[var(--bg)] text-xs text-[var(--fg-2)] leading-relaxed whitespace-pre-wrap font-mono cursor-text hover:border-[var(--line-2)] transition"
-              >
-                {project.notes || (
-                  <span className="text-[var(--fg-3)] italic">No notes yet. Click to add some.</span>
-                )}
-              </div>
-            )}
+            </div>
           </Section>
 
-          <div className="pt-2 text-[11px] font-mono text-[var(--fg-3)]">
-            Updated {formatDate(project.updatedAt)}
-          </div>
+          {/* Commands */}
+          <Section label="Commands">
+            {commands.map((c, idx) => (
+              <div key={idx} className="edit-row">
+                <Terminal className="h-3.5 w-3.5 text-[var(--fg-3)] flex-shrink-0" />
+                <InlineText
+                  value={c.label}
+                  onCommit={(v) => update({ commands: commands.map((x, i) => (i === idx ? { ...x, label: v } : x)) })}
+                  placeholder="Label"
+                  ariaLabel="Command label"
+                  className="!w-[110px] flex-shrink-0 text-[12px] text-[var(--fg-3)]"
+                />
+                <InlineText
+                  value={c.cmd}
+                  onCommit={(v) =>
+                    update({
+                      commands: v
+                        ? commands.map((x, i) => (i === idx ? { ...x, cmd: v } : x))
+                        : commands.filter((_, i) => i !== idx),
+                    })
+                  }
+                  ariaLabel="Command"
+                  className="font-mono text-[12px] text-[var(--fg)]"
+                />
+                <button
+                  onClick={() => copyToClipboard(c.cmd, `cmd-${idx}`)}
+                  className="row-action !opacity-100"
+                  title="Copy command"
+                  aria-label="Copy command"
+                >
+                  {copied === `cmd-${idx}` ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+                </button>
+                <span className="row-actions">
+                  <RowDelete label="Remove command" onClick={() => update({ commands: commands.filter((_, i) => i !== idx) })} />
+                </span>
+              </div>
+            ))}
+            <div className="edit-row">
+              <Plus className="h-3.5 w-3.5 text-[var(--fg-3)] flex-shrink-0" />
+              <InlineText
+                value=""
+                clearOnCommit
+                onCommit={(v) => v && update({ commands: [...commands, { label: commands.length ? 'Run' : 'Dev', cmd: v }] })}
+                placeholder="Add a command, e.g. npm run dev"
+                ariaLabel="New command"
+                className="font-mono text-[12px]"
+              />
+            </div>
+          </Section>
+
+          {/* Links */}
+          <Section label="Links">
+            {refs.map((r, idx) => (
+              <div key={idx} className="edit-row">
+                <a
+                  href={r.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="row-action !opacity-100 hover:!text-[var(--accent)]"
+                  title={`Open ${r.url}`}
+                  aria-label={`Open ${r.name}`}
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+                <InlineText
+                  value={r.name}
+                  onCommit={(v) => update({ upstreamRefs: refs.map((x, i) => (i === idx ? { ...x, name: v || x.name } : x)) })}
+                  ariaLabel="Link name"
+                  className="!w-[130px] flex-shrink-0 text-[12.5px] text-[var(--fg)]"
+                />
+                <InlineText
+                  value={r.url}
+                  onCommit={(v) =>
+                    update({
+                      upstreamRefs: v
+                        ? refs.map((x, i) => (i === idx ? { ...x, url: v } : x))
+                        : refs.filter((_, i) => i !== idx),
+                    })
+                  }
+                  ariaLabel="Link URL"
+                  className="font-mono text-[11.5px] text-[var(--fg-3)]"
+                />
+                <span className="row-actions">
+                  <RowDelete label="Remove link" onClick={() => update({ upstreamRefs: refs.filter((_, i) => i !== idx) })} />
+                </span>
+              </div>
+            ))}
+            <div className="edit-row">
+              <Plus className="h-3.5 w-3.5 text-[var(--fg-3)] flex-shrink-0" />
+              <InlineText
+                value=""
+                clearOnCommit
+                onCommit={(v) => {
+                  if (!v) return;
+                  const url = /^[a-z]+:\/\//i.test(v) ? v : `https://${v}`;
+                  let name = 'Link';
+                  try {
+                    name = new URL(url).hostname.replace(/^www\./, '');
+                  } catch {
+                    /* keep the default name */
+                  }
+                  update({ upstreamRefs: [...refs, { name, url }] });
+                }}
+                placeholder="Paste a URL"
+                ariaLabel="New link"
+                className="font-mono text-[11.5px]"
+              />
+            </div>
+          </Section>
+
+          {/* Tech */}
+          <Section label="Tech stack">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {project.techStack.map((tech) => (
+                <span key={tech} className="tag tag-removable">
+                  {tech}
+                  <button
+                    onClick={() => update({ techStack: project.techStack.filter((t) => t !== tech) })}
+                    aria-label={`Remove ${tech}`}
+                    title={`Remove ${tech}`}
+                  >
+                    <X className="h-2.5 w-2.5" />
+                  </button>
+                </span>
+              ))}
+              <InlineText
+                value=""
+                clearOnCommit
+                onCommit={(v) => {
+                  const add = v.split(',').map((t) => t.trim()).filter((t) => t && !project.techStack.includes(t));
+                  if (add.length) update({ techStack: [...project.techStack, ...add] });
+                }}
+                placeholder="Add tech"
+                ariaLabel="Add tech"
+                className="!w-[110px] text-[11.5px]"
+              />
+            </div>
+          </Section>
+
+          {/* Architecture */}
+          <Section label="Architecture">
+            <InlineText
+              multiline
+              value={project.architectureNotes ?? ''}
+              onCommit={(v) => update({ architectureNotes: optional(v) })}
+              placeholder="How is it built?"
+              ariaLabel="Architecture notes"
+              className="text-[13px] leading-relaxed text-[var(--fg-2)]"
+            />
+          </Section>
+
+          {/* Notes */}
+          <Section label="Notes" aside={<span className="hint">Ctrl+Enter saves</span>}>
+            <InlineText
+              multiline
+              value={project.notes ?? ''}
+              onCommit={(v) => update({ notes: v })}
+              placeholder="Thoughts, findings, decisions..."
+              ariaLabel="Notes"
+              className="font-mono text-[12px] leading-relaxed text-[var(--fg-2)] min-h-[64px]"
+            />
+          </Section>
+
+          <div className="pt-6 text-[11px] text-[var(--fg-3)]">Updated {formatDate(project.updatedAt)}</div>
         </div>
       </div>
     </div>
@@ -389,6 +483,7 @@ const DrawerContent: React.FC<{
 
 export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   project,
+  categories,
   onClose,
   onUpdateProject,
   onDeleteProject,
@@ -399,6 +494,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     <DrawerContent
       key={project.id}
       project={project}
+      categories={categories}
       onClose={onClose}
       onUpdateProject={onUpdateProject}
       onDeleteProject={onDeleteProject}
