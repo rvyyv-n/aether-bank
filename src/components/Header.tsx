@@ -11,7 +11,8 @@ import {
   TrendingUp,
   Compass,
   ArrowUpDown,
-  Gauge
+  Gauge,
+  Search
 } from 'lucide-react';
 import type { ProjectIdea } from '../types';
 import { BankerLogo } from './BankerLogo';
@@ -31,6 +32,7 @@ interface HeaderProps {
   onResetData: () => void;
   onExportJson: () => void;
   onToggleMobileSidebar: () => void;
+  onOpenPalette: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -48,6 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
   onResetData,
   onExportJson,
   onToggleMobileSidebar,
+  onOpenPalette,
 }) => {
   return (
     <header className="app-header">
@@ -176,6 +179,17 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Header Actions */}
       <div className="header-actions">
+        <button
+          className="quick-switch"
+          onClick={onOpenPalette}
+          aria-label="Quick switcher"
+          title="Quick switcher (Ctrl+K)"
+        >
+          <Search className="h-3.5 w-3.5" />
+          <span className="max-lg:hidden">Jump to</span>
+          <kbd className="max-lg:hidden">Ctrl K</kbd>
+        </button>
+
         {/* Dark / Light Mode Toggle */}
         <button
           className="icon-button cursor-pointer"

@@ -11,6 +11,7 @@ import { MobileNav } from './components/MobileNav';
 import { UsageView } from './components/UsageView';
 import { ProjectDrawer } from './components/ProjectDrawer';
 import { NewProjectModal } from './components/NewProjectModal';
+import { CommandPalette, type PaletteCommand } from './components/CommandPalette';
 
 const STORAGE_KEY = 'banker_vault_v3';
 const THEME_KEY = 'banker_theme_v1';
@@ -50,6 +51,7 @@ export function App() {
   const [selectedProject, setSelectedProject] = useState<ProjectIdea | null>(null);
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
 
   // Sync theme to document element
   useEffect(() => {
@@ -84,6 +86,14 @@ export function App() {
   // Global hotkeys
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsPaletteOpen((open) => !open);
+        return;
+      }
+      // Leave browser shortcuts (Ctrl+T, Ctrl+N, ...) alone
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
       const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
       if (tag === 'input' || tag === 'textarea' || tag === 'select') {
         if (e.key === 'Escape') {
@@ -96,7 +106,8 @@ export function App() {
         setSelectedProject(null);
         setIsNewModalOpen(false);
         setIsMobileSidebarOpen(false);
-      } else if (e.key === '/' || (e.ctrlKey && e.key === 'k') || (e.metaKey && e.key === 'k')) {
+        setIsPaletteOpen(false);
+      } else if (e.key === '/') {
         e.preventDefault();
         const searchInput = document.querySelector('.search input') as HTMLInputElement;
         searchInput?.focus();
@@ -247,6 +258,29 @@ export function App() {
     downloadAnchor.remove();
   };
 
+  const goTo = (section: typeof activeSection, mode?: typeof viewMode) => {
+    setActiveSection(section);
+    if (mode) setViewMode(mode);
+  };
+
+  const paletteCommands: PaletteCommand[] = [
+    { id: 'board', group: 'Go to', label: 'Board', hint: '1', run: () => goTo('vault', 'board') },
+    { id: 'table', group: 'Go to', label: 'Table', hint: '2', run: () => goTo('vault', 'table') },
+    { id: 'roadmap', group: 'Go to', label: 'Roadmap', hint: '3', run: () => goTo('roadmap') },
+    { id: 'analytics', group: 'Go to', label: 'Analytics', hint: '4', run: () => goTo('analytics') },
+    { id: 'usage', group: 'Go to', label: 'Usage', hint: '5', run: () => goTo('usage') },
+    { id: 'new', group: 'Actions', label: 'New idea', hint: 'N', run: () => setIsNewModalOpen(true) },
+    {
+      id: 'theme',
+      group: 'Actions',
+      label: theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
+      hint: 'T',
+      run: () => setTheme(theme === 'dark' ? 'light' : 'dark'),
+    },
+    { id: 'reset-filters', group: 'Actions', label: 'Show all projects', run: handleResetFilters },
+    { id: 'export', group: 'Actions', label: 'Export vault as JSON', run: handleExportJson },
+  ];
+
   return (
     <div className="app">
       {/* Header matching Slopalytics structure */}
@@ -265,6 +299,7 @@ export function App() {
         onResetData={handleResetData}
         onExportJson={handleExportJson}
         onToggleMobileSidebar={() => setIsMobileSidebarOpen((prev) => !prev)}
+        onOpenPalette={() => setIsPaletteOpen(true)}
       />
 
       {/* Main Body Layout: Fluid Content + Slopalytics Right Sidebar */}
@@ -335,6 +370,14 @@ export function App() {
         onClose={() => setSelectedProject(null)}
         onUpdateProject={handleUpdateProject}
         onDeleteProject={handleDeleteProject}
+      />
+
+      <CommandPalette
+        open={isPaletteOpen}
+        onClose={() => setIsPaletteOpen(false)}
+        projects={projects}
+        commands={paletteCommands}
+        onSelectProject={setSelectedProject}
       />
 
       {/* New Project Idea Modal */}
