@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 <a href="https://rvyyv-n.github.io/banker/">
   <img src="icon.svg" alt="Banker icon" width="96" height="96" />
@@ -10,7 +10,7 @@
 
 A local-first developer workbench for tracking software tools, technical specifications, and roadmap milestones.
 
-[**Open the app**](https://rvyyv-n.github.io/banker/) • [GitHub](https://github.com/rvyyv-n/banker) • [License: MIT](LICENSE)
+[**Open the app**](https://rvyyv-n.github.io/banker/) â€¢ [GitHub](https://github.com/rvyyv-n/banker) â€¢ [License: MIT](LICENSE)
 
 </div>
 
@@ -64,7 +64,7 @@ polishing, and release.
 ### Overview
 
 The default view. Active work (in progress and polishing) is shown as cards with
-progress, the next unfinished milestone, tech stack, a copyable dev command and
+progress, the next unfinished milestone, technology icons, a copyable dev command and
 repo status. Queued projects follow as a sortable list, and shipped ones fold away.
 
 <a href="https://rvyyv-n.github.io/banker/">
@@ -300,4 +300,4 @@ and publishes the static bundle directly to GitHub Pages.
 
 ## License
 
-[MIT](LICENSE) © rvyyv-n
+[MIT](LICENSE) Â© rvyyv-n
