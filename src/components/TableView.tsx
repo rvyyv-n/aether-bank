@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import type { ProjectIdea, ProjectStatus } from '../types';
+import type { ProjectIdea, ProjectStatus, SortProps } from '../types';
 import { 
   Terminal,
   Copy,
   Check
 } from 'lucide-react';
-import { StatusDot, StatusOptions, PriorityBadge, ProgressBar } from './ui';
+import { StatusDot, StatusOptions, PriorityBadge, ProgressBar, SortHead } from './ui';
 import { progressOf } from '../data/status';
 
-interface TableViewProps {
+interface TableViewProps extends SortProps {
   projects: ProjectIdea[];
   onSelectProject: (project: ProjectIdea) => void;
   onUpdateStatus: (projectId: string, newStatus: ProjectStatus) => void;
@@ -18,7 +18,13 @@ export const TableView: React.FC<TableViewProps> = ({
   projects,
   onSelectProject,
   onUpdateStatus,
+  sortBy,
+  sortReversed,
+  onSort,
 }) => {
+  const head = (key: SortProps['sortBy'], label: string) => (
+    <SortHead label={label} active={sortBy === key} reversed={sortReversed} onClick={() => onSort(key)} />
+  );
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const copyToClipboard = (e: React.MouseEvent, text: string, id: string) => {
@@ -90,13 +96,13 @@ export const TableView: React.FC<TableViewProps> = ({
         <table className="w-full text-left text-xs border-collapse">
           <thead>
             <tr className="border-b border-[var(--line)] text-[var(--fg-3)] text-[11.5px] select-none">
-              <th className="py-2 pr-4 font-normal whitespace-nowrap">Priority</th>
-              <th className="py-2 pr-4 font-normal whitespace-nowrap">Project</th>
-              <th className="py-2 pr-4 font-normal whitespace-nowrap">Status</th>
-              <th className="py-2 pr-4 font-normal whitespace-nowrap">Milestones</th>
+              <th className="py-2 pr-4 font-normal whitespace-nowrap">{head('priority', 'Priority')}</th>
+              <th className="py-2 pr-4 font-normal whitespace-nowrap">{head('title', 'Project')}</th>
+              <th className="py-2 pr-4 font-normal whitespace-nowrap">{head('status', 'Status')}</th>
+              <th className="py-2 pr-4 font-normal whitespace-nowrap">{head('progress', 'Milestones')}</th>
               <th className="py-2 pr-4 font-normal whitespace-nowrap">Tech Stack</th>
               <th className="py-2 pr-4 font-normal whitespace-nowrap hidden xl:table-cell">Dev Command</th>
-              <th className="py-2 pr-4 font-normal whitespace-nowrap">Updated</th>
+              <th className="py-2 pr-4 font-normal whitespace-nowrap">{head('updated', 'Updated')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--line)] font-normal">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { 
   Plus, 
   Download, 
@@ -9,10 +9,17 @@ import {
   LayoutGrid,
   Table2,
   ArrowUpDown,
-  Search
+  Search,
+  Palette,
+  Check,
+  Landmark,
+  Map as MapIcon,
+  ChartColumn,
+  Activity
 } from 'lucide-react';
 import type { ProjectIdea } from '../types';
 import { BankerLogo } from './BankerLogo';
+import { ACCENTS, type Accent } from '../data/accents';
 
 interface HeaderProps {
   projects: ProjectIdea[];
@@ -25,6 +32,8 @@ interface HeaderProps {
   setSortBy: (sort: 'priority' | 'status' | 'title' | 'progress' | 'updated') => void;
   theme: 'dark' | 'light';
   setTheme: (theme: 'dark' | 'light') => void;
+  accent: Accent;
+  setAccent: (accent: Accent) => void;
   onOpenNewModal: () => void;
   onResetData: () => void;
   onExportJson: () => void;
@@ -43,12 +52,25 @@ export const Header: React.FC<HeaderProps> = ({
   setSortBy,
   theme,
   setTheme,
+  accent,
+  setAccent,
   onOpenNewModal,
   onResetData,
   onExportJson,
   onToggleMobileSidebar,
   onOpenPalette,
 }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (e: MouseEvent) => {
+      if (!menuRef.current?.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [menuOpen]);
+
   return (
     <header className="app-header">
       {/* Brand */}
@@ -73,24 +95,28 @@ export const Header: React.FC<HeaderProps> = ({
           className={activeSection === 'vault' ? 'active' : ''}
           onClick={() => setActiveSection('vault')}
         >
+          <Landmark className="h-3.5 w-3.5 mr-1.5 opacity-70" />
           Vault
         </button>
         <button
           className={activeSection === 'roadmap' ? 'active' : ''}
           onClick={() => setActiveSection('roadmap')}
         >
+          <MapIcon className="h-3.5 w-3.5 mr-1.5 opacity-70" />
           Roadmap
         </button>
         <button
           className={activeSection === 'analytics' ? 'active' : ''}
           onClick={() => setActiveSection('analytics')}
         >
+          <ChartColumn className="h-3.5 w-3.5 mr-1.5 opacity-70" />
           Analytics
         </button>
         <button
           className={activeSection === 'usage' ? 'active' : ''}
           onClick={() => setActiveSection('usage')}
         >
+          <Activity className="h-3.5 w-3.5 mr-1.5 opacity-70" />
           Usage
         </button>
       </nav>
@@ -148,6 +174,39 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="max-lg:hidden">Jump to</span>
           <kbd className="max-lg:hidden">Ctrl K</kbd>
         </button>
+
+        {/* Accent colours */}
+        <div className="relative" ref={menuRef}>
+          <button
+            className="icon-button cursor-pointer"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label="Colour theme"
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            title="Colour theme"
+          >
+            <Palette className="h-4 w-4" />
+          </button>
+          {menuOpen && (
+            <div className="menu" role="menu">
+              {ACCENTS.map((a) => (
+                <button
+                  key={a.id}
+                  role="menuitemradio"
+                  aria-checked={accent === a.id}
+                  onClick={() => {
+                    setAccent(a.id);
+                    setMenuOpen(false);
+                  }}
+                >
+                  <span className="swatch" style={{ background: a.swatch }} />
+                  <span className="flex-1">{a.label}</span>
+                  {accent === a.id && <Check className="h-3.5 w-3.5" />}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Dark / Light Mode Toggle */}
         <button

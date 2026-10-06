@@ -16,7 +16,7 @@ export const STATUS_META: Record<ProjectStatus, { label: string; color: string }
   spike: { label: 'Exploring', color: '#d4a373' },
   in_progress: { label: 'In Progress', color: '#8fae8b' },
   polishing: { label: 'Polishing', color: '#7fadad' },
-  shipped: { label: 'Shipped', color: '#c5ac98' },
+  shipped: { label: 'Shipped', color: 'var(--accent)' },
 };
 
 export const PRIORITY_META: Record<PriorityLevel, string> = {

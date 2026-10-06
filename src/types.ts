@@ -27,3 +27,11 @@ export interface ProjectIdea {
   commands?: { label: string; cmd: string }[];
   updatedAt: string;
 }
+
+export type SortKey = 'priority' | 'status' | 'title' | 'progress' | 'updated';
+
+export interface SortProps {
+  sortBy: SortKey;
+  sortReversed: boolean;
+  onSort: (key: SortKey) => void;
+}

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import type { ProjectIdea, PriorityLevel } from '../types';
-import { StatusDot, PriorityBadge, ProgressBar } from './ui';
+import type { ProjectIdea, PriorityLevel, SortProps } from '../types';
+import { StatusDot, PriorityBadge, ProgressBar, SortHead } from './ui';
 import { STATUS_ORDER, STATUS_META, DONE_COLOR } from '../data/status';
 
-interface AnalyticsViewProps {
+interface AnalyticsViewProps extends SortProps {
   projects: ProjectIdea[];
   onSelectProject: (project: ProjectIdea) => void;
 }
@@ -20,7 +20,7 @@ const PRIORITIES: PriorityLevel[] = ['P0', 'P1', 'P2', 'P3'];
 
 const doneCount = (p: ProjectIdea) => p.milestones.filter((m) => m.completed).length;
 
-export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelectProject }) => {
+export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelectProject, sortBy, sortReversed, onSort }) => {
   const [chart, setChart] = useState<Chart>('velocity');
 
   const totalMilestones = projects.reduce((n, p) => n + p.milestones.length, 0);
@@ -89,6 +89,18 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ projects, onSelect
             <span className="hint">Open a project from its row</span>
           </div>
           <div className="mt-2">
+            <div className="rank-row rank-head">
+              <span />
+              <span className="flex gap-4">
+                <SortHead label="Project" active={sortBy === 'title'} reversed={sortReversed} onClick={() => onSort('title')} />
+                <SortHead label="Status" active={sortBy === 'status'} reversed={sortReversed} onClick={() => onSort('status')} />
+                <SortHead label="Priority" active={sortBy === 'priority'} reversed={sortReversed} onClick={() => onSort('priority')} />
+              </span>
+              <span className="val">
+                <SortHead label="Done" active={sortBy === 'progress'} reversed={sortReversed} onClick={() => onSort('progress')} />
+              </span>
+              <span className="hide-phone val" />
+            </div>
             {projects.map((p, i) => {
               const done = doneCount(p);
               const total = p.milestones.length;

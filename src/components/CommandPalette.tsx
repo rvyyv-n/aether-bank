@@ -7,7 +7,7 @@ import { StatusDot } from './ui';
 export interface PaletteCommand {
   id: string;
   label: string;
-  group: 'Go to' | 'Actions';
+  group: 'Go to' | 'Actions' | 'Theme';
   hint?: string;
   run: () => void;
 }
@@ -79,7 +79,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     if (!q) {
       const inGroup = (g: PaletteCommand['group']) =>
         commandItems.filter((i) => i.kind === 'command' && i.command.group === g);
-      return [...inGroup('Go to'), ...projectItems, ...inGroup('Actions')];
+      return [...inGroup('Go to'), ...projectItems, ...inGroup('Actions'), ...inGroup('Theme')];
     }
     return [...projectItems, ...commandItems].sort((a, b) => a.score - b.score);
   }, [query, projects, commands]);

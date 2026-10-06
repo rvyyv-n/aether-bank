@@ -5,10 +5,10 @@
   --surface: #0d0b0a;
   --hover: #141210;
   --fg: #ffffff;
-  --fg-2: #c9c2bb;
-  --fg-3: #9b948d;
-  --line: #1c1a18;
-  --line-2: #36312d;
+  --fg-2: #ece8e4;
+  --fg-3: #bdb6af;
+  --line: #26231f;
+  --line-2: #433d38;
   --accent: #c5ac98;
   --accent-muted: rgba(197, 172, 152, 0.12);
   --on-accent: #000000;
@@ -24,8 +24,8 @@ html.light {
   --surface: #f8f6f3;
   --hover: #f1eeea;
   --fg: #20201e;
-  --fg-2: #625d57;
-  --fg-3: #77716c;
+  --fg-2: #3f3b37;
+  --fg-3: #57524d;
   --line: #e8e4df;
   --line-2: #ccc5be;
   --accent: #806047;
@@ -1248,7 +1248,88 @@ a:focus-visible, [tabindex="0"]:focus-visible {
     transition: background 0.15s;
   }
 
+  .list-head {
+    padding-top: 4px;
+    padding-bottom: 6px;
+    border-top: 0;
+    font-size: 12px;
+  }
+
+  .list-head:hover {
+    background: transparent;
+  }
+
   .list-row:hover {
     background: var(--hover);
   }
+}
+
+/* Accent themes. The default (sand) keeps the sand values from :root */
+:root[data-accent="sky"] { --accent: #8ab4f8; --accent-muted: rgba(138, 180, 248, 0.14); }
+:root[data-accent="sky"][data-theme="light"] { --accent: #1a5fd0; --accent-muted: rgba(26, 95, 208, 0.12); }
+:root[data-accent="mint"] { --accent: #19c39b; --accent-muted: rgba(25, 195, 155, 0.14); }
+:root[data-accent="mint"][data-theme="light"] { --accent: #0b7a5f; --accent-muted: rgba(11, 122, 95, 0.12); }
+:root[data-accent="mono"] { --accent: #e7e5e4; --accent-muted: rgba(231, 229, 228, 0.12); }
+:root[data-accent="mono"][data-theme="light"] { --accent: #292524; --accent-muted: rgba(41, 37, 36, 0.1); }
+
+/* Primary buttons follow the accent */
+.btn-accent {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  min-width: 11rem;
+  padding: 6px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: 5px;
+  font-size: 13px;
+  color: var(--fg-2);
+  text-align: left;
+}
+
+.menu button:hover {
+  background: var(--hover);
+  color: var(--fg);
+}
+
+.menu button[aria-checked="true"] {
+  color: var(--fg);
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Sortable column heads */
+.sort-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--fg-3);
+  transition: color 0.15s;
+  cursor: pointer;
+}
+
+.sort-head:hover,
+.sort-head[aria-pressed="true"] {
+  color: var(--fg);
 }

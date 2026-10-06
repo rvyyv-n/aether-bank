@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, Trash2 } from 'lucide-react';
+import { SortHead } from './ui';
 import {
   PROVIDERS,
   PROVIDER_MODELS,
@@ -98,6 +99,7 @@ export const UsageView: React.FC<{ sideSlot: HTMLElement | null }> = ({ sideSlot
   const [scrub, setScrub] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [withCache, setWithCache] = useState(false);
+  const [rankSort, setRankSort] = useState<{ key: 'name' | 'value'; reversed: boolean }>({ key: 'value', reversed: false });
   const [hiddenHarnesses, setHiddenHarnesses] = useState<string[]>([]);
   const [form, setForm] = useState({
     date: dayKey(now),
@@ -319,6 +321,13 @@ export const UsageView: React.FC<{ sideSlot: HTMLElement | null }> = ({ sideSlot
     setForm((f) => ({ ...f, inputTokens: '', outputTokens: '' }));
   };
 
+  const sortRank = (key: 'name' | 'value') =>
+    setRankSort((s) => (s.key === key ? { key, reversed: !s.reversed } : { key, reversed: false }));
+  const rankedRows = [...analysis.rows].sort((a, b) => {
+    const d = rankSort.key === 'name' ? a.key.localeCompare(b.key) : b.value - a.value;
+    return rankSort.reversed ? -d : d;
+  });
+
   const inputCls = 'field';
   const labelCls = 'field-label';
   const metricNoun = metric === 'tokens' ? 'tokens' : metric === 'msgs' ? 'messages' : 'est. spend';
@@ -464,11 +473,22 @@ export const UsageView: React.FC<{ sideSlot: HTMLElement | null }> = ({ sideSlot
       <section>
         <div className="rank-row rank-head">
           <span />
-          <span>{range === 0 ? 'All-time' : `${range}-day`} ranking</span>
-          <span className="val">Per day</span>
-          <span className="val">Share</span>
+          <span>
+            <SortHead
+              label={`${range === 0 ? 'All-time' : `${range}-day`} ranking`}
+              active={rankSort.key === 'name'}
+              reversed={rankSort.reversed}
+              onClick={() => sortRank('name')}
+            />
+          </span>
+          <span className="val">
+            <SortHead label="Per day" active={rankSort.key === 'value'} reversed={rankSort.reversed} onClick={() => sortRank('value')} className="justify-end" />
+          </span>
+          <span className="val">
+            <SortHead label="Share" active={rankSort.key === 'value'} reversed={rankSort.reversed} onClick={() => sortRank('value')} className="justify-end" />
+          </span>
         </div>
-        {analysis.rows.map((r, i) => (
+        {rankedRows.map((r, i) => (
           <div key={r.key} className="rank-row">
             <span className="num">{i + 1}</span>
             <div className="min-w-0">

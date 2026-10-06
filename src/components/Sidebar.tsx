@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ProjectIdea, ProjectStatus, PriorityLevel } from '../types';
-import { Search, X } from 'lucide-react';
+import { CircleDot, Flag, FolderOpen, Search, Tag, X } from 'lucide-react';
 import { STATUS_META, PRIORITY_META, progressOf } from '../data/status';
 import { StatusDot } from './ui';
 
@@ -147,7 +147,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Status */}
       <div className="filter-group">
         <div className="section-head">
-          <h3>Status</h3>
+          <h3 className="inline-flex items-center gap-1.5">
+            <CircleDot className="h-3.5 w-3.5 text-[var(--fg-3)]" />
+            Status
+          </h3>
           <span className="hint">double-click for only</span>
         </div>
         <div>
@@ -175,7 +178,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {showPriority && (
       <div className="filter-group">
         <div className="section-head">
-          <h3>Priority</h3>
+          <h3 className="inline-flex items-center gap-1.5">
+            <Flag className="h-3.5 w-3.5 text-[var(--fg-3)]" />
+            Priority
+          </h3>
         </div>
         <div className="strike-filter">
           {PRIORITIES.map((p) => (
@@ -197,7 +203,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Category */}
       <div className="filter-group">
         <div className="section-head">
-          <h3>Category</h3>
+          <h3 className="inline-flex items-center gap-1.5">
+            <Tag className="h-3.5 w-3.5 text-[var(--fg-3)]" />
+            Category
+          </h3>
         </div>
         <div className="strike-filter">
           {categories.map((cat) => (
@@ -217,7 +226,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {showDirectory && (
       <div className="filter-group directory">
         <div className="section-head">
-          <h3>Directory</h3>
+          <h3 className="inline-flex items-center gap-1.5">
+            <FolderOpen className="h-3.5 w-3.5 text-[var(--fg-3)]" />
+            Directory
+          </h3>
           <span className="row-count">{filteredProjects.length}</span>
         </div>
         {filteredProjects.length === 0 ? (

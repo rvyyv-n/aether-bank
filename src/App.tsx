@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { ProjectIdea, ProjectStatus, PriorityLevel } from './types';
 import { INITIAL_PROJECTS } from './data/initialData';
+import { ACCENTS, ACCENT_KEY, type Accent } from './data/accents';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { VaultOverview } from './components/VaultOverview';
@@ -27,6 +28,16 @@ export function App() {
     return 'dark'; // Slopalytics dark default
   });
 
+  const [accent, setAccent] = useState<Accent>(() => {
+    try {
+      const stored = localStorage.getItem(ACCENT_KEY);
+      if (ACCENTS.some((a) => a.id === stored)) return stored as Accent;
+    } catch (e) {
+      console.error(e);
+    }
+    return 'sand';
+  });
+
   const [projects, setProjects] = useState<ProjectIdea[]>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -46,7 +57,17 @@ export function App() {
   const [hiddenStatuses, setHiddenStatuses] = useState<ProjectStatus[]>([]);
   const [hiddenPriorities, setHiddenPriorities] = useState<PriorityLevel[]>([]);
   const [hiddenCategories, setHiddenCategories] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<'priority' | 'status' | 'title' | 'progress' | 'updated'>('priority');
+  const [sortBy, setSortByRaw] = useState<'priority' | 'status' | 'title' | 'progress' | 'updated'>('priority');
+  const [sortReversed, setSortReversed] = useState(false);
+  const setSortBy = (key: typeof sortBy) => {
+    setSortByRaw(key);
+    setSortReversed(false);
+  };
+  // Clicking the active column again flips the direction
+  const onSort = (key: typeof sortBy) => {
+    if (key === sortBy) setSortReversed((r) => !r);
+    else setSortBy(key);
+  };
 
   const [selectedProject, setSelectedProject] = useState<ProjectIdea | null>(null);
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
@@ -74,6 +95,15 @@ export function App() {
       console.error(e);
     }
   }, [theme]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(ACCENT_KEY, accent);
+    } catch (e) {
+      console.error(e);
+    }
+    document.documentElement.setAttribute('data-accent', accent);
+  }, [accent]);
 
   // Sync projects to localStorage
   useEffect(() => {
@@ -163,7 +193,9 @@ export function App() {
 
       return matchesCategory && matchesStatus && matchesPriority && matchesQuery;
     })
-    .sort((a, b) => {
+    .sort((a, b) => (sortReversed ? -1 : 1) * compare(a, b));
+
+  function compare(a: ProjectIdea, b: ProjectIdea) {
       if (sortBy === 'priority') {
         const pOrder: Record<PriorityLevel, number> = { P0: 0, P1: 1, P2: 2, P3: 3 };
         return pOrder[a.priority] - pOrder[b.priority];
@@ -197,7 +229,7 @@ export function App() {
         return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
       }
       return 0;
-    });
+  }
 
   const handleUpdateStatus = (projectId: string, newStatus: ProjectStatus) => {
     setProjects((prev) =>
@@ -270,6 +302,12 @@ export function App() {
     { id: 'roadmap', group: 'Go to', label: 'Roadmap', hint: '3', run: () => goTo('roadmap') },
     { id: 'analytics', group: 'Go to', label: 'Analytics', hint: '4', run: () => goTo('analytics') },
     { id: 'usage', group: 'Go to', label: 'Usage', hint: '5', run: () => goTo('usage') },
+    ...ACCENTS.map((a): PaletteCommand => ({
+      id: `accent-${a.id}`,
+      group: 'Theme',
+      label: `${a.label} colours`,
+      run: () => setAccent(a.id),
+    })),
     { id: 'new', group: 'Actions', label: 'New idea', hint: 'N', run: () => setIsNewModalOpen(true) },
     {
       id: 'theme',
@@ -296,6 +334,8 @@ export function App() {
         setSortBy={setSortBy}
         theme={theme}
         setTheme={setTheme}
+        accent={accent}
+        setAccent={setAccent}
         onOpenNewModal={() => setIsNewModalOpen(true)}
         onResetData={handleResetData}
         onExportJson={handleExportJson}
@@ -310,6 +350,9 @@ export function App() {
             <VaultOverview
               projects={filteredProjects}
               onSelectProject={setSelectedProject}
+              sortBy={sortBy}
+              sortReversed={sortReversed}
+              onSort={onSort}
             />
           )}
 
@@ -318,6 +361,9 @@ export function App() {
               projects={filteredProjects}
               onSelectProject={setSelectedProject}
               onUpdateStatus={handleUpdateStatus}
+              sortBy={sortBy}
+              sortReversed={sortReversed}
+              onSort={onSort}
             />
           )}
 
@@ -332,6 +378,9 @@ export function App() {
             <AnalyticsView
               projects={filteredProjects}
               onSelectProject={setSelectedProject}
+              sortBy={sortBy}
+              sortReversed={sortReversed}
+              onSort={onSort}
             />
           )}
 

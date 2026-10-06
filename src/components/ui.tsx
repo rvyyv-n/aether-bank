@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 import type { ProjectStatus, PriorityLevel } from '../types';
 import { STATUS_ORDER, STATUS_META, PRIORITY_META, DONE_COLOR } from '../data/status';
 
@@ -52,4 +53,18 @@ export const ProgressBar: React.FC<{ pct: number; className?: string }> = ({ pct
       style={{ width: `${pct}%`, backgroundColor: pct === 100 ? DONE_COLOR : 'var(--accent)' }}
     />
   </div>
+);
+
+/** Clickable column head; shows an arrow while it is the active sort. */
+export const SortHead: React.FC<{
+  label: string;
+  active: boolean;
+  reversed: boolean;
+  onClick: () => void;
+  className?: string;
+}> = ({ label, active, reversed, onClick, className = '' }) => (
+  <button type="button" className={`sort-head ${className}`} aria-pressed={active} onClick={onClick}>
+    {label}
+    {active && (reversed ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />)}
+  </button>
 );

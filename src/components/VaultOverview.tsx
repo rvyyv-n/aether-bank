@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import type { ProjectIdea, ProjectStatus } from '../types';
-import { Check, ChevronRight, Copy } from 'lucide-react';
-import { StatusDot, PriorityBadge, ProgressBar } from './ui';
+import type { ProjectIdea, ProjectStatus, SortProps } from '../types';
+import { Check, ChevronRight, Copy, ListTodo, PackageCheck, Zap } from 'lucide-react';
+import { StatusDot, PriorityBadge, ProgressBar, SortHead } from './ui';
 import { STATUS_META, progressOf } from '../data/status';
 
-interface VaultOverviewProps {
+interface VaultOverviewProps extends SortProps {
   projects: ProjectIdea[];
   onSelectProject: (project: ProjectIdea) => void;
 }
@@ -92,7 +92,25 @@ const Row: React.FC<{ project: ProjectIdea; onOpen: () => void }> = ({ project, 
   );
 };
 
-export const VaultOverview: React.FC<VaultOverviewProps> = ({ projects, onSelectProject }) => {
+export const VaultOverview: React.FC<VaultOverviewProps> = ({
+  projects,
+  onSelectProject,
+  sortBy,
+  sortReversed,
+  onSort,
+}) => {
+  const head = (key: SortProps['sortBy'], label: string, className = '') => (
+    <SortHead label={label} active={sortBy === key} reversed={sortReversed} onClick={() => onSort(key)} className={className} />
+  );
+  const listHead = (
+    <div className="list-row list-head">
+      <span className="w-2" />
+      <span className="flex-1">{head('title', 'Project')}</span>
+      <span className="hide-phone">{head('status', 'Status')}</span>
+      <span className="w-8 text-center">{head('priority', 'Pri')}</span>
+      <span className="w-10 flex justify-end">{head('progress', 'Done')}</span>
+    </div>
+  );
   const [showShipped, setShowShipped] = useState(false);
 
   const active = projects.filter((p) => ACTIVE.includes(p.status));
@@ -118,7 +136,10 @@ export const VaultOverview: React.FC<VaultOverviewProps> = ({ projects, onSelect
       {active.length > 0 && (
         <section>
           <div className="section-head">
-            <h3>Active</h3>
+            <h3 className="inline-flex items-center gap-2">
+              <Zap className="h-3.5 w-3.5 text-[var(--accent)]" />
+              Active
+            </h3>
             <span className="hint">{active.length} in flight</span>
           </div>
           <div className="focus-grid mt-3">
@@ -132,10 +153,14 @@ export const VaultOverview: React.FC<VaultOverviewProps> = ({ projects, onSelect
       {next.length > 0 && (
         <section>
           <div className="section-head">
-            <h3>Up next</h3>
+            <h3 className="inline-flex items-center gap-2">
+              <ListTodo className="h-3.5 w-3.5 text-[var(--accent)]" />
+              Up next
+            </h3>
             <span className="hint">{next.length} queued</span>
           </div>
           <div className="mt-1">
+            {listHead}
             {next.map((p) => (
               <Row key={p.id} project={p} onOpen={() => onSelectProject(p)} />
             ))}
@@ -146,7 +171,10 @@ export const VaultOverview: React.FC<VaultOverviewProps> = ({ projects, onSelect
       {shipped.length > 0 && (
         <section>
           <div className="section-head">
-            <h3>Shipped</h3>
+            <h3 className="inline-flex items-center gap-2">
+              <PackageCheck className="h-3.5 w-3.5 text-[var(--accent)]" />
+              Shipped
+            </h3>
             <button className="text-button inline-flex items-center gap-1" onClick={() => setShowShipped((s) => !s)}>
               <ChevronRight className={`h-3.5 w-3.5 transition-transform ${showShipped ? 'rotate-90' : ''}`} />
               {showShipped ? 'Hide' : `Show ${shipped.length}`}
@@ -154,6 +182,7 @@ export const VaultOverview: React.FC<VaultOverviewProps> = ({ projects, onSelect
           </div>
           {showShipped && (
             <div className="mt-1">
+              {listHead}
               {shipped.map((p) => (
                 <Row key={p.id} project={p} onOpen={() => onSelectProject(p)} />
               ))}
