@@ -3,8 +3,7 @@ import type { ProjectIdea, ProjectStatus } from '../types';
 import { 
   Terminal,
   Copy,
-  Check,
-  ChevronRight
+  Check
 } from 'lucide-react';
 import { StatusDot, StatusOptions, PriorityBadge, ProgressBar } from './ui';
 import { progressOf } from '../data/status';
@@ -41,7 +40,16 @@ export const TableView: React.FC<TableViewProps> = ({
   };
 
   return (
-    <>
+    <div className="page">
+    <div className="page-head">
+      <div>
+        <h1>
+          Table
+          <span>{projects.length} {projects.length === 1 ? 'project' : 'projects'}</span>
+        </h1>
+        <p>Every project at a glance. Change a status here or open one for detail.</p>
+      </div>
+    </div>
     <div className="md:hidden space-y-2.5">
       {projects.length === 0 && (
         <div className="py-12 text-center text-xs text-[var(--fg-3)] font-mono">
@@ -77,25 +85,24 @@ export const TableView: React.FC<TableViewProps> = ({
         );
       })}
     </div>
-    <div className="hidden md:block w-full overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--surface)]">
+    <div className="hidden md:block w-full">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="border-b border-[var(--line)] bg-[var(--surface)] text-[var(--fg-3)] font-mono uppercase tracking-wider text-[11px] select-none">
-              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Priority</th>
-              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Project</th>
-              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Status</th>
-              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Milestones</th>
-              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Tech Stack</th>
-              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Dev Command</th>
-              <th className="py-2.5 px-3.5 font-medium whitespace-nowrap">Updated</th>
-              <th className="py-2.5 px-2 text-right"></th>
+            <tr className="border-b border-[var(--line)] text-[var(--fg-3)] text-[10.5px] select-none">
+              <th className="py-2 pr-4 font-normal whitespace-nowrap">Priority</th>
+              <th className="py-2 pr-4 font-normal whitespace-nowrap">Project</th>
+              <th className="py-2 pr-4 font-normal whitespace-nowrap">Status</th>
+              <th className="py-2 pr-4 font-normal whitespace-nowrap">Milestones</th>
+              <th className="py-2 pr-4 font-normal whitespace-nowrap">Tech Stack</th>
+              <th className="py-2 pr-4 font-normal whitespace-nowrap">Dev Command</th>
+              <th className="py-2 pr-4 font-normal whitespace-nowrap">Updated</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--line)] font-normal">
             {projects.length === 0 ? (
               <tr>
-                <td colSpan={8} className="py-12 text-center text-xs text-[var(--fg-3)] font-mono">
+                <td colSpan={7} className="py-12 text-center text-xs text-[var(--fg-3)] font-mono">
                   No projects matching active filters.
                 </td>
               </tr>
@@ -111,17 +118,17 @@ export const TableView: React.FC<TableViewProps> = ({
                     className="hover:bg-[var(--hover)] transition-colors cursor-pointer group"
                   >
                     {/* Priority */}
-                    <td className="py-3 px-3.5 whitespace-nowrap align-middle">
+                    <td className="py-3 pr-4 whitespace-nowrap align-middle">
                       <PriorityBadge priority={project.priority} />
                     </td>
 
                     {/* Title & Category */}
-                    <td className="py-3 px-3.5 align-middle min-w-[220px]">
+                    <td className="py-3 pr-4 align-middle min-w-[220px]">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-xs text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors">
                           {project.title}
                         </span>
-                        <span className="text-[10px] font-mono text-[var(--fg-3)] border border-[var(--line)] px-1 py-0.2 rounded">
+                        <span className="text-[10.5px] text-[var(--fg-3)]">
                           {project.category}
                         </span>
                       </div>
@@ -131,7 +138,7 @@ export const TableView: React.FC<TableViewProps> = ({
                     </td>
 
                     {/* Status with dot */}
-                    <td className="py-3 px-3.5 whitespace-nowrap align-middle" onClick={(e) => e.stopPropagation()}>
+                    <td className="py-3 pr-4 whitespace-nowrap align-middle" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2">
                         <StatusDot status={project.status} />
                         <select
@@ -147,7 +154,7 @@ export const TableView: React.FC<TableViewProps> = ({
                     </td>
 
                     {/* Milestones Progress */}
-                    <td className="py-3 px-3.5 align-middle min-w-[150px]">
+                    <td className="py-3 pr-4 align-middle min-w-[150px]">
                       <div className="flex items-center justify-between text-[11px] font-mono text-[var(--fg-3)] mb-1">
                         <span>{completed}/{total}</span>
                         <span>{pct}%</span>
@@ -156,26 +163,17 @@ export const TableView: React.FC<TableViewProps> = ({
                     </td>
 
                     {/* Tech Stack */}
-                    <td className="py-3 px-3.5 align-middle">
-                      <div className="flex flex-wrap gap-1 max-w-[200px]">
-                        {project.techStack.slice(0, 3).map((tech) => (
-                          <span
-                            key={tech}
-                            className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-[var(--bg)] text-[var(--fg-2)] border border-[var(--line)]"
-                          >
-                            {tech}
-                          </span>
-                        ))}
+                    <td className="py-3 pr-4 align-middle">
+                      <div className="text-[11px] text-[var(--fg-2)] max-w-[220px] truncate">
+                        {project.techStack.slice(0, 3).join(', ')}
                         {project.techStack.length > 3 && (
-                          <span className="px-1 py-0.2 rounded text-[10px] font-mono text-[var(--fg-3)] border border-[var(--line)]">
-                            +{project.techStack.length - 3}
-                          </span>
+                          <span className="text-[var(--fg-3)]"> +{project.techStack.length - 3}</span>
                         )}
                       </div>
                     </td>
 
                     {/* Dev Command */}
-                    <td className="py-3 px-3.5 whitespace-nowrap align-middle" onClick={(e) => e.stopPropagation()}>
+                    <td className="py-3 pr-4 whitespace-nowrap align-middle" onClick={(e) => e.stopPropagation()}>
                       {primaryCommand ? (
                         <button
                           onClick={(e) =>
@@ -206,14 +204,10 @@ export const TableView: React.FC<TableViewProps> = ({
                     </td>
 
                     {/* Updated */}
-                    <td className="py-3 px-3.5 whitespace-nowrap font-mono text-[11px] text-[var(--fg-3)] align-middle">
+                    <td className="py-3 pr-4 whitespace-nowrap font-mono text-[11px] text-[var(--fg-3)] align-middle">
                       {formatShortDate(project.updatedAt)}
                     </td>
 
-                    {/* Chevron */}
-                    <td className="py-3 px-2 text-right align-middle">
-                      <ChevronRight className="h-3.5 w-3.5 text-[var(--fg-3)] group-hover:text-[var(--fg)] group-hover:translate-x-0.5 transition-all inline-block" />
-                    </td>
                   </tr>
                 );
               })
@@ -222,6 +216,6 @@ export const TableView: React.FC<TableViewProps> = ({
         </table>
       </div>
     </div>
-    </>
+    </div>
   );
 };
