@@ -1,6 +1,7 @@
 import React from 'react';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, Clock, GitBranch } from 'lucide-react';
 import type { ProjectStatus, PriorityLevel } from '../types';
+import { idleLabel, type Activity } from '../data/repos';
 import { STATUS_ORDER, STATUS_META, PRIORITY_META, DONE_COLOR } from '../data/status';
 
 export const StatusDot: React.FC<{ status: ProjectStatus; className?: string }> = ({
@@ -54,6 +55,30 @@ export const ProgressBar: React.FC<{ pct: number; className?: string }> = ({ pct
     />
   </div>
 );
+
+/** Branch, uncommitted files and last activity for a project folder; nothing when unknown. */
+export const RepoLine: React.FC<{ activity?: Activity; className?: string }> = ({ activity, className = '' }) => {
+  if (!activity || (!activity.repo?.found && activity.daysIdle === undefined)) return null;
+  const repo = activity.repo?.found ? activity.repo : undefined;
+  return (
+    <div className={`repo-line ${className}`}>
+      {repo?.branch && (
+        <span title={repo.subject ? `${repo.commit}: ${repo.subject}` : undefined}>
+          <GitBranch className="h-3 w-3" />
+          {repo.branch}
+        </span>
+      )}
+      {!!repo?.dirty && <span className="warn">{repo.dirty} uncommitted</span>}
+      {!!repo?.ahead && <span>{repo.ahead} unpushed</span>}
+      {activity.daysIdle !== undefined && (
+        <span className={activity.daysIdle >= 14 ? 'warn' : ''}>
+          <Clock className="h-3 w-3" />
+          {idleLabel(activity.daysIdle)}
+        </span>
+      )}
+    </div>
+  );
+};
 
 /** Clickable column head; shows an arrow while it is the active sort. */
 export const SortHead: React.FC<{

@@ -11,6 +11,8 @@ import { AnalyticsView } from './components/AnalyticsView';
 import { MobileNav } from './components/MobileNav';
 import { UsageView } from './components/UsageView';
 import { ProjectDrawer } from './components/ProjectDrawer';
+import { ProjectPage } from './components/ProjectPage';
+import { useActivity } from './data/repos';
 import { NewProjectModal } from './components/NewProjectModal';
 import { CommandPalette, type PaletteCommand } from './components/CommandPalette';
 
@@ -70,6 +72,9 @@ export function App() {
   };
 
   const [selectedProject, setSelectedProject] = useState<ProjectIdea | null>(null);
+  // The full project page belongs to the view it was opened from, so navigating away closes it
+  const [pageOpen, setPageOpen] = useState<{ id: string; view: string } | null>(null);
+  const activity = useActivity(projects);
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
@@ -135,6 +140,7 @@ export function App() {
 
       if (e.key === 'Escape') {
         setSelectedProject(null);
+        setPageOpen(null);
         setIsNewModalOpen(false);
         setIsMobileSidebarOpen(false);
         setIsPaletteOpen(false);
@@ -291,6 +297,13 @@ export function App() {
     downloadAnchor.remove();
   };
 
+  const viewKey = activeSection + viewMode;
+  const pageProject = pageOpen && pageOpen.view === viewKey ? projects.find((p) => p.id === pageOpen.id) : undefined;
+  const openPage = (project: ProjectIdea) => {
+    setPageOpen({ id: project.id, view: viewKey });
+    setSelectedProject(null);
+  };
+
   const goTo = (section: typeof activeSection, mode?: typeof viewMode) => {
     setActiveSection(section);
     if (mode) setViewMode(mode);
@@ -345,10 +358,22 @@ export function App() {
 
       {/* Main Body Layout: Fluid Content + Slopalytics Right Sidebar */}
       <div className="body-layout">
-        <main key={activeSection + viewMode} className="main-content view-enter p-4 sm:p-6">
-          {activeSection === 'vault' && viewMode === 'overview' && (
+        <main key={viewKey + (pageProject?.id ?? '')} className="main-content view-enter p-4 sm:p-6">
+          {pageProject && (
+            <ProjectPage
+              project={pageProject}
+              categories={Array.from(new Set(projects.map((p) => p.category)))}
+              activity={activity[pageProject.id]}
+              onBack={() => setPageOpen(null)}
+              onUpdateProject={handleUpdateProject}
+              onDeleteProject={handleDeleteProject}
+            />
+          )}
+
+          {!pageProject && activeSection === 'vault' && viewMode === 'overview' && (
             <VaultOverview
               projects={filteredProjects}
+              activity={activity}
               onSelectProject={setSelectedProject}
               sortBy={sortBy}
               sortReversed={sortReversed}
@@ -356,9 +381,10 @@ export function App() {
             />
           )}
 
-          {activeSection === 'vault' && viewMode === 'table' && (
+          {!pageProject && activeSection === 'vault' && viewMode === 'table' && (
             <TableView
               projects={filteredProjects}
+              activity={activity}
               onSelectProject={setSelectedProject}
               onUpdateStatus={handleUpdateStatus}
               sortBy={sortBy}
@@ -367,14 +393,14 @@ export function App() {
             />
           )}
 
-          {activeSection === 'roadmap' && (
+          {!pageProject && activeSection === 'roadmap' && (
             <RoadmapView
               projects={filteredProjects}
               onSelectProject={setSelectedProject}
             />
           )}
 
-          {activeSection === 'analytics' && (
+          {!pageProject && activeSection === 'analytics' && (
             <AnalyticsView
               projects={filteredProjects}
               onSelectProject={setSelectedProject}
@@ -384,7 +410,7 @@ export function App() {
             />
           )}
 
-          {activeSection === 'usage' && <UsageView sideSlot={sideSlot} />}
+          {!pageProject && activeSection === 'usage' && <UsageView sideSlot={sideSlot} />}
         </main>
 
         {/* Slopalytics Right-Hand Sidebar */}
@@ -420,6 +446,7 @@ export function App() {
         project={selectedProject}
         categories={Array.from(new Set(projects.map((p) => p.category)))}
         onClose={() => setSelectedProject(null)}
+        onOpenPage={openPage}
         onUpdateProject={handleUpdateProject}
         onDeleteProject={handleDeleteProject}
       />

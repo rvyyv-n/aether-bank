@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import type { ProjectIdea, ProjectStatus, SortProps } from '../types';
 import { Check, ChevronRight, Copy, ListTodo, PackageCheck, Zap } from 'lucide-react';
-import { StatusDot, PriorityBadge, ProgressBar, SortHead } from './ui';
+import { StatusDot, PriorityBadge, ProgressBar, SortHead, RepoLine } from './ui';
+import { idleLabel, type Activity, type ActivityMap } from '../data/repos';
 import { STATUS_META, progressOf } from '../data/status';
 
 interface VaultOverviewProps extends SortProps {
   projects: ProjectIdea[];
+  activity: ActivityMap;
   onSelectProject: (project: ProjectIdea) => void;
 }
 
 const ACTIVE: ProjectStatus[] = ['in_progress', 'polishing'];
 const NEXT: ProjectStatus[] = ['spike', 'planned', 'backlog'];
 
-const ActiveCard: React.FC<{ project: ProjectIdea; onOpen: () => void }> = ({ project, onOpen }) => {
+const ActiveCard: React.FC<{ project: ProjectIdea; activity?: Activity; onOpen: () => void }> = ({ project, activity, onOpen }) => {
   const [copied, setCopied] = useState(false);
   const { done, total, pct } = progressOf(project);
   const next = project.milestones.find((m) => !m.completed);
@@ -70,11 +72,12 @@ const ActiveCard: React.FC<{ project: ProjectIdea; onOpen: () => void }> = ({ pr
           </button>
         )}
       </div>
+      <RepoLine activity={activity} className="mt-3" />
     </article>
   );
 };
 
-const Row: React.FC<{ project: ProjectIdea; onOpen: () => void }> = ({ project, onOpen }) => {
+const Row: React.FC<{ project: ProjectIdea; activity?: Activity; onOpen: () => void }> = ({ project, activity, onOpen }) => {
   const { done, total } = progressOf(project);
   return (
     <button onClick={onOpen} className="list-row">
@@ -84,6 +87,7 @@ const Row: React.FC<{ project: ProjectIdea; onOpen: () => void }> = ({ project, 
         <span className="block truncate text-[12px] text-[var(--fg-3)]">{project.subtitle}</span>
       </span>
       <span className="hide-phone text-[12px] text-[var(--fg-3)]">{STATUS_META[project.status].label}</span>
+      <span className="hide-phone w-20 text-right text-[12px] text-[var(--fg-3)]">{idleLabel(activity?.daysIdle)}</span>
       <PriorityBadge priority={project.priority} />
       <span className="w-10 text-right text-[12px] tabular-nums text-[var(--fg-3)]">
         {done}/{total}
@@ -94,6 +98,7 @@ const Row: React.FC<{ project: ProjectIdea; onOpen: () => void }> = ({ project, 
 
 export const VaultOverview: React.FC<VaultOverviewProps> = ({
   projects,
+  activity,
   onSelectProject,
   sortBy,
   sortReversed,
@@ -107,6 +112,7 @@ export const VaultOverview: React.FC<VaultOverviewProps> = ({
       <span className="w-2" />
       <span className="flex-1">{head('title', 'Project')}</span>
       <span className="hide-phone">{head('status', 'Status')}</span>
+      <span className="hide-phone w-20 text-right">Active</span>
       <span className="w-8 text-center">{head('priority', 'Pri')}</span>
       <span className="w-10 flex justify-end">{head('progress', 'Done')}</span>
     </div>
@@ -144,7 +150,7 @@ export const VaultOverview: React.FC<VaultOverviewProps> = ({
           </div>
           <div className="focus-grid mt-3">
             {active.map((p) => (
-              <ActiveCard key={p.id} project={p} onOpen={() => onSelectProject(p)} />
+              <ActiveCard key={p.id} project={p} activity={activity[p.id]} onOpen={() => onSelectProject(p)} />
             ))}
           </div>
         </section>
@@ -162,7 +168,7 @@ export const VaultOverview: React.FC<VaultOverviewProps> = ({
           <div className="mt-1">
             {listHead}
             {next.map((p) => (
-              <Row key={p.id} project={p} onOpen={() => onSelectProject(p)} />
+              <Row key={p.id} project={p} activity={activity[p.id]} onOpen={() => onSelectProject(p)} />
             ))}
           </div>
         </section>
@@ -184,7 +190,7 @@ export const VaultOverview: React.FC<VaultOverviewProps> = ({
             <div className="mt-1">
               {listHead}
               {shipped.map((p) => (
-                <Row key={p.id} project={p} onOpen={() => onSelectProject(p)} />
+                <Row key={p.id} project={p} activity={activity[p.id]} onOpen={() => onSelectProject(p)} />
               ))}
             </div>
           )}

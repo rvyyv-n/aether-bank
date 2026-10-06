@@ -1333,3 +1333,89 @@ a:focus-visible, [tabindex="0"]:focus-visible {
 .sort-head[aria-pressed="true"] {
   color: var(--fg);
 }
+
+/* Repo and activity line, shown on project cards and the project page */
+.repo-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  font-size: 12px;
+  color: var(--fg-3);
+}
+
+.repo-line > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.repo-line .warn {
+  color: #d4a373;
+}
+
+:root[data-theme="light"] .repo-line .warn {
+  color: #8a5a1e;
+}
+
+/* Project page: editor on the left, repo and activity beside it */
+.project-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  gap: 40px;
+  align-items: start;
+}
+
+.project-rail {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (max-width: 1023px) {
+  .project-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .project-rail {
+    position: static;
+  }
+}
+
+.rail-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 14px;
+  margin: 12px 0 0;
+  font-size: 13px;
+}
+
+.rail-facts dt {
+  color: var(--fg-3);
+}
+
+.rail-facts dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--fg);
+  overflow-wrap: anywhere;
+}
+
+/* Status colours: lighter on dark, deeper on light so the dots stay readable */
+:root {
+  --st-backlog: #77716c;
+  --st-planned: #8fa3b8;
+  --st-spike: #d4a373;
+  --st-in_progress: #8fae8b;
+  --st-polishing: #7fadad;
+}
+
+:root[data-theme="light"] {
+  --st-backlog: #77716c;
+  --st-planned: #55728f;
+  --st-spike: #a0651a;
+  --st-in_progress: #4d7a48;
+  --st-polishing: #3f7a7a;
+}

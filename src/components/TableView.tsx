@@ -5,17 +5,20 @@ import {
   Copy,
   Check
 } from 'lucide-react';
-import { StatusDot, StatusOptions, PriorityBadge, ProgressBar, SortHead } from './ui';
+import { StatusDot, StatusOptions, PriorityBadge, ProgressBar, SortHead, RepoLine } from './ui';
+import type { ActivityMap } from '../data/repos';
 import { progressOf } from '../data/status';
 
 interface TableViewProps extends SortProps {
   projects: ProjectIdea[];
+  activity: ActivityMap;
   onSelectProject: (project: ProjectIdea) => void;
   onUpdateStatus: (projectId: string, newStatus: ProjectStatus) => void;
 }
 
 export const TableView: React.FC<TableViewProps> = ({
   projects,
+  activity,
   onSelectProject,
   onUpdateStatus,
   sortBy,
@@ -108,7 +111,7 @@ export const TableView: React.FC<TableViewProps> = ({
           <tbody className="divide-y divide-[var(--line)] font-normal">
             {projects.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-12 text-center text-xs text-[var(--fg-3)] font-mono">
+                <td colSpan={7} className="py-12 text-center text-xs text-[var(--fg-3)] font-mono">
                   No projects matching active filters.
                 </td>
               </tr>
@@ -141,6 +144,7 @@ export const TableView: React.FC<TableViewProps> = ({
                       <div className="text-[12px] text-[var(--fg-2)] truncate max-w-sm mt-0.5">
                         {project.subtitle}
                       </div>
+                      <RepoLine activity={activity[project.id]} className="mt-1" />
                     </td>
 
                     {/* Status with dot */}
@@ -195,7 +199,7 @@ export const TableView: React.FC<TableViewProps> = ({
                           <Terminal className="h-3 w-3 opacity-60" />
                           <span className="truncate max-w-[120px]">{primaryCommand.cmd}</span>
                           {copiedId === `tbl-cmd-${project.id}` ? (
-                            <Check className="h-3 w-3 text-emerald-500" />
+                            <Check className="h-3 w-3 text-[var(--accent)]" />
                           ) : (
                             <Copy className="h-3 w-3 opacity-40" />
                           )}
