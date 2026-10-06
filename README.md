@@ -15,7 +15,7 @@ A local-first developer workbench for tracking software tools, technical specifi
 </div>
 
 <a href="https://rvyyv-n.github.io/banker/">
-  <img src="screenshots/banker-oled-dark.png" alt="Banker Kanban Board in OLED Dark mode" width="100%" />
+  <img src="screenshots/banker-oled-dark.png" alt="Banker overview in dark mode" width="100%" />
 </a>
 
 ## Contents
@@ -35,9 +35,14 @@ Banker provides a single place to track software tools through their entire
 lifecycle: from initial spark and architectural spike through execution,
 polishing, and release.
 
-- **Fast stage progression.** Move projects through six distinct phases
-  (*Backlog*, *Planned*, *Exploring*, *In Progress*, *Polishing*, and
-  *Shipped*) with one-click navigation arrows.
+- **Six stages.** Move projects through *Backlog*, *Planned*, *Exploring*,
+  *In Progress*, *Polishing* and *Shipped* from the table or the project page.
+- **Git-aware cards.** Projects with a repo path show their branch, uncommitted
+  files, unpushed commits and how long since the last commit or coding session.
+  Read locally by the server, never sent anywhere.
+- **Themes.** Four accent themes in dark and light, switched from the palette
+  menu or the command palette. Text and status colours are contrast-tested.
+- **Sortable everywhere.** Click any column or section head to sort, again to flip.
 - **Checklists with live progress.** Every project tracks its milestones,
   updating progress meters in real time.
 - **Specs and decisions.** Keep problem statements, architectural rationale,
@@ -49,20 +54,20 @@ polishing, and release.
 - **Token usage across your tools.** A Usage page reads your local Claude Code
   and Antigravity logs and shows tokens, messages and estimated spend by model,
   harness and project.
-- **Built for phones.** Bottom navigation, a swipeable board, and card lists.
+- **Built for phones.** Bottom navigation and card lists.
 - **Zero data loss.** Everything syncs to browser storage instantly, with
   one-click JSON export for backups and cross-machine handoffs.
 
 ## Views
 
-### Board
+### Overview
 
-The default high-level view. Six stages organize active work across a fluid
-full-width grid with task completion meters, tech stack tags, next milestone
-previews, dev command shortcuts, and priority badges.
+The default view. Active work (in progress and polishing) is shown as cards with
+progress, the next unfinished milestone, tech stack, a copyable dev command and
+repo status. Queued projects follow as a sortable list, and shipped ones fold away.
 
 <a href="https://rvyyv-n.github.io/banker/">
-  <img src="screenshots/banker-oled-dark.png" alt="Banker Kanban board" width="100%" />
+  <img src="screenshots/banker-oled-dark.png" alt="Banker overview" width="100%" />
 </a>
 
 ### Table
@@ -75,14 +80,19 @@ in one click, and update project stages inline.
   <img src="screenshots/banker-table.png" alt="Banker Table view" width="100%" />
 </a>
 
-### Project drawer
+### Project drawer and page
 
 Clicking any card opens a slide-over panel with the full technical specification,
 interactive milestone checklists, linked workspaces, terminal commands, and an
-editable scratchpad.
+editable scratchpad. The expand button opens the same editor as a full page, with
+progress, repo details and activity beside it.
 
 <a href="https://rvyyv-n.github.io/banker/">
   <img src="screenshots/banker-drawer.png" alt="Banker project detail drawer" width="100%" />
+</a>
+
+<a href="https://rvyyv-n.github.io/banker/">
+  <img src="screenshots/banker-project-page.png" alt="Banker project page" width="100%" />
 </a>
 
 ### Analytics
@@ -110,7 +120,8 @@ the numbers come from.
 ### Light mode
 
 Crisp, paper-like neutral styling with stark typography. Press <kbd>T</kbd>
-anywhere or tap the sun/moon icon to switch between OLED Dark and Light mode.
+anywhere or tap the sun/moon icon to switch between OLED Dark and Light mode. The
+palette menu in the header changes the accent colour.
 
 <a href="https://rvyyv-n.github.io/banker/">
   <img src="screenshots/banker-light-mode.png" alt="Banker in crisp light mode" width="100%" />
@@ -118,9 +129,8 @@ anywhere or tap the sun/moon icon to switch between OLED Dark and Light mode.
 
 ### Mobile
 
-Built for one-handed use. A bottom tab bar switches sections, the board scrolls
-sideways one column at a time, the table becomes a list of cards, and filters open
-as a full-screen sheet. Tap targets are at least 40px.
+Built for one-handed use. A bottom tab bar switches sections, the table becomes a
+list of cards, and filters open as a full-screen sheet. Tap targets are at least 40px.
 
 <p align="center">
   <a href="https://rvyyv-n.github.io/banker/">
@@ -156,6 +166,7 @@ To run Banker on your local machine and point it to your repositories:
 3. **Managing your projects**:
    - **Through the UI**: Use the `+` button (or press <kbd>N</kbd>) to add your own local projects with their directory paths and dev commands.
    - **Pre-seeding via code**: Edit `src/data/initialData.ts` to define your own default catalog of repositories and initial milestones.
+   - **Repo status**: set a project's repo path (relative to a folder above this one, or a full path inside your code folders) to see its branch and activity. Set `BANKER_ROOT` to your code folders, separated by `;` on Windows, to change where paths resolve.
    - **Backups & Sync**: Use **Export** in the header to save a `banker-vault.json` snapshot of your project state anytime.
 
 ## Token usage
@@ -208,6 +219,9 @@ src/
   index.css               pure OLED dark (#000000) and paper light CSS tokens
   data/
     initialData.ts        initial project catalog and milestone seeds
+    status.ts             stages, priorities, progress helpers and status colours
+    accents.ts            accent theme list
+    repos.ts              fetches repo status and last activity for projects
     usage.ts              usage types, providers and sample data
   components/
     Header.tsx            Slopalytics-style navigation header with section & view tabs
@@ -215,7 +229,9 @@ src/
     BankerLogo.tsx        three stacked ledger bars mark
     MobileNav.tsx         bottom tab bar for phones
     UsageView.tsx         token usage by model, harness and project
-    KanbanBoard.tsx       six-column stage board with dev shortcuts & milestones
+    VaultOverview.tsx     active cards, sortable queue and shipped list
+    ProjectBody.tsx       editable project fields shared by the drawer and page
+    ProjectPage.tsx       full-page project view with repo and activity rail
     TableView.tsx         high-density developer data grid with 1-click command & path copy
     RoadmapView.tsx       four-phase ecosystem execution timeline
     AnalyticsView.tsx     Slopalytics-style velocity, distribution, and tech stack intelligence
@@ -223,6 +239,9 @@ src/
     NewProjectModal.tsx   fast idea capture modal
 screenshots/              retina edge-to-edge screenshots of views and mobile layout
 scripts/
+  repo-status.cjs         read-only git status and last activity for project folders
+  e2e.cjs                 end-to-end and contrast checks
+  host.cjs                background server for npm run host
   usage-collector.cjs     scans local Claude Code and Antigravity logs for token usage
 capture.cjs               automated headless Chrome screenshot capture script
 server.cjs                standalone local server for the built app and /usage.json
@@ -244,7 +263,7 @@ Open the address Vite prints (default `http://localhost:3333`).
 | `npm run dev`         | Start the Vite dev server with hot module reloading          |
 | `npm run build`       | Typecheck and build the production bundle to `dist/`         |
 | `npm run check`       | Lint, typecheck and build (what CI runs)                     |
-| `npm run test:e2e`    | Build, start the server on a free port, check every section on desktop and phone in headless Chrome, then stop |
+| `npm run test:e2e`    | Build, start the server on a free port, check every section on desktop and phone in headless Chrome, test theme contrast, then stop |
 | `npm run preview`     | Preview the production build locally with Vite               |
 | `npm run serve`       | Serve `dist/` and live usage on port 3333, reachable on your LAN |
 | `npm run host`        | Build and run the same server in the background; prints local and LAN URLs and returns |
@@ -262,8 +281,8 @@ system temp folder.
 | <kbd>N</kbd>       | Open the new project modal          |
 | <kbd>T</kbd>       | Toggle between OLED dark and light  |
 | <kbd>/</kbd>       | Focus the search filter             |
-| <kbd>1</kbd>       | Switch to the Kanban board          |
-| <kbd>2</kbd>       | Switch to the CRM table view        |
+| <kbd>1</kbd>       | Switch to the overview              |
+| <kbd>2</kbd>       | Switch to the table                 |
 | <kbd>3</kbd>       | Switch to the Roadmap view          |
 | <kbd>4</kbd>       | Switch to the Analytics view        |
 | <kbd>5</kbd>       | Switch to the Usage view            |

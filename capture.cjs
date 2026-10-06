@@ -56,7 +56,7 @@ async function capture() {
     console.log('Captured banker-oled-dark.png');
 
     // 2. Open Project Drawer in OLED Dark
-    const card = await page.$('.slop-card');
+    const card = await page.$('.focus-card');
     if (card) {
       await card.click();
       await new Promise(r => setTimeout(r, 600));
@@ -64,6 +64,14 @@ async function capture() {
       await page.screenshot({ path: drawerPath });
       copyToArtifact(drawerPath, 'banker-drawer.png');
       console.log('Captured banker-drawer.png');
+
+      // Same project as a full page
+      await page.evaluate(() => document.querySelector('[aria-label="Open as a page"]')?.click());
+      await new Promise(r => setTimeout(r, 600));
+      const pagePath = path.join(OUT_DIR, 'banker-project-page.png');
+      await page.screenshot({ path: pagePath });
+      copyToArtifact(pagePath, 'banker-project-page.png');
+      console.log('Captured banker-project-page.png');
 
       await page.keyboard.press('Escape');
       await new Promise(r => setTimeout(r, 400));
