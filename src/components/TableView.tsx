@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { StatusDot, StatusOptions, PriorityBadge, ProgressBar, SortHead, RepoLine, CategoryTag } from './ui';
 import type { ActivityMap } from '../data/repos';
+import { TechIcons } from './TechIcons';
 import { progressOf } from '../data/status';
 
 interface TableViewProps extends SortProps {
@@ -172,12 +173,7 @@ export const TableView: React.FC<TableViewProps> = ({
 
                     {/* Tech Stack */}
                     <td className="py-3 pr-4 align-middle">
-                      <div className="text-[12px] text-[var(--fg-2)] max-w-[260px] leading-snug line-clamp-2" title={project.techStack.join(', ')}>
-                        {project.techStack.slice(0, 3).join(', ')}
-                        {project.techStack.length > 3 && (
-                          <span className="text-[var(--fg-3)]"> +{project.techStack.length - 3}</span>
-                        )}
-                      </div>
+                      <TechIcons techs={project.techStack} />
                     </td>
 
                     {/* Dev Command */}

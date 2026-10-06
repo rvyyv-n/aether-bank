@@ -4,6 +4,7 @@ import { Check, Copy } from 'lucide-react';
 import { StatusDot, PriorityBadge, ProgressBar, RepoLine, CategoryTag } from './ui';
 import { STATUS_META, progressOf } from '../data/status';
 import type { Activity } from '../data/repos';
+import { TechIcons } from './TechIcons';
 
 interface ProjectCardProps {
   project: ProjectIdea;
@@ -66,7 +67,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, activity, onO
       {!compact && (
         <>
           <div className="mt-4 flex items-center gap-3 text-[12px] text-[var(--fg-3)]">
-            <span className="truncate">{project.techStack.slice(0, 3).join(', ')}</span>
+            <TechIcons techs={project.techStack} max={7} />
             {cmd && (
               <button className="ml-auto flex items-center gap-1.5 hover:text-[var(--fg)] shrink-0" onClick={copy} title={`Copy: ${cmd}`}>
                 <span className="font-mono truncate max-w-[9rem]">{cmd}</span>
