@@ -172,7 +172,7 @@ export const TableView: React.FC<TableViewProps> = ({
 
                     {/* Tech Stack */}
                     <td className="py-3 pr-4 align-middle">
-                      <div className="text-[12px] text-[var(--fg-2)] max-w-[220px] truncate">
+                      <div className="text-[12px] text-[var(--fg-2)] max-w-[260px] leading-snug line-clamp-2" title={project.techStack.join(', ')}>
                         {project.techStack.slice(0, 3).join(', ')}
                         {project.techStack.length > 3 && (
                           <span className="text-[var(--fg-3)]"> +{project.techStack.length - 3}</span>
