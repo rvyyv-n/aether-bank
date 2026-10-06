@@ -8,10 +8,7 @@ import {
   SlidersHorizontal,
   LayoutGrid,
   Table2,
-  TrendingUp,
-  Compass,
   ArrowUpDown,
-  Gauge,
   Search
 } from 'lucide-react';
 import type { ProjectIdea } from '../types';
@@ -98,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
       </nav>
 
-      {/* View Sub-tabs with Slopalytics active underline */}
+      {/* Board / table switch; the other sections carry their own controls */}
       <nav className="view-tabs" aria-label="Sub views">
         {activeSection === 'vault' && (
           <>
@@ -117,14 +114,14 @@ export const Header: React.FC<HeaderProps> = ({
               Table
             </button>
             <span className="tab-divider" aria-hidden="true" />
-            <span className="text-[11px] font-mono text-[var(--fg-3)] hidden sm:inline">
+            <span className="text-[11px] tabular-nums text-[var(--fg-3)] hidden sm:inline">
               {filteredCount === projects.length ? `${projects.length} ideas` : `${filteredCount}/${projects.length}`}
             </span>
             <div className="flex items-center gap-1.5 text-xs text-[var(--fg-3)]">
               <ArrowUpDown className="h-3 w-3" />
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as HeaderProps['sortBy'])}
                 className="bg-transparent border-0 text-[11.5px] text-[var(--fg-2)] hover:text-[var(--fg)] cursor-pointer focus:outline-none"
               >
                 <option value="priority" className="bg-[var(--surface)] text-[var(--fg)]">Sort: Priority</option>
@@ -137,44 +134,6 @@ export const Header: React.FC<HeaderProps> = ({
           </>
         )}
 
-        {activeSection === 'roadmap' && (
-          <>
-            <button className="active">
-              <Compass className="h-3.5 w-3.5 mr-1.5 opacity-70" />
-              Phases
-            </button>
-            <span className="tab-divider" aria-hidden="true" />
-            <span className="text-xs text-[var(--fg-3)] flex items-center font-mono">
-              4 tracks
-            </span>
-          </>
-        )}
-
-        {activeSection === 'usage' && (
-          <>
-            <button className="active">
-              <Gauge className="h-3.5 w-3.5 mr-1.5 opacity-70" />
-              Tokens
-            </button>
-            <span className="tab-divider" aria-hidden="true" />
-            <span className="text-xs text-[var(--fg-3)] flex items-center font-mono">
-              by provider &amp; model
-            </span>
-          </>
-        )}
-
-        {activeSection === 'analytics' && (
-          <>
-            <button className="active">
-              <TrendingUp className="h-3.5 w-3.5 mr-1.5 opacity-70" />
-              Progress
-            </button>
-            <span className="tab-divider" aria-hidden="true" />
-            <span className="text-xs text-[var(--fg-3)] flex items-center font-mono">
-              {projects.length} Tracked Projects
-            </span>
-          </>
-        )}
       </nav>
 
       {/* Header Actions */}
@@ -230,7 +189,7 @@ export const Header: React.FC<HeaderProps> = ({
           className="btn-accent cursor-pointer ml-1 max-md:h-9 max-md:w-9 max-md:justify-center max-md:!p-0"
         >
           <Plus className="h-3.5 w-3.5" />
-          <span className="max-md:hidden">New Idea</span>
+          <span className="max-md:hidden">New idea</span>
         </button>
 
         {/* Mobile Filter Toggle */}

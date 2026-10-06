@@ -25,7 +25,7 @@ interface UsageRow {
 
 interface UsagePayload {
   generatedAt: string;
-  sources: { claudeFiles: number; antigravityConversations: number };
+  sources: Record<string, number>; // harness -> log files found
   rows: UsageRow[];
 }
 
@@ -47,9 +47,10 @@ const FAMILIES: Record<string, string[]> = {
 const GENERIC = ['#e08a6b', '#4ade80', '#a78bfa', '#60a5fa', '#f59e0b', '#f472b6', '#2dd4bf', '#a3a3a3'];
 const OTHER_COLOR = '#57534e';
 
-const tokensOf = (r: UsageRow) => r.in + r.out + r.cw;
-const valueOf = (r: UsageRow, m: Metric) =>
-  m === 'tokens' ? tokensOf(r) : m === 'msgs' ? r.msgs : r.cost ?? 0;
+// Cache reads are re-read context, so they're left out unless asked for
+const tokensOf = (r: UsageRow, withCache = false) => r.in + r.out + r.cw + (withCache ? r.cr : 0);
+const valueOf = (r: UsageRow, m: Metric, withCache: boolean) =>
+  m === 'tokens' ? tokensOf(r, withCache) : m === 'msgs' ? r.msgs : r.cost ?? 0;
 
 const fmtNum = (n: number) =>
   n >= 1e9 ? `${(n / 1e9).toFixed(2)}B`
@@ -95,6 +96,7 @@ export const UsageView: React.FC = () => {
   const [range, setRange] = useState<number>(30);
   const [scrub, setScrub] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [withCache, setWithCache] = useState(false);
   const [form, setForm] = useState({
     date: dayKey(now),
     provider: 'anthropic' as Provider,
@@ -159,19 +161,19 @@ export const UsageView: React.FC = () => {
 
     for (const r of allRows) {
       const k = keyOf(r);
-      const v = valueOf(r, metric);
+      const v = valueOf(r, metric, withCache);
       if (inWin.has(r.d)) {
         totals.set(k, (totals.get(k) ?? 0) + v);
         providerOf.set(k, r.p);
         const day = perDay.get(r.d) ?? new Map<string, number>();
         day.set(k, (day.get(k) ?? 0) + v);
         perDay.set(r.d, day);
-        tokens += tokensOf(r);
+        tokens += tokensOf(r, withCache);
         input += r.in;
         output += r.out;
         cached += r.cr;
         msgs += r.msgs;
-        if (r.cost == null) unpriced += tokensOf(r);
+        if (r.cost == null) unpriced += tokensOf(r, withCache);
         else spend += r.cost;
       } else if (inPrev.has(r.d)) {
         prevTotals.set(k, (prevTotals.get(k) ?? 0) + v);
@@ -228,7 +230,7 @@ export const UsageView: React.FC = () => {
     }));
 
     return { series, rows, grand, tokens, input, output, cached, msgs, spend, unpriced, hasPrev: prevGrand > 0 };
-  }, [allRows, days, prevDays, metric, dimension]);
+  }, [allRows, days, prevDays, metric, dimension, withCache]);
 
   // ---- chart geometry ----
   const W = 360;
@@ -306,102 +308,101 @@ export const UsageView: React.FC = () => {
     setForm((f) => ({ ...f, inputTokens: '', outputTokens: '' }));
   };
 
-  const tab = (active: boolean) =>
-    `px-0.5 py-2 text-[13px] border-b-2 transition cursor-pointer whitespace-nowrap ${
-      active ? 'text-[var(--fg)] border-[var(--accent)] font-medium' : 'text-[var(--fg-3)] border-transparent hover:text-[var(--fg-2)]'
-    }`;
-  const inputCls =
-    'w-full bg-[var(--bg)] border border-[var(--line)] rounded-md px-2 py-1.5 text-xs text-[var(--fg)] focus:outline-none focus:border-[var(--accent)]';
-  const labelCls = 'block text-[var(--fg-3)] font-mono text-[10.5px] uppercase mb-1';
-  const cardLabel = 'text-[11px] font-mono text-[var(--fg-3)] uppercase tracking-wider';
+  const inputCls = 'field';
+  const labelCls = 'field-label';
   const metricNoun = metric === 'tokens' ? 'tokens' : metric === 'msgs' ? 'messages' : 'est. spend';
   const dimNoun = dimension === 'model' ? 'models' : dimension === 'harness' ? 'harnesses' : 'projects';
   const updated = live
     ? new Date(live.generatedAt).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
     : null;
+  const sources = live ? Object.entries(live.sources).sort((a, b) => b[1] - a[1]) : [];
+  const seg = <T extends string | number>(value: T, current: T, set: (v: T) => void, label: string) => (
+    <button key={String(value)} aria-pressed={value === current} onClick={() => set(value)}>
+      {label}
+    </button>
+  );
 
   return (
-    <div className="sm:p-6 max-w-5xl mx-auto space-y-5">
-      {/* Title */}
-      <div className="flex items-start justify-between gap-4">
+    <div className="page">
+      <div className="page-head">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-[var(--fg)] m-0">
-            {dimension === 'model' ? 'Model' : dimension === 'harness' ? 'Harness' : 'Project'} usage
+          <h1>
+            Usage
+            <span>{fmtMetric(analysis.grand, metric)} {metricNoun}</span>
           </h1>
-          <p className="text-xs text-[var(--fg-3)] mt-1 m-0">
+          <p>
             {liveState === 'ok' && live
-              ? `from local logs: ${live.sources.claudeFiles} Claude Code sessions, ${live.sources.antigravityConversations} Antigravity conversations`
+              ? `Read from local logs on this machine${updated ? `, updated ${updated}` : ''}`
               : liveState === 'loading'
-                ? 'reading local logs…'
-                : 'sample data. Local usage is only available when served by the Banker server.'}
+                ? 'Reading local logs…'
+                : 'Showing sample data. Local usage is only available when served by the Banker server.'}
           </p>
         </div>
-        {updated && <div className="text-[11px] text-[var(--fg-3)] text-right shrink-0">Updated {updated}</div>}
-      </div>
-
-      {/* Metric tabs */}
-      <div className="flex gap-6 border-b border-[var(--line)] overflow-x-auto">
-        {([['tokens', 'Tokens'], ['msgs', 'Messages'], ['spend', 'Est. spend']] as const).map(([id, label]) => (
-          <button key={id} onClick={() => setMetric(id)} className={tab(metric === id)}>{label}</button>
-        ))}
-      </div>
-
-      {/* Range / mode / dimension */}
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-[var(--line)]">
-        {RANGES.map((r) => (
-          <button key={r} onClick={() => setRange(r)} className={tab(range === r)}>{r === 0 ? 'All' : `${r} days`}</button>
-        ))}
-        <span className="hidden sm:block w-px h-4 bg-[var(--line-2)]" />
-        <button onClick={() => setMode('share')} className={tab(mode === 'share')}>Share</button>
-        <button onClick={() => setMode('volume')} className={tab(mode === 'volume')}>Volume</button>
-        <div className="sm:ml-auto flex gap-4 w-full sm:w-auto border-t sm:border-t-0 border-[var(--line)] sm:border-0">
-          {([['model', 'Models'], ['harness', 'Harnesses'], ['project', 'Projects']] as const).map(([id, label]) => (
-            <button key={id} onClick={() => setDimension(id)} className={tab(dimension === id)}>{label}</button>
-          ))}
+        <div className="seg">
+          {([['tokens', 'Tokens'], ['msgs', 'Messages'], ['spend', 'Est. spend']] as const).map(([id, label]) =>
+            seg<Metric>(id, metric, setMetric, label)
+          )}
         </div>
       </div>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <div className="slop-card p-3.5">
-          <div className={cardLabel}>Tokens</div>
-          <div className="text-xl font-semibold mt-1 tracking-tight text-[var(--accent)]">{fmtNum(analysis.tokens)}</div>
-          <div className="text-[11px] text-[var(--fg-3)] mt-0.5">{fmtNum(analysis.input)} in · {fmtNum(analysis.output)} out</div>
+      <div className="toolbar">
+        <div className="seg">
+          {RANGES.map((r) => seg<number>(r, range, setRange, r === 0 ? 'All time' : `${r} days`))}
         </div>
-        <div className="slop-card p-3.5">
-          <div className={cardLabel}>Cache reads</div>
-          <div className="text-xl font-semibold mt-1 tracking-tight text-[var(--fg)]">{fmtNum(analysis.cached)}</div>
-          <div className="text-[11px] text-[var(--fg-3)] mt-0.5">re-read context</div>
+        <span className="seg-sep hide-phone" />
+        <div className="seg">
+          {seg<Mode>('share', mode, setMode, 'Share')}
+          {seg<Mode>('volume', mode, setMode, 'Volume')}
         </div>
-        <div className="slop-card p-3.5">
-          <div className={cardLabel}>Messages</div>
-          <div className="text-xl font-semibold mt-1 tracking-tight text-[var(--fg)]">{fmtNum(analysis.msgs)}</div>
-          <div className="text-[11px] text-[var(--fg-3)] mt-0.5">{fmtNum(analysis.msgs / days.length)} / day</div>
+        <div className="seg sm:ml-auto">
+          {([['model', 'Models'], ['harness', 'Harnesses'], ['project', 'Projects']] as const).map(([id, label]) =>
+            seg<Dimension>(id, dimension, setDimension, label)
+          )}
         </div>
-        <div className="slop-card p-3.5">
-          <div className={cardLabel}>Est. spend</div>
-          <div className="text-xl font-semibold mt-1 tracking-tight text-[var(--fg)]">{analysis.spend > 0 ? fmtMoney(analysis.spend) : "—"}</div>
-          <div className="text-[11px] text-[var(--fg-3)] mt-0.5">
-            {analysis.spend === 0 ? 'no price data' : analysis.unpriced > 0 ? `excl. ${fmtNum(analysis.unpriced)} unpriced` : 'list prices'}
-          </div>
+      </div>
+
+      <div className="stats">
+        <div className="stat">
+          <span>Tokens</span>
+          <strong className="text-[var(--accent)]">{fmtNum(analysis.tokens)}</strong>
+          <small>{fmtNum(analysis.input)} in · {fmtNum(analysis.output)} out</small>
+        </div>
+        <div className="stat">
+          <span>Cache reads</span>
+          <strong>{fmtNum(analysis.cached)}</strong>
+          <small>
+            <button className="text-button text-[10.5px]" onClick={() => setWithCache((c) => !c)}>
+              {withCache ? 'Counted in tokens' : 'Not in tokens. Count them'}
+            </button>
+          </small>
+        </div>
+        <div className="stat">
+          <span>Messages</span>
+          <strong>{fmtNum(analysis.msgs)}</strong>
+          <small>{fmtNum(analysis.msgs / days.length)} a day</small>
+        </div>
+        <div className="stat">
+          <span>Est. spend</span>
+          <strong>{analysis.spend > 0 ? fmtMoney(analysis.spend) : '–'}</strong>
+          <small>
+            {analysis.spend === 0 ? 'No price data' : analysis.unpriced > 0 ? `Excl. ${fmtNum(analysis.unpriced)} unpriced` : 'At list prices'}
+          </small>
         </div>
       </div>
 
       {/* Chart */}
-      <div>
-        <div className="flex justify-between gap-3 text-[11px] text-[var(--fg-3)] mb-2">
-          <span>
-            {fmtMetric(analysis.grand, metric)} {metricNoun} · {mode === 'share' ? `daily share of ${dimNoun}` : `daily ${metricNoun}`}
-          </span>
-          <span className="shrink-0">{days[0].slice(5)} – {days[n - 1].slice(5)} · UTC</span>
+      <section>
+        <div className="section-head">
+          <h3>{mode === 'share' ? `Daily share of ${dimNoun}` : `Daily ${metricNoun}`}</h3>
+          <span className="hint">{days[0].slice(5)} – {days[n - 1].slice(5)} · UTC</span>
         </div>
         {analysis.grand === 0 ? (
-          <div className="h-48 flex items-center justify-center text-xs font-mono text-[var(--fg-3)] border border-dashed border-[var(--line)] rounded-md">
+          <div className="h-48 flex items-center justify-center side-note border border-dashed border-[var(--line)] rounded-md mt-2">
             {liveState === 'loading' ? 'Loading…' : 'No usage in this range.'}
           </div>
         ) : (
-          <div className="flex gap-2">
-            <div className="flex flex-col justify-between text-[10px] font-mono text-[var(--fg-3)] text-right w-9 shrink-0 py-0.5" style={{ height: H }}>
+          <div className="flex gap-2 mt-2">
+            <div className="flex flex-col justify-between text-[10px] text-[var(--fg-3)] tabular-nums text-right w-9 shrink-0 py-0.5" style={{ height: H }}>
               {yTicks.map((t, i) => <span key={i}>{t}</span>)}
             </div>
             <div className="flex-1 min-w-0 relative">
@@ -425,20 +426,20 @@ export const UsageView: React.FC = () => {
               </svg>
               {scrub != null && scrubDay && (
                 <div
-                  className="absolute top-1 z-10 rounded-md border border-[var(--line-2)] bg-[var(--surface)] px-2.5 py-1.5 text-[11px] pointer-events-none shadow-lg"
+                  className="absolute top-1 z-10 rounded-lg border border-[var(--line-2)] bg-[var(--surface)] px-2.5 py-1.5 text-[11px] pointer-events-none shadow-lg"
                   style={{ left: `${(xAt(scrub) / W) * 100}%`, transform: `translateX(${scrub > n / 2 ? '-105%' : '5%'})` }}
                 >
-                  <div className="font-mono text-[var(--fg-3)] mb-1">{scrubDay}</div>
+                  <div className="text-[var(--fg-3)] tabular-nums mb-1">{scrubDay}</div>
                   {scrubItems.map((x) => (
                     <div key={x.key} className="flex items-center gap-1.5 text-[var(--fg)]">
                       <span className="w-2 h-2 rounded-sm shrink-0" style={{ background: x.color }} />
                       <span className="truncate max-w-[110px]">{x.key}</span>
-                      <span className="font-mono text-[var(--fg-2)] ml-auto pl-2">{fmtMetric(x.v, metric)}</span>
+                      <span className="tabular-nums text-[var(--fg-2)] ml-auto pl-2">{fmtMetric(x.v, metric)}</span>
                     </div>
                   ))}
                 </div>
               )}
-              <div className="flex justify-between text-[10px] font-mono text-[var(--fg-3)] mt-1.5">
+              <div className="flex justify-between text-[10px] tabular-nums text-[var(--fg-3)] mt-1.5">
                 <span>{days[0].slice(5)}</span>
                 <span>{days[Math.floor((n - 1) / 2)].slice(5)}</span>
                 <span>{days[n - 1].slice(5)}</span>
@@ -446,109 +447,126 @@ export const UsageView: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
+      </section>
 
-      {/* Ranked table */}
-      <div>
-        <div className="grid grid-cols-[1.5rem_1fr_4.5rem_4.5rem] gap-x-2 text-[11px] text-[var(--fg-3)] pb-2 border-b border-[var(--line)]">
+      {/* Ranking */}
+      <section>
+        <div className="rank-row rank-head">
           <span />
-          <span>{range === 0 ? 'All-time' : `${range}-day`} averages</span>
-          <span className="text-right">Per day</span>
-          <span className="text-right">Share</span>
+          <span>{range === 0 ? 'All-time' : `${range}-day`} ranking</span>
+          <span className="val">Per day</span>
+          <span className="val">Share</span>
         </div>
         {analysis.rows.map((r, i) => (
-          <div key={r.key} className="grid grid-cols-[1.5rem_1fr_4.5rem_4.5rem] gap-x-2 items-center py-3 border-b border-[var(--line)]">
-            <span className="text-[11px] font-mono text-[var(--fg-3)]">{i + 1}</span>
+          <div key={r.key} className="rank-row">
+            <span className="num">{i + 1}</span>
             <div className="min-w-0">
-              <div className="text-sm truncate" style={{ color: r.color }}>{r.key}</div>
-              <div
-                className="h-[3px] rounded-full mt-1.5"
-                style={{ background: r.color, width: `${Math.max(6, (r.value / analysis.rows[0].value) * 100)}%` }}
-              />
+              <div className="truncate">{r.key}</div>
+              <div className="rank-bar" style={{ background: r.color, width: `${Math.max(4, (r.value / analysis.rows[0].value) * 100)}%` }} />
             </div>
-            <span className="text-right text-sm font-mono text-[var(--fg)]">{fmtMetric(r.perDay, metric)}</span>
-            <div className="text-right">
-              <div className="text-sm font-mono text-[var(--fg)]">{r.share.toFixed(1)}%</div>
+            <span className="val">{fmtMetric(r.perDay, metric)}</span>
+            <span className="val">
+              {r.share.toFixed(1)}%
               {analysis.hasPrev && r.delta != null && (
-                <div className="text-[10px] font-mono text-[var(--fg-3)]">{r.delta >= 0 ? '+' : '−'}{Math.abs(r.delta).toFixed(1)}pp</div>
+                <small>{r.delta >= 0 ? '+' : '−'}{Math.abs(r.delta).toFixed(1)}pp</small>
               )}
-            </div>
+            </span>
           </div>
         ))}
-        {analysis.rows.length === 0 && <p className="text-xs text-[var(--fg-3)] py-4 m-0">Nothing to rank yet.</p>}
-      </div>
+        {analysis.rows.length === 0 && <p className="side-note py-4">Nothing to rank yet.</p>}
+      </section>
 
-      {/* Manual log (for harnesses without local logs) */}
-      <div className="slop-card p-4 sm:p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-xs font-mono uppercase tracking-wider text-[var(--fg-3)] m-0">Manual entries</h3>
-            <p className="text-[11px] text-[var(--fg-3)] mt-1 m-0">For tools that don't leave local logs.</p>
+      <div className="grid gap-8 sm:grid-cols-2">
+        {/* What was scanned */}
+        <section>
+          <div className="section-head">
+            <h3>Sources</h3>
+            <span className="hint">log files found</span>
           </div>
-          <button onClick={() => setShowForm((s) => !s)} className="btn-accent cursor-pointer">
-            <Plus className="h-3.5 w-3.5" />
-            <span>Log usage</span>
-          </button>
-        </div>
-
-        {showForm && (
-          <form onSubmit={addEntry} className="grid grid-cols-2 sm:grid-cols-6 gap-3 mt-4">
-            <div>
-              <label className={labelCls}>Date</label>
-              <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className={inputCls} />
-            </div>
-            <div>
-              <label className={labelCls}>Provider</label>
-              <select
-                value={form.provider}
-                onChange={(e) => {
-                  const provider = e.target.value as Provider;
-                  setForm({ ...form, provider, model: PROVIDER_MODELS[provider][0] });
-                }}
-                className={inputCls}
-              >
-                {PROVIDERS.map((p) => (
-                  <option key={p.id} value={p.id}>{p.label}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className={labelCls}>Model</label>
-              <input list="usage-models" value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} className={inputCls} />
-              <datalist id="usage-models">
-                {PROVIDER_MODELS[form.provider].map((m) => (
-                  <option key={m} value={m} />
-                ))}
-              </datalist>
-            </div>
-            <div>
-              <label className={labelCls}>Input</label>
-              <input type="number" min="0" placeholder="0" value={form.inputTokens} onChange={(e) => setForm({ ...form, inputTokens: e.target.value })} className={inputCls} />
-            </div>
-            <div>
-              <label className={labelCls}>Output</label>
-              <input type="number" min="0" placeholder="0" value={form.outputTokens} onChange={(e) => setForm({ ...form, outputTokens: e.target.value })} className={inputCls} />
-            </div>
-            <div className="flex items-end">
-              <button type="submit" className="btn-accent cursor-pointer w-full justify-center">Add</button>
-            </div>
-          </form>
-        )}
-
-        {manual.length > 0 && (
-          <div className="mt-4 divide-y divide-[var(--line)]">
-            {manual.slice(0, 8).map((e) => (
-              <div key={e.id} className="flex items-center gap-3 py-2 text-xs">
-                <span className="font-mono text-[var(--fg-3)]">{e.date}</span>
-                <span className="text-[var(--fg)] truncate">{e.model}</span>
-                <span className="ml-auto font-mono text-[var(--fg-2)]">{fmtNum(e.inputTokens)} / {fmtNum(e.outputTokens)}</span>
-                <button onClick={() => saveManual(manual.filter((x) => x.id !== e.id))} className="text-[var(--fg-3)] hover:text-[var(--fg)] cursor-pointer" aria-label="Delete entry">
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
+          {sources.length > 0 ? (
+            sources.map(([name, files]) => (
+              <div key={name} className="flex items-center gap-3 py-2 border-t border-[var(--line)] text-[12.5px]">
+                <span className="flex-1 truncate text-[var(--fg)]">{name}</span>
+                <span className="row-count">{files}</span>
               </div>
-            ))}
+            ))
+          ) : (
+            <p className="side-note">{liveState === 'loading' ? 'Reading…' : 'No local logs found.'}</p>
+          )}
+          <p className="side-note mt-3 !text-[11px] !text-[var(--fg-3)]">
+            Every coding agent on this machine that keeps token counts in its local logs. Log the rest by hand.
+          </p>
+        </section>
+
+        {/* Manual log (for harnesses without local logs) */}
+        <section>
+          <div className="section-head">
+            <h3>Manual entries</h3>
+            <button onClick={() => setShowForm((s) => !s)} className="text-button inline-flex items-center gap-1">
+              <Plus className="h-3 w-3" />
+              {showForm ? 'Close' : 'Log usage'}
+            </button>
           </div>
-        )}
+
+          {showForm && (
+            <form onSubmit={addEntry} className="grid grid-cols-2 gap-3 py-3 border-t border-[var(--line)]">
+              <div>
+                <label className={labelCls}>Date</label>
+                <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className={inputCls} />
+              </div>
+              <div>
+                <label className={labelCls}>Provider</label>
+                <select
+                  value={form.provider}
+                  onChange={(e) => {
+                    const provider = e.target.value as Provider;
+                    setForm({ ...form, provider, model: PROVIDER_MODELS[provider][0] });
+                  }}
+                  className={inputCls}
+                >
+                  {PROVIDERS.map((p) => (
+                    <option key={p.id} value={p.id}>{p.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-span-2">
+                <label className={labelCls}>Model</label>
+                <input list="usage-models" value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} className={inputCls} />
+                <datalist id="usage-models">
+                  {PROVIDER_MODELS[form.provider].map((m) => (
+                    <option key={m} value={m} />
+                  ))}
+                </datalist>
+              </div>
+              <div>
+                <label className={labelCls}>Input tokens</label>
+                <input type="number" min="0" placeholder="0" value={form.inputTokens} onChange={(e) => setForm({ ...form, inputTokens: e.target.value })} className={inputCls} />
+              </div>
+              <div>
+                <label className={labelCls}>Output tokens</label>
+                <input type="number" min="0" placeholder="0" value={form.outputTokens} onChange={(e) => setForm({ ...form, outputTokens: e.target.value })} className={inputCls} />
+              </div>
+              <div className="col-span-2 flex justify-end">
+                <button type="submit" className="btn-accent cursor-pointer">Add entry</button>
+              </div>
+            </form>
+          )}
+
+          {manual.length > 0
+            ? manual.slice(0, 8).map((e) => (
+                <div key={e.id} className="edit-row flex items-center gap-3 py-2 border-t border-[var(--line)] text-[12.5px]">
+                  <span className="row-count">{e.date}</span>
+                  <span className="text-[var(--fg)] truncate">{e.model}</span>
+                  <span className="ml-auto row-count">{fmtNum(e.inputTokens)} / {fmtNum(e.outputTokens)}</span>
+                  <span className="row-actions">
+                    <button onClick={() => saveManual(manual.filter((x) => x.id !== e.id))} className="row-action" aria-label="Delete entry">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </span>
+                </div>
+              ))
+            : !showForm && <p className="side-note">None yet.</p>}
+        </section>
       </div>
     </div>
   );
