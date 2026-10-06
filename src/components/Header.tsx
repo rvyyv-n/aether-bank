@@ -62,7 +62,9 @@ export const Header: React.FC<HeaderProps> = ({
         aria-label="Banker home"
       >
         <BankerLogo size={20} className="flex-shrink-0 text-[var(--accent)]" />
-        <strong>Banker</strong>
+        <strong>
+          <span>Bank</span>er
+        </strong>
       </a>
 
       {/* Main Section Navigation Tabs (Slopalytics style) */}

@@ -1,21 +1,22 @@
 import React from 'react';
 import type { ProjectIdea, ProjectStatus, PriorityLevel } from '../types';
+import { Search, X } from 'lucide-react';
+import { STATUS_META, PRIORITY_META, progressOf } from '../data/status';
 import { StatusDot } from './ui';
-import { STATUS_META, progressOf } from '../data/status';
-import { Search, X, RotateCcw } from 'lucide-react';
 
 interface SidebarProps {
   projects: ProjectIdea[];
+  filteredProjects: ProjectIdea[];
   filteredCount: number;
   totalCount: number;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
-  selectedStatus: string;
-  setSelectedStatus: (status: string) => void;
-  selectedPriority: string;
-  setSelectedPriority: (p: string) => void;
-  selectedCategory: string;
-  setSelectedCategory: (cat: string) => void;
+  hiddenStatuses: ProjectStatus[];
+  setHiddenStatuses: (s: ProjectStatus[]) => void;
+  hiddenPriorities: PriorityLevel[];
+  setHiddenPriorities: (p: PriorityLevel[]) => void;
+  hiddenCategories: string[];
+  setHiddenCategories: (c: string[]) => void;
   selectedProjectId: string | null;
   onSelectProject: (project: ProjectIdea) => void;
   isOpenMobile: boolean;
@@ -30,18 +31,31 @@ const PRIORITIES: PriorityLevel[] = ['P0', 'P1', 'P2', 'P3'];
 // Active work first in the filter list
 const STATUS_FILTER_ORDER: ProjectStatus[] = ['in_progress', 'spike', 'planned', 'polishing', 'shipped', 'backlog'];
 
+/** Click switches one value off or on; double-click shows only that value. */
+function makeToggle<T>(all: T[], hidden: T[], setHidden: (next: T[]) => void) {
+  return {
+    onClick: (v: T) =>
+      setHidden(hidden.includes(v) ? hidden.filter((h) => h !== v) : [...hidden, v]),
+    onDoubleClick: (v: T) => {
+      const onlyThis = hidden.length === all.length - 1 && !hidden.includes(v);
+      setHidden(onlyThis ? [] : all.filter((a) => a !== v));
+    },
+  };
+}
+
 export const Sidebar: React.FC<SidebarProps> = ({
   projects,
+  filteredProjects,
   filteredCount,
   totalCount,
   searchQuery,
   setSearchQuery,
-  selectedStatus,
-  setSelectedStatus,
-  selectedPriority,
-  setSelectedPriority,
-  selectedCategory,
-  setSelectedCategory,
+  hiddenStatuses,
+  setHiddenStatuses,
+  hiddenPriorities,
+  setHiddenPriorities,
+  hiddenCategories,
+  setHiddenCategories,
   selectedProjectId,
   onSelectProject,
   isOpenMobile,
@@ -50,57 +64,52 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onExportJson,
   onResetData,
 }) => {
-  const categories = Array.from(new Set(projects.map((p) => p.category)));
+  const categories = Array.from(new Set(projects.map((p) => p.category))).sort();
   const hasActiveFilters =
     searchQuery !== '' ||
-    selectedStatus !== 'all' ||
-    selectedPriority !== 'all' ||
-    selectedCategory !== 'all';
+    hiddenStatuses.length > 0 ||
+    hiddenPriorities.length > 0 ||
+    hiddenCategories.length > 0;
 
+  const statusToggle = makeToggle(STATUS_FILTER_ORDER, hiddenStatuses, setHiddenStatuses);
+  const priorityToggle = makeToggle(PRIORITIES, hiddenPriorities, setHiddenPriorities);
+  const categoryToggle = makeToggle(categories, hiddenCategories, setHiddenCategories);
 
   return (
-    <aside className={`sidebar ${isOpenMobile ? 'open' : ''}`}>
-      {/* Top Heading */}
+    <aside className={`sidebar ${isOpenMobile ? 'open' : ''}`} aria-label="Filters and projects">
       <div className="side-heading">
         <h2>
-          <span>Projects</span>
-          <span className="count-badge">
-            ({filteredCount}{filteredCount !== totalCount ? `/${totalCount}` : ''})
+          Projects
+          <span>
+            {filteredCount !== totalCount ? `${filteredCount} of ${totalCount}` : totalCount}
           </span>
         </h2>
         {hasActiveFilters && (
-          <button
-            onClick={onResetFilters}
-            className="text-[11px] text-[var(--accent)] hover:underline flex items-center gap-1 cursor-pointer"
-            title="Reset filters"
-          >
-            <RotateCcw className="h-3 w-3" />
-            <span>Reset</span>
+          <button onClick={onResetFilters} className="text-button" title="Show everything">
+            Reset
           </button>
         )}
         {isOpenMobile && (
-          <button
-            onClick={onCloseMobile}
-            className="p-1 rounded text-[var(--fg-3)] hover:text-[var(--fg)] md:hidden cursor-pointer"
-          >
+          <button onClick={onCloseMobile} className="icon-button md:hidden" aria-label="Close filters">
             <X className="h-4 w-4" />
           </button>
         )}
       </div>
 
-      {/* Inline Search */}
       <div className="search">
         <Search className="h-3.5 w-3.5 flex-shrink-0" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search projects..."
+          placeholder="Search projects, tech, commands"
+          aria-label="Search projects"
         />
         {searchQuery ? (
           <button
             onClick={() => setSearchQuery('')}
-            className="text-[var(--fg-3)] hover:text-[var(--fg)] cursor-pointer"
+            className="text-[var(--fg-3)] hover:text-[var(--fg)]"
+            aria-label="Clear search"
           >
             <X className="h-3 w-3" />
           </button>
@@ -109,116 +118,66 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
       </div>
 
-      {/* Status Filter (Slopalytics strike/toggle style) */}
-      <div>
-        <div className="filter-section-title">
-          <span>Status</span>
-          {selectedStatus !== 'all' && (
-            <button
-              onClick={() => setSelectedStatus('all')}
-              className="text-[10px] text-[var(--accent)] normal-case cursor-pointer hover:underline"
-            >
-              all
-            </button>
-          )}
+      {/* Status */}
+      <div className="filter-group">
+        <div className="section-head">
+          <h3>Status</h3>
+          <span className="hint">double-click for only</span>
         </div>
-        <div className="flex flex-col gap-1">
+        <div>
           {STATUS_FILTER_ORDER.map((id) => {
-            const st = { id, ...STATUS_META[id] };
-            const isSelected = selectedStatus === st.id;
-            const count = projects.filter((p) => p.status === st.id).length;
+            const shown = !hiddenStatuses.includes(id);
+            const count = projects.filter((p) => p.status === id).length;
             return (
               <button
-                key={st.id}
-                onClick={() =>
-                  setSelectedStatus(selectedStatus === st.id ? 'all' : st.id)
-                }
-                className={`flex items-center justify-between py-1 px-1.5 rounded text-xs transition cursor-pointer ${
-                  isSelected
-                    ? 'text-[var(--fg)] bg-[var(--hover)] font-medium'
-                    : 'text-[var(--fg-2)] hover:text-[var(--fg)] hover:bg-[var(--hover)]'
-                }`}
+                key={id}
+                aria-pressed={shown}
+                onClick={() => statusToggle.onClick(id)}
+                onDoubleClick={() => statusToggle.onDoubleClick(id)}
+                className="model-row"
               >
-                <span className="flex items-center gap-2">
-                  <StatusDot status={st.id} className="w-1.5 h-1.5" />
-                  <span>{st.label}</span>
-                </span>
-                <span className="font-mono text-[11px] text-[var(--fg-3)]">
-                  {count}
-                </span>
+                <StatusDot status={id} className={`w-[7px] h-[7px] ${shown ? '' : 'opacity-30'}`} />
+                <span className="flex-1 truncate">{STATUS_META[id].label}</span>
+                <span className="row-count">{count}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Priority Filter */}
-      <div>
-        <div className="filter-section-title">
-          <span>Priority</span>
-          {selectedPriority !== 'all' && (
-            <button
-              onClick={() => setSelectedPriority('all')}
-              className="text-[10px] text-[var(--accent)] normal-case cursor-pointer hover:underline"
-            >
-              all
-            </button>
-          )}
+      {/* Priority */}
+      <div className="filter-group">
+        <div className="section-head">
+          <h3>Priority</h3>
         </div>
-        <div className="grid grid-cols-4 gap-1">
-          {PRIORITIES.map((p) => {
-            const isSelected = selectedPriority === p;
-            const count = projects.filter((item) => item.priority === p).length;
-            return (
-              <button
-                key={p}
-                onClick={() =>
-                  setSelectedPriority(selectedPriority === p ? 'all' : p)
-                }
-                className={`py-1 text-center font-mono text-xs rounded border transition cursor-pointer ${
-                  isSelected
-                    ? 'border-[var(--accent)] text-[var(--fg)] bg-[var(--hover)] font-bold'
-                    : 'border-[var(--line)] text-[var(--fg-3)] hover:text-[var(--fg)] hover:border-[var(--line-2)]'
-                }`}
-              >
-                {p} <span className="text-[10px] opacity-60">({count})</span>
-              </button>
-            );
-          })}
+        <div className="strike-filter">
+          {PRIORITIES.map((p) => (
+            <button
+              key={p}
+              aria-pressed={!hiddenPriorities.includes(p)}
+              onClick={() => priorityToggle.onClick(p)}
+              onDoubleClick={() => priorityToggle.onDoubleClick(p)}
+              title={`${p} · ${PRIORITY_META[p]}`}
+            >
+              {p}
+              <span className="row-count ml-1">{projects.filter((x) => x.priority === p).length}</span>
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Category / Ecosystem Filter */}
-      <div>
-        <div className="filter-section-title">
-          <span>Category</span>
-          {selectedCategory !== 'all' && (
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className="text-[10px] text-[var(--accent)] normal-case cursor-pointer hover:underline"
-            >
-              all
-            </button>
-          )}
+      {/* Category */}
+      <div className="filter-group">
+        <div className="section-head">
+          <h3>Category</h3>
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={`filter-pill cursor-pointer ${
-              selectedCategory === 'all' ? 'active' : ''
-            }`}
-          >
-            All
-          </button>
+        <div className="strike-filter">
           {categories.map((cat) => (
             <button
               key={cat}
-              onClick={() =>
-                setSelectedCategory(selectedCategory === cat ? 'all' : cat)
-              }
-              className={`filter-pill cursor-pointer ${
-                selectedCategory === cat ? 'active' : ''
-              }`}
+              aria-pressed={!hiddenCategories.includes(cat)}
+              onClick={() => categoryToggle.onClick(cat)}
+              onDoubleClick={() => categoryToggle.onDoubleClick(cat)}
             >
               {cat}
             </button>
@@ -226,51 +185,55 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Quick Switcher / Project Rows */}
-      <div className="flex-1 min-h-0 flex flex-col pt-2 border-t border-[var(--line)]">
-        <div className="filter-section-title mb-2">
-          <span>Quick Directory</span>
-          <span className="font-mono text-[10px] text-[var(--fg-3)]">
-            {projects.length}
-          </span>
+      {/* Directory, following the filters above */}
+      <div className="filter-group directory">
+        <div className="section-head">
+          <h3>Directory</h3>
+          <span className="row-count">{filteredProjects.length}</span>
         </div>
-        <div className="flex flex-col gap-0.5 overflow-y-auto pr-1">
-          {projects.map((proj) => {
-            const { done: completed, total } = progressOf(proj);
-            const isSelected = selectedProjectId === proj.id;
-
-            return (
-              <button
-                key={proj.id}
-                onClick={() => onSelectProject(proj)}
-                className={`project-row cursor-pointer ${
-                  isSelected ? 'active' : ''
-                }`}
-                title={`${proj.title}: ${proj.subtitle}`}
-              >
-                <StatusDot status={proj.status} className="project-dot" />
-                <span className="truncate flex-1 font-medium">{proj.title}</span>
-                <span className="font-mono text-[10px] text-[var(--fg-3)]">
-                  {completed}/{total}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        {filteredProjects.length === 0 ? (
+          <p className="side-note">
+            Nothing matches.{' '}
+            <button className="text-button" onClick={onResetFilters}>
+              Reset filters
+            </button>
+          </p>
+        ) : (
+          <div>
+            {filteredProjects.map((proj) => {
+              const { done, total, pct } = progressOf(proj);
+              const isSelected = selectedProjectId === proj.id;
+              return (
+                <button
+                  key={proj.id}
+                  onClick={() => onSelectProject(proj)}
+                  aria-pressed={isSelected}
+                  className="model-row directory-row"
+                  title={`${proj.title}: ${proj.subtitle}`}
+                >
+                  <StatusDot status={proj.status} className="w-[7px] h-[7px]" />
+                  <span className="flex-1 truncate">{proj.title}</span>
+                  <span className="row-count">
+                    {done}/{total}
+                  </span>
+                  <span
+                    className="row-bar"
+                    style={{ width: `${pct}%`, background: STATUS_META[proj.status].color }}
+                    aria-hidden="true"
+                  />
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Data actions (phones only; on larger screens they live in the header) */}
-      <div className="md:hidden flex gap-2 pt-2 border-t border-[var(--line)]">
-        <button
-          onClick={onExportJson}
-          className="flex-1 py-2.5 rounded-md border border-[var(--line)] text-xs text-[var(--fg-2)] text-center"
-        >
+      <div className="md:hidden flex gap-5 pt-3 border-t border-[var(--line)]">
+        <button onClick={onExportJson} className="text-button">
           Export JSON
         </button>
-        <button
-          onClick={onResetData}
-          className="flex-1 py-2.5 rounded-md border border-[var(--line)] text-xs text-[var(--fg-2)] text-center"
-        >
+        <button onClick={onResetData} className="text-button !text-[var(--fg-3)]">
           Reset data
         </button>
       </div>

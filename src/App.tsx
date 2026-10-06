@@ -41,9 +41,10 @@ export function App() {
   const [activeSection, setActiveSection] = useState<'vault' | 'roadmap' | 'analytics' | 'usage'>('vault');
   const [viewMode, setViewMode] = useState<'board' | 'table'>('board');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedStatus, setSelectedStatus] = useState('all');
-  const [selectedPriority, setSelectedPriority] = useState('all');
+  // Filters list what is switched off, so new categories show up by default
+  const [hiddenStatuses, setHiddenStatuses] = useState<ProjectStatus[]>([]);
+  const [hiddenPriorities, setHiddenPriorities] = useState<PriorityLevel[]>([]);
+  const [hiddenCategories, setHiddenCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'priority' | 'status' | 'title' | 'progress' | 'updated'>('priority');
 
   const [selectedProject, setSelectedProject] = useState<ProjectIdea | null>(null);
@@ -127,14 +128,9 @@ export function App() {
   // Filter and sort projects
   const filteredProjects = projects
     .filter((project) => {
-      const matchesCategory =
-        selectedCategory === 'all' || project.category === selectedCategory;
-
-      const matchesStatus =
-        selectedStatus === 'all' || project.status === selectedStatus;
-
-      const matchesPriority =
-        selectedPriority === 'all' || project.priority === selectedPriority;
+      const matchesCategory = !hiddenCategories.includes(project.category);
+      const matchesStatus = !hiddenStatuses.includes(project.status);
+      const matchesPriority = !hiddenPriorities.includes(project.priority);
 
       const q = searchQuery.toLowerCase().trim();
       const matchesQuery =
@@ -225,17 +221,14 @@ export function App() {
     if (confirm('Reset idea bank back to default initial context?')) {
       setProjects(INITIAL_PROJECTS);
       localStorage.removeItem(STORAGE_KEY);
-      setSelectedCategory('all');
-      setSelectedStatus('all');
-      setSelectedPriority('all');
-      setSearchQuery('');
+      handleResetFilters();
     }
   };
 
   const handleResetFilters = () => {
-    setSelectedCategory('all');
-    setSelectedStatus('all');
-    setSelectedPriority('all');
+    setHiddenCategories([]);
+    setHiddenStatuses([]);
+    setHiddenPriorities([]);
     setSearchQuery('');
   };
 
@@ -317,12 +310,13 @@ export function App() {
           totalCount={projects.length}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          selectedStatus={selectedStatus}
-          setSelectedStatus={setSelectedStatus}
-          selectedPriority={selectedPriority}
-          setSelectedPriority={setSelectedPriority}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
+          filteredProjects={filteredProjects}
+          hiddenStatuses={hiddenStatuses}
+          setHiddenStatuses={setHiddenStatuses}
+          hiddenPriorities={hiddenPriorities}
+          setHiddenPriorities={setHiddenPriorities}
+          hiddenCategories={hiddenCategories}
+          setHiddenCategories={setHiddenCategories}
           selectedProjectId={selectedProject?.id || null}
           onSelectProject={setSelectedProject}
           isOpenMobile={isMobileSidebarOpen}
