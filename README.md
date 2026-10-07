@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 <a href="https://rvyyv-n.github.io/banker/">
   <img src="icon.svg" alt="Banker icon" width="96" height="96" />
@@ -10,7 +10,7 @@
 
 A local-first developer workbench for tracking software tools, technical specifications, and roadmap milestones.
 
-[**Open the app**](https://rvyyv-n.github.io/banker/) â€¢ [GitHub](https://github.com/rvyyv-n/banker) â€¢ [License: MIT](LICENSE)
+[**Open the app**](https://rvyyv-n.github.io/banker/) • [GitHub](https://github.com/rvyyv-n/banker) • [License: MIT](LICENSE)
 
 </div>
 
@@ -300,4 +300,4 @@ and publishes the static bundle directly to GitHub Pages.
 
 ## License
 
-[MIT](LICENSE) Â© rvyyv-n
+[MIT](LICENSE) © rvyyv-n
