@@ -143,7 +143,11 @@ list of cards, and filters open as a full-screen sheet. Tap targets are at least
   </a>
   &nbsp;
   <a href="https://rvyyv-n.github.io/banker/">
-    <img src="screenshots/banker-mobile-usage.png" alt="Banker mobile usage page" width="48%" />
+    <img src="screenshots/banker-mobile-usage.png" alt="Banker mobile usage in OLED dark mode" width="48%" />
+  </a>
+  &nbsp;
+  <a href="https://rvyyv-n.github.io/banker/">
+    <img src="screenshots/banker-mobile-usage-light.png" alt="Banker mobile usage in light mode" width="48%" />
   </a>
 </p>
 

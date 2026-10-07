@@ -128,7 +128,7 @@ async function capture() {
     fs.copyFileSync(mobileDarkPath, path.join(OUT_DIR, 'banker-mobile.png'));
     console.log('Captured banker-mobile-dark.png');
 
-    // 8. Mobile usage page, then mobile light board
+    // 8. Mobile usage page, then mobile light board, then mobile light usage
     const navButtons = await page.$$('.mobile-nav button');
     await navButtons[3].click();
     await new Promise(r => setTimeout(r, 800));
@@ -142,6 +142,12 @@ async function capture() {
     const mobileLightPath = path.join(OUT_DIR, 'banker-mobile-light.png');
     await page.screenshot({ path: mobileLightPath });
     console.log('Captured banker-mobile-light.png');
+
+    await navButtons[3].click();
+    await new Promise(r => setTimeout(r, 800));
+    const mobileUsageLightPath = path.join(OUT_DIR, 'banker-mobile-usage-light.png');
+    await page.screenshot({ path: mobileUsageLightPath });
+    console.log('Captured banker-mobile-usage-light.png');
 
   } catch (err) {
     console.error('Error during capture:', err);
