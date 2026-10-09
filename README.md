@@ -10,7 +10,7 @@
 
 A local-first developer workbench for tracking software tools, technical specifications, and roadmap milestones.
 
-[**Open the app**](https://rvyyv-n.github.io/banker/) • [GitHub](https://github.com/rvyyv-n/banker) • [License: MIT](LICENSE)
+[**Open the app**](https://rvyyv-n.github.io/banker/) &bull; [GitHub](https://github.com/rvyyv-n/banker) &bull; [License: MIT](LICENSE)
 
 </div>
 
@@ -300,7 +300,7 @@ system temp folder.
 
 | Key                | Action                              |
 | ------------------ | ----------------------------------- |
-| <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>K</kbd> | Open the command palette |
+| <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>K</kbd> | Open the command palette |
 | <kbd>N</kbd>       | Open the new project modal          |
 | <kbd>T</kbd>       | Toggle between OLED dark and light  |
 | <kbd>/</kbd>       | Focus the search filter             |
@@ -320,4 +320,4 @@ and publishes the static bundle directly to GitHub Pages.
 
 ## License
 
-[MIT](LICENSE) © rvyyv-n
+[MIT](LICENSE) &copy; rvyyv-n
