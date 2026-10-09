@@ -27,6 +27,7 @@ A local-first developer workbench for tracking software tools, technical specifi
 - [Privacy and storage](#privacy-and-storage)
 - [How it's built](#how-its-built)
 - [Development](#development)
+- [Deployment](#deployment)
 - [License](#license)
 
 ## What it does
@@ -94,6 +95,15 @@ progress, repo details and activity beside it.
 
 <a href="https://rvyyv-n.github.io/banker/">
   <img src="screenshots/banker-project-page.png" alt="Banker project page" width="100%" />
+</a>
+
+### Roadmap
+
+A four-phase execution timeline that groups every project by stage, so you can see
+what is queued, underway and done at a glance.
+
+<a href="https://rvyyv-n.github.io/banker/">
+  <img src="screenshots/banker-roadmap.png" alt="Banker Roadmap view" width="100%" />
 </a>
 
 ### Analytics
@@ -219,6 +229,7 @@ Built with React 19, TypeScript, and Vite with Tailwind CSS v4.
 icon.svg                  clean vector mark for repository and documentation
 icon.png                  512x512 high-resolution app icon
 src/
+  main.tsx                entry point
   App.tsx                 app shell, theme provider, and view orchestrator
   types.ts                typed project schema, status enums, and milestones
   index.css               pure OLED dark (#000000) and paper light CSS tokens
@@ -230,7 +241,11 @@ src/
     usage.ts              usage types, providers and sample data
   components/
     Header.tsx            Slopalytics-style navigation header with section & view tabs
+    CommandPalette.tsx    Ctrl+K palette to jump to a project, view or action
     Sidebar.tsx           Slopalytics-style filter sidebar with status, priority, and quick directory
+    TechIcons.tsx         technology icons from simple-icons
+    InlineText.tsx        click-to-edit text fields
+    ui.tsx                small shared interface pieces
     BankerLogo.tsx        three stacked ledger bars mark
     MobileNav.tsx         bottom tab bar for phones
     UsageView.tsx         token usage by model, harness and project
@@ -285,6 +300,7 @@ system temp folder.
 
 | Key                | Action                              |
 | ------------------ | ----------------------------------- |
+| <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>K</kbd> | Open the command palette |
 | <kbd>N</kbd>       | Open the new project modal          |
 | <kbd>T</kbd>       | Toggle between OLED dark and light  |
 | <kbd>/</kbd>       | Focus the search filter             |
