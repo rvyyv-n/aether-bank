@@ -333,7 +333,6 @@ export const INITIAL_PROJECTS: ProjectIdea[] = [
       { id: 'bk6', text: 'Deploy production static site to GitHub Pages', completed: true }
     ],
     upstreamRefs: [
-      { name: 'GitHub Pages Live', url: 'https://rvyyv-n.github.io/banker/' },
       { name: 'GitHub Repo', url: 'https://github.com/rvyyv-n/banker' }
     ],
     commands: [

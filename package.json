@@ -37,7 +37,6 @@
     "vite": "^8.3.0"
   },
   "description": "Minimal local-first developer project and idea vault.",
-  "homepage": "https://rvyyv-n.github.io/banker/",
   "repository": {
     "type": "git",
     "url": "https://github.com/rvyyv-n/banker.git"
